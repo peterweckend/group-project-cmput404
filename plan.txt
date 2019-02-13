@@ -5,10 +5,13 @@ Enforce HTTP Basic Auth
 Restfl API
 Friend reqeusts
 
+Workflow:
+Ensure each of us has our own working branch
+Only merge with master when we know it wont fudge anything up
+
 first steps:
 probably make our website template
 this way we can each work on different sections independent from one another
 make upload, submission pages, or would these be popouts with javascript?
 trello board to manage work section, who's working on what
 design mockups will need to be made at one point, not for marks but for our own sanity
-
