@@ -1,0 +1,11 @@
+Probably use Django
+Front end/UI probably least important, can be saved till later
+How can we split the work up?
+Enforce HTTP Basic Auth
+Restfl API
+Friend reqeusts
+
+first steps:
+probably make our website template
+make upload, submission pages, or would these be popouts with javascript?
+
