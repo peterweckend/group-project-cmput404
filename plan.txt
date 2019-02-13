@@ -8,6 +8,7 @@ Friend reqeusts
 Workflow:
 Ensure each of us has our own working branch
 Only merge with master when we know it wont fudge anything up
+we should probably make some unit tests for our program tbh
 
 first steps:
 probably make our website template
