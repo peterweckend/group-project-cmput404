@@ -1,0 +1,1 @@
+web: cd backend && gunicorn project404_t8.wsgi
