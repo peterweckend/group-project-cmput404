@@ -16,3 +16,9 @@ this way we can each work on different sections independent from one another
 make upload, submission pages, or would these be popouts with javascript?
 trello board to manage work section, who's working on what
 design mockups will need to be made at one point, not for marks but for our own sanity
+
+Feb 22:
+Made Heroku,
+Going to do vue front end,
+Can split up tasks and each person does front end and back end for their tasks?
+We should make mockups - we'll take some topics each and make mockups for them
