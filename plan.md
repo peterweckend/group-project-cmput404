@@ -3,12 +3,11 @@
 # Using the environment: 
 ## To set up your environment (Do this if its the first time you work on the project or when the requirements.txt file changes):
 
-1. Open terminal in the top level of the repo (same place as where README.md is)
+1. Open terminal in the top level of the repo (at root, where README.md is)
 2. run `virtualenv venv --python=python3`
 3. run `source venv/bin/activate`
-4. Open terminal in the same place as requirements.txt (in the backend folder)
-5. run `pip install -r requirements.txt` 
-6. You shouldn't have received any errors after installing the requirements. You should be good to go. Make sure you don't commit your personal virtual environment to github
+4. run `pip install -r requirements.txt` 
+5. You shouldn't have received any errors after installing the requirements. You should be good to go. Make sure you don't commit your personal virtual environment to github
 
 ## Every time you develop
 
@@ -42,5 +41,5 @@ Made Heroku,
 Going to do vue front end,
 Can split up tasks and each person does front end and back end for their tasks?
 We should make mockups - we'll take some topics each and make mockups for them
-
+Ben making mockups, app should be deployed in heroku
 
