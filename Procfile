@@ -1,1 +1,1 @@
-web: pwd && cd backend/project404_t8 && gunicorn project404_t8.wsgi.py
+web: pwd && cd backend/project404_t8 && gunicorn project404_t8.wsgi
