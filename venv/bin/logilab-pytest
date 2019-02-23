@@ -1,7 +1,0 @@
-#!/home/student/Documents/group-project-cmput404/venv/bin/python3
-
-import warnings
-warnings.simplefilter('default', DeprecationWarning)
-
-from logilab.common.pytest import run
-run()
