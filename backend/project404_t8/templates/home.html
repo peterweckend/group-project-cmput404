@@ -5,9 +5,15 @@
 
 {% block content %}
 {% if user.is_authenticated %}
+{% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'home/home.css' %}">
+
   Hi {{ user.username }}!
   <p><a href="{% url 'logout' %}">logout</a></p>
 {% else %}
+{% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
+
   <p>You are not logged in</p>
   <a href="{% url 'login' %}">login</a>
 {% endif %}
