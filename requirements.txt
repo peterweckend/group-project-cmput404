@@ -56,3 +56,12 @@ urllib3==1.24.1
 virtualenv==15.1.0
 whitenoise==4.1.2
 wrapt==1.9.0
+coverage==4.5.2
+django-cors-headers==2.4.0
+django-tastypie==0.14.2
+django-webpack-loader==0.6.0
+djangorestframework==3.9.1
+pkg-resources==0.0.0
+python-dateutil==2.8.0
+python-mimeparse==1.6.0
+six==1.12.0
