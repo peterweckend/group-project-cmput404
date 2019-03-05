@@ -3,4 +3,4 @@ from API.viewsets import PostViewSet
 
 router = routers.DefaultRouter()
 
-router.register(r’API’, PostViewSet)
+router.register(r'API', PostViewSet)
