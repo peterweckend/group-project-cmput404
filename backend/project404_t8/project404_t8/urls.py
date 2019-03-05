@@ -18,7 +18,8 @@ from django.urls import path, include
 from django.views.generic.base import TemplateView # new
 from django.conf.urls import url, include
 from .router import router
-from API import urls
+# from API import urls
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
