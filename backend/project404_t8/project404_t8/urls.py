@@ -16,14 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic.base import TemplateView # new
-from API.resources import PostResource
 from django.conf.urls import url, include
-
-post_resource = PostResource()
-
+from .router import router
+from API import urls
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('', TemplateView.as_view(template_name='home.html'), name='home'), # new
-    url(r'^API/', include(post_resource.urls)),
+    url(r'^API/', include(router.urls)),
 ]
