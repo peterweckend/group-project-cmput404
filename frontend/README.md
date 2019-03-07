@@ -5,7 +5,7 @@
 ## Build Setup
 
 ``` bash
-# install dependencies
+# install dependencies, vue-cli, js-cookie, vuex
 npm install
 
 # serve with hot reload at localhost:8080
