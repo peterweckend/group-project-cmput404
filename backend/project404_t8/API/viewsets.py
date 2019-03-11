@@ -20,7 +20,7 @@ class PostViewSet(viewsets.ModelViewSet):
     #     queryset = Posts.objects.all()
     #     serializer = PostsSerializer(queryset, many=True)
     #     return Response(serializer.data)
-    #
+    
     # elif request.method == 'POST':
     #     serializer = PostsSerializer(data=request.data)
     #     if serializer.is_valid():
