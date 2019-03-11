@@ -124,7 +124,7 @@ STATIC_URL = '/static/'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 
-# Configure Django App for Heroku.
-django_heroku.settings(locals(), test_runner=False)
+if '/app' in os.environ['HOME']:
+    django_heroku.settings(locals())
 
-django_heroku.settings(locals()) # bottom of the file
+# django_heroku.settings(locals()) # bottom of the file
