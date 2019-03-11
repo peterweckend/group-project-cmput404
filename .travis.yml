@@ -5,5 +5,9 @@ python:
 install:
   - pip install -r requirements.txt
 # command to run tests
-# script:
-#   - pytest
+script:
+  - cd backend/
+  - cd connectify/
+  - python manage.py test API
+notifications:
+  slack: 404cmput:IggvlyVpLl4wrzVWpIGZGl9A
