@@ -3,10 +3,8 @@ python:
   - "3.6"
 install:
   - pip install -r requirements.txt
-# command to run tests
-# script:
-#   - pytest
-script:
+  - import os
+script: # command to run tests
   - cd backend/
   - python project404_t8/manage.py test API
 notifications:
