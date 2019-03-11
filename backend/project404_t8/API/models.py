@@ -1,5 +1,5 @@
 from django.db import models
-
+from datetime import datetime
 
 
 
@@ -47,17 +47,18 @@ class Comment(models.Model):
     id = models.AutoField(primary_key=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Posts, on_delete=models.CASCADE)
+    datetime = models.DateTimeField(default=datetime.now, blank=True)
 
     def __str__(self):
-            return '%s %s %s' % (self.id, self.author, self.post)
+            return '%s %s %s %s' % (self.id, self.author, self.post, self.datetime)
 
 
 # This is when you befriend someone and they befriend you
 # (Friend another author and they accept the friend request)
 # When the friend request is accepted, the corresponding Follow model is deleted
 class Friendship(models.Model):
-    friend_a = models.ForeignKey(User, related_name="friend_as", on_delete=models.CASCADE)
-    friend_b = models.ForeignKey(User, related_name="friend_bs", on_delete=models.CASCADE)
+    friend_a = models.ForeignKey(User, related_name="friend_a_set", on_delete=models.CASCADE)
+    friend_b = models.ForeignKey(User, related_name="friend_b_set", on_delete=models.CASCADE)
 
     def __str__(self):
         return '%s %s' % (self.friend_a, self.friend_b)

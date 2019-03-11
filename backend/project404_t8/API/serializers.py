@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Posts, User, Comment, Friendship, Follow, Server
+# REST API Serializer JSON https://www.youtube.com/watch?v=V4NjlXiu5WI
 
 
 
