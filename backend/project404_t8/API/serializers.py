@@ -24,6 +24,7 @@ class PostsSerializer(serializers.ModelSerializer):
     # is_markdown = serializers.BooleanField()
     class Meta:
         model = Posts
+        fields =('__all__')
 
 
 class CommentSerializer(serializers.ModelSerializer):
