@@ -12,6 +12,7 @@
 ## Every time you develop
 
 1. Activate the virtual environment
+2. run `python manage.py migrate` from the same location as manage.py, if the database has changed
 
 
 ---
