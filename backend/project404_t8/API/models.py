@@ -13,7 +13,7 @@ class User(models.Model):
         return '%s' % (self.id)
 
 
-class Posts(models.Model):
+class Post(models.Model):
 
     PRIVACYCHOICE = (
         ('1', 'me'),
@@ -46,7 +46,7 @@ class Posts(models.Model):
 class Comment(models.Model):
     id = models.AutoField(primary_key=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey(Posts, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
     datetime = models.DateTimeField(default=datetime.now, blank=True)
 
     def __str__(self):
