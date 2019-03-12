@@ -15,7 +15,7 @@
     The user should be able to select privacy from a radio selector
     The user should have a submit button to submit -->
 <h1>Create a post</h1>
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Create Post">

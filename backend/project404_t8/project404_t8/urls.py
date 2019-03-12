@@ -19,6 +19,9 @@ from django.views.generic.base import TemplateView # new
 from django.conf.urls import url, include
 from .router import router
 from rest_framework.authtoken import views
+from django.conf.urls.static import static
+from django.conf import settings
+
 # from .views import *
 
 from API import urls
@@ -33,4 +36,4 @@ urlpatterns = [
     url(r'^',include('API.urls')), 
     # path("upload/", uploadView, name="upload"),
     # path('api-token-auth/', views.obtain_auth_token, name='api-token-auth'),
-]
+] #+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
