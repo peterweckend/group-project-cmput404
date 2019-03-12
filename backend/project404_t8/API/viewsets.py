@@ -72,13 +72,45 @@ class ServerViewSet(viewsets.ModelViewSet):
 
 def uploadView(request):
     # if this is a POST request we need to process the form data
+    # So if we wanted to get even more fancy too, ajax could post to this itself and we
+    # wouldnt require another page, but lets just take babysteps for now
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = uploadForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
-            # Here is 
+            # So models could just expect a dictionary of these values
+            # How do we know what user is posting the data?
+            # something like this: request.user.id 
+            # Probably just add that to the form.cleaned_data dictionary
+            
+            newPost = form.cleaned_data
+            print(newPost)
+            print(request.FILES)
+            # Don't do anything if no image is uploaded
+            newPost["image"] = None
+            if request.FILES != {}:
+                newPost["image"] = request.FILES["image"]
+
+            # If shared author isn't input then convert it to None/null for now 
+            if newPost["sharedAuthor"] == "":
+                newPost["sharedAuthor"] = None
+
+            newPost = Post(
+                id = request.user.id,
+                title = newPost["title"],
+                body = newPost["body"],
+                image_link = newPost["imageLink"],
+                uploaded_image = newPost["image"],
+                privacy_setting = newPost["privacy"],
+                shared_author = newPost["sharedAuthor"],
+                is_markdown = newPost["markdown"]
+            )
+
+            print(newPost)
+            newPost.save()
+            
             # redirect to a new URL:
             return HttpResponseRedirect('/')
 
