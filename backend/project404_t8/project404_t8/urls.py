@@ -27,10 +27,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('', TemplateView.as_view(template_name='home.html'), name='home'), # new
-    path('api/', include('API.urls')),
-    path('api/', include(router.urls)), # do we take out this
-    url(r'^', include(router.urls)),    # or this one?
-    # url(r'^',include('API.urls')), 
+    # path('api/', include('API.urls')),
+    # path('api/', include(router.urls)),
+    url(r'^', include(router.urls)),
+    url(r'^',include('API.urls')), 
     # path("upload/", uploadView, name="upload"),
     # path('api-token-auth/', views.obtain_auth_token, name='api-token-auth'),
 ]
