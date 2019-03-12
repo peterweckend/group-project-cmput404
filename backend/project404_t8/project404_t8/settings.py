@@ -123,4 +123,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
-django_heroku.settings(locals()) # bottom of the file
+
+if '/app' in os.environ['HOME']:
+    django_heroku.settings(locals())
+
+# django_heroku.settings(locals()) # bottom of the file

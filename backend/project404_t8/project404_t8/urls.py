@@ -18,11 +18,15 @@ from django.urls import path, include
 from django.views.generic.base import TemplateView # new
 from django.conf.urls import url, include
 from .router import router
-# from API import urls
+# from .views import *
+
+from API import urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('', TemplateView.as_view(template_name='home.html'), name='home'), # new
-    url(r'^API/', include(router.urls)),
+    # path("upload/", uploadView, name="upload"),
+    url(r'^', include(router.urls)),
+    url(r'^',include('API.urls'))
 ]

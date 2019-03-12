@@ -1,7 +1,10 @@
 from django.shortcuts import render
 from rest_framework import generics,status,viewsets
-from .models import Post
-from .serializers import PostSerializer
+from .models import Posts
+from .serializers import PostsSerializer
+from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import render
+from .forms import uploadForm
 # from rest_framework.decorators import api_view
 # from rest_framework.response import Response
 # from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -27,3 +30,22 @@ class PostViewSet(viewsets.ModelViewSet):
     #         serializer.save()
     #         return Response(serializer.data, status=status.HTTP_201_CREATED)
     #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+def uploadView(request):
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = uploadForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            # Here is 
+            # redirect to a new URL:
+            return HttpResponseRedirect('/')
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = uploadForm()
+
+    return render(request, 'upload/upload.html', {'form': form})
