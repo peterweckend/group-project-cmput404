@@ -5,7 +5,6 @@ install:
   - pip install -r requirements.txt
 script: # command to run tests
   - cd backend/
-  - python project404_t8/manage.py migrate
   - python project404_t8/manage.py test API
 notifications:
   slack: 404cmput:IggvlyVpLl4wrzVWpIGZGl9A
