@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics,status,viewsets
-from .models import Posts
-from .serializers import PostsSerializer
+from .models import Post
+from .serializers import PostSerializer
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from .forms import uploadForm
