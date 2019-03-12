@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'API',
-    'rest_framework'
+    'rest_framework',
+    'rest_framework.authtoken'
 ]
 
 MIDDLEWARE = [
@@ -71,7 +72,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'project404_t8.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
