@@ -82,11 +82,14 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',
-    )
-}
+
+# Rest framework, comment this out if you want to see the default view thingy
+# REST_FRAMEWORK = {
+#     'DEFAULT_RENDERER_CLASSES': (
+#         'rest_framework.renderers.JSONRenderer',
+#     )
+# }
+
 # Media
 MEDIA_URL = "/media/"
 # MEDIA_ROOT = os.path.join(BASE_DIR,'media')
