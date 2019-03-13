@@ -37,3 +37,7 @@ urlpatterns = [
     # path("upload/", uploadView, name="upload"),
     # path('api-token-auth/', views.obtain_auth_token, name='api-token-auth'),
 ] #+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

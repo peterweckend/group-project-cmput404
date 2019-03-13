@@ -19,8 +19,7 @@ class uploadForm(forms.Form):
     title = forms.CharField(label='Title', max_length=24)
     body = forms.CharField(label='Body', max_length=100, required = False)
     markdown = forms.BooleanField(required = False)
-    image = forms.ImageField(label="Image",required = False)
-    imageLink = forms.CharField(label='Image Link', max_length=100, required = False)
+    imageLink = forms.ImageField(label="Image",required = False)
     privacy = forms.CharField(label='Privacy', widget=forms.Select(choices=privacyOptions))
     # If we wanted to get fancy, this could autofill from the user's friends
     sharedAuthor = forms.CharField(label='Shared Author', required = False)
