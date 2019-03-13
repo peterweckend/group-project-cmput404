@@ -27,8 +27,7 @@ class Post(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=250)
     body = models.TextField()
-    image_link = models.TextField(blank=True, null=True) # As an author, posts I create can link to images.
-    uploaded_image = models.FileField(upload_to='uploadedImages/%Y/%m/%d', blank=True, null=True)
+    image_link = models.FileField(blank=True, null=True) # As an author, posts I create can link to images.
     privacy_setting = models.CharField(max_length=1, choices=PRIVACYCHOICE, default='1')
 
     # This is null if privacy_setting != 2. Specifies the ID of the shared author.
