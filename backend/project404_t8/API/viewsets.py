@@ -110,9 +110,10 @@ def uploadView(request):
 
             print(newPost)
             newPost.save()
-            
+            id = newPost.id
+
             # redirect to a new URL:
-            return HttpResponseRedirect('/')
+            return HttpResponseRedirect('/post/%s' %id)
 
     # if a GET (or any other method) we'll create a blank form
     else:
@@ -125,7 +126,11 @@ def postView(request, id):
     # This is our post object with the given ID
     post = get_object_or_404(Post, pk=id) #pk is primary key
 
-    # Get relevant information
+    # We could check to see if the user has permission to view this post in here
+    # Based on the privacy setting etc.
+    imageExists = False
+    if post.image_link != "":
+        imageExists = True
     
 
-    return render(request, 'post/post.html', {"post":post})
+    return render(request, 'post/post.html', {"post":post, "imageExists":imageExists})
