@@ -4,11 +4,47 @@
 <head>
   <meta charset="utf-8">
   <title>{% block title %}Django Auth Tutorial{% endblock %}</title>
+  {% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
+<header>
+    <div class="container">
+      <h1 class="logo">
+          <!-- <img src="" alt="logo" > -->
+        <img src="{% static 'img/logo.svg' %}" alt="logo" width=150px height=40px>
+      </h1>
+
+      <nav>
+        <ul>
+          <li><a href="#">Home</a></li>
+          <li><a href="#">Me</a></li>
+          <li><a href="#">Friends</a></li>
+          <li><a href="#">RUNESCAPE</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
 <body>
   <main>
-    {% block content %}
-    {% endblock %}
+    <div class="grid-container">
+     
+      <div class="item2">Menu</div>
+
+      <div class="item3">
+        {% block content %}
+            Main 
+        {% endblock %}
+      </div>
+      <div class="item4">Right</div>
+      <div class="item5">Footer</div>
+    </div>
+      
+
+ 
+
   </main>
 </body>
 </html>

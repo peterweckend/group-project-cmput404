@@ -6,9 +6,11 @@
 {% block content %}
 {% if user.is_authenticated %}
 {% load static %}
-  <link rel="stylesheet" type="text/css" href="{% static 'home/home.css' %}">
 
-  Hi {{ user.username }}!
+  <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
+  
+  <p>Hi {{ user.username }}!</p>
+
   <p><a href="{% url 'logout' %}">logout</a></p>
   <p><a href="upload/">Create a post</a></p>
 {% else %}
