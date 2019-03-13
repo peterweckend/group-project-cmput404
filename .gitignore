@@ -155,3 +155,12 @@ node_modules
 # Gradle
 .idea/**/gradle.xml
 .idea/**/libraries
+
+# Database
+backend/project404_t8/db.sqlite3
+
+# Uploaded media files
+backend/project404_t8/media
+
+# Migrations
+backend/project404_t8/API/migrations

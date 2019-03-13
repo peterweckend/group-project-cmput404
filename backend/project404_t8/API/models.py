@@ -13,7 +13,7 @@ class User(models.Model):
         return '%s' % (self.id)
 
 
-class Posts(models.Model):
+class Post(models.Model):
 
     PRIVACYCHOICE = (
         ('1', 'me'),
@@ -28,7 +28,7 @@ class Posts(models.Model):
     title = models.CharField(max_length=250)
     body = models.TextField()
     image_link = models.TextField(blank=True, null=True) # As an author, posts I create can link to images.
-
+    uploaded_image = models.FileField(upload_to='uploadedImages/%Y/%m/%d', blank=True, null=True)
     privacy_setting = models.CharField(max_length=1, choices=PRIVACYCHOICE, default='1')
 
     # This is null if privacy_setting != 2. Specifies the ID of the shared author.
@@ -46,7 +46,7 @@ class Posts(models.Model):
 class Comment(models.Model):
     id = models.AutoField(primary_key=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey(Posts, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
     datetime = models.DateTimeField(default=datetime.now, blank=True)
 
     def __str__(self):

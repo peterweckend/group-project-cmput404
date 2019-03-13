@@ -2,8 +2,8 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APITestCase, APIClient
 from rest_framework.views import status
-from .models import Posts
-from .serializers import PostsSerializer
+from .models import Post
+from .serializers import PostSerializer
 # Create your tests here.
 
 class postTestCase(APITestCase):
@@ -12,7 +12,7 @@ class postTestCase(APITestCase):
     @staticmethod
     def create_post(title="", body=""):
         if title != "" and body != "":
-            Posts.objects.create(title=title, body=body)
+            Post.objects.create(title=title, body=body)
 
     def setUp(self):
         # add test data
