@@ -89,20 +89,19 @@ def uploadView(request):
             print(newPost)
             print(request.FILES)
             # Don't do anything if no image is uploaded
-            newPost["image"] = None
+            newPost["imageLink"] = None
             if request.FILES != {}:
-                newPost["image"] = request.FILES["image"]
+                newPost["imageLink"] = request.FILES["imageLink"]
 
             # If shared author isn't input then convert it to None/null for now 
             if newPost["sharedAuthor"] == "":
                 newPost["sharedAuthor"] = None
 
             newPost = Post(
-                id = request.user.id,
+                # id = request.user.id,
                 title = newPost["title"],
                 body = newPost["body"],
                 image_link = newPost["imageLink"],
-                uploaded_image = newPost["image"],
                 privacy_setting = newPost["privacy"],
                 shared_author = newPost["sharedAuthor"],
                 is_markdown = newPost["markdown"]
