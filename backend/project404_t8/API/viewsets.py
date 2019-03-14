@@ -6,7 +6,7 @@ from .models import Post, Comment, Friendship, Follow, Server
 from .serializers import UserSerializer, PostSerializer, CommentSerializer, FriendshipSerializer, FollowSerializer, ServerSerializer
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
-from .forms import uploadForm
+from .forms import uploadForm, friendRequestForm
 from django.conf import settings
 from users.models import CustomUser
 
@@ -21,7 +21,9 @@ from users.models import CustomUser
 # Create your views here.
 #@api_view(['GET','POST'])
 
-# class UserViewSet(viewsets.ViewSet): #this makes it so when you go to localhost/user/, you can't post
+# this makes it so when you go to localhost/user/, you can't post
+# class UserViewSet(viewsets.ViewSet): 
+# 
 #     def list(self, request):
 #         queryset = User.objects.all()
 #         serializer = UserSerializer(queryset, many=True)
@@ -125,14 +127,72 @@ def uploadView(request):
 
 def postView(request, id):
 
-    # This is our post object with the given ID
-    post = get_object_or_404(Post, pk=id) #pk is primary key
-
     # We could check to see if the user has permission to view this post in here
     # Based on the privacy setting etc.
+
+
+    # This is our post object with the given ID
+    # If the post doesn't exist it instantly 404's
+    # This way we won't have to do any taxing database math
+    post = get_object_or_404(Post, pk=id) #pk is primary key
+    
+    # Do not display an image if the image does not exist
     imageExists = False
     if post.image_link != "":
         imageExists = True
     
+    
+    # Perform privacy calculations
+    # Has permission will be passed in
+    # If its False we could either display a 404 or a "you do not have permission"
+    hasPermission = False
+    
+    # ('1', 'me'),
+    if post.privacy_setting == 1:
+        if request.user.id == post.author:
+            hasPermission = True
+
+    # ('2', 'another author'),
+    if post.privacy_setting == 2:
+        if request.user.id == post.author or request.user.id == post.shared_author:
+            hasPermission = True
+
+    # ('3', 'my friends'),
+    # So first get the ID of all the author's friends
+    if post.privacy_setting == 3:
+        pass
+
+
+    # ('4', 'friends of friends'),
+    # ('5', 'only friends on my host'),
+    # ('6', 'public'),
+    # ('7', 'unlisted')
 
     return render(request, 'post/post.html', {"post":post, "imageExists":imageExists})
+
+def friendRequestView(request):
+    # When the user posts here, they will send a follow/friend request
+    # This will add an element to follow or something maybe?
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = friendRequestForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            # Send the friend request
+            # Maybe when two people friend request each other it should just accept
+            # That way we can just send the freind request accept as another fr
+            # Seems smart
+            # So if the follow relation already exists between the two ids
+            # instead of adding the inverse we will just erase, then add the relation
+            # to the friend table instead
+            
+            # redirect to a new URL:
+            return HttpResponseRedirect('/')
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = uploadForm()
+
+    return render(request, 'friendrequest/friendrequest.html', {'form': form})
