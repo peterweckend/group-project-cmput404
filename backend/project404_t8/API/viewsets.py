@@ -148,5 +148,7 @@ def IndexView(request):
     # imageExists = False
     # if post.image_link != "":
     #     imageExists = True
-    return render(request, 'home.html', {"post":post})
+
+    # filter by yourself,friends, friends of friends
+    return render(request, 'homepage/home.html', {"post":post})
     

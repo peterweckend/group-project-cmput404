@@ -12,7 +12,26 @@
   <p>Hi {{ user.username }}!</p>
   <p>{{post.title}}</p>
   {% for p in post %}
-    <li>{{p.title}} </li>
+    <div class="row">
+          <div class="panel panel-default">
+              <div class="panel-body">
+              
+                  <div class="panel panel-default">
+                      <!-- Default panel contents 1 -->
+                      <div class="panel-heading">{{p.title}}</div>
+                      <div class="panel-body">
+                          <p>{{p.body}}</p>
+                      </div>
+                  </div>
+                  
+                  
+              </div> <!-- Missing div here -->
+          </div>
+      
+      
+    </div>
+    <!-- <div class = "posts"><li>{{p.title}} </li></div> -->
+    
   {% endfor %}
   <p><a href="{% url 'logout' %}">logout</a></p>
   <p><a href="upload/">Create a post</a></p>
