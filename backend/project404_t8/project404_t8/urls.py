@@ -28,7 +28,9 @@ from API import urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('django.contrib.auth.urls')),
+    path('users/', include('users.urls')), # new
+    path('users/', include('django.contrib.auth.urls')), # new
+    # url(r'^', include('django.contrib.auth.urls')),
     path('', TemplateView.as_view(template_name='home.html'), name='home'), # new
     # path('api/', include('API.urls')),
     # path('api/', include(router.urls)),
