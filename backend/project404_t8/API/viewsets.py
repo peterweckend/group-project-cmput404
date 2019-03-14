@@ -7,7 +7,7 @@ from .serializers import UserSerializer, PostSerializer, CommentSerializer, Frie
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from .forms import uploadForm
-
+from django.views import generic
 # from rest_framework.decorators import api_view
 # from rest_framework.response import Response
 # from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -134,3 +134,16 @@ def postView(request, id):
     
 
     return render(request, 'post/post.html', {"post":post, "imageExists":imageExists})
+
+def IndexView(request):
+
+    # This is our post object with the given ID
+    post = Post.objects.all() #pk is primary key
+
+    # We could check to see if the user has permission to view this post in here
+    # Based on the privacy setting etc.
+    # imageExists = False
+    # if post.image_link != "":
+    #     imageExists = True
+    return render(request, 'home.html', {"post":post})
+    
