@@ -28,12 +28,15 @@ from API import urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('django.contrib.auth.urls')),
+    path('users/', include('users.urls')), # new
+    path('users/', include('django.contrib.auth.urls')), # new
+    # url(r'^', include('django.contrib.auth.urls')),
     path('', TemplateView.as_view(template_name='home.html'), name='home'), # new
     # path('api/', include('API.urls')),
     # path('api/', include(router.urls)),
     url(r'^', include(router.urls)),
     url(r'^',include('API.urls')), 
+    url(r'^',include('users.urls')), 
     # path("upload/", uploadView, name="upload"),
     # path('api-token-auth/', views.obtain_auth_token, name='api-token-auth'),
 ] #+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

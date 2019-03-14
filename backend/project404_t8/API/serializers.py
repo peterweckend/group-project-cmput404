@@ -1,20 +1,16 @@
 from rest_framework import serializers
-from .models import Post, User, Comment, Friendship, Follow, Server
+from .models import Post, Comment, Friendship, Follow, Server
 # REST API Serializer JSON https://www.youtube.com/watch?v=V4NjlXiu5WI
-
-
+from users.models import CustomUser
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = '__all__'  
-    # id = serializers.ReadOnlyField()
-    # username = serializers.CharField()
-    # display_name = serializers.CharField()
-    # # this might have to be changed
-    # password = serializers.CharField()
-
-
+        model = CustomUser
+        fields = ['id', 'username', 'password', 'last_login']
+        # "id", "last_login", "is_superuser", "first_name", "last_name", 
+        # "email", "is_staff", "is_active", "date_joined", "username", 
+        # "password", "admin", "timestamp", "groups", "user_permissions"
+        
 class PostSerializer(serializers.ModelSerializer):
     # id = serializers.ReadOnlyField()
     # title = serializers.CharField()

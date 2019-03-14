@@ -1,8 +1,6 @@
 from django.contrib import admin
-from .models import User, Post, Comment, Friendship, Follow, Server
+from .models import Post, Comment, Friendship, Follow, Server
 # Register your models here.
-
-admin.site.register(User)
 
 # Added for testing. Can be removed later -tolu
 admin.site.register(Post)
