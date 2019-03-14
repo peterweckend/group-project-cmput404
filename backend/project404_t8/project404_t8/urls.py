@@ -36,6 +36,7 @@ urlpatterns = [
     # path('api/', include(router.urls)),
     url(r'^', include(router.urls)),
     url(r'^',include('API.urls')), 
+    url(r'^',include('users.urls')), 
     # path("upload/", uploadView, name="upload"),
     # path('api-token-auth/', views.obtain_auth_token, name='api-token-auth'),
 ] #+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

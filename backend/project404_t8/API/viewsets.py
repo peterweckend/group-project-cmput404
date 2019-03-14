@@ -2,19 +2,20 @@ from django.shortcuts import render
 from rest_framework import generics,status,viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from .models import User, Post, Comment, Friendship, Follow, Server
+from .models import Post, Comment, Friendship, Follow, Server
 from .serializers import UserSerializer, PostSerializer, CommentSerializer, FriendshipSerializer, FollowSerializer, ServerSerializer
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from .forms import uploadForm
 from django.conf import settings
+from users.models import CustomUser
 
 # from rest_framework.decorators import api_view
 # from rest_framework.response import Response
 # from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # from .serializers import *
 
-# Token and Seesion Authetntication: https://youtu.be/PFcnQbOfbUU
+# Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
 # Django REST API Tutorial: Filtering System - https://youtu.be/s9V9F9Jtj7Q
 
 # Create your views here.
@@ -28,7 +29,7 @@ from django.conf import settings
 
 # get newest value for user
 class UserViewSet(viewsets.ModelViewSet):
-        queryset = User.objects.all()
+        queryset = CustomUser.objects.all()
         serializer_class = UserSerializer
 
         @action(methods=['get'], detail=False)
