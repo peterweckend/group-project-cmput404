@@ -91,8 +91,8 @@ def uploadView(request):
             # Probably just add that to the form.cleaned_data dictionary
             
             newPost = form.cleaned_data
-            print(newPost)
-            print(request.FILES)
+            # print(newPost)
+            # print(request.FILES)
             # Don't do anything if no image is uploaded
             newPost["imageLink"] = None
             if request.FILES != {}:
@@ -112,7 +112,7 @@ def uploadView(request):
                 is_markdown = newPost["markdown"]
             )
 
-            print(newPost)
+            # print(newPost)
             newPost.save()
             id = newPost.id
 
@@ -173,6 +173,9 @@ def postView(request, id):
 def friendRequestView(request):
     # When the user posts here, they will send a follow/friend request
     # This will add an element to follow or something maybe?
+    # So I think this should all be done through ajax too to be honest
+    # So on the profile page when you click the button it just sends the 
+    # http request using AJAX instead of the browser
 
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -188,11 +191,31 @@ def friendRequestView(request):
             # instead of adding the inverse we will just erase, then add the relation
             # to the friend table instead
             
-            # redirect to a new URL:
+            receiverId = form.cleaned_data["friendToAdd"]
+            receiverId = CustomUser.objects.get(pk=receiverId)
+            followerId = request.user
+
+            # If the inverse relationship exists, remove it,
+            # Then add the relationship to friends instead
+            # So first, query for the relationship
+            if Follow.objects.filter(follower=receiverId, receiver=followerId).exists():
+                # Delete this entry, then create a friend relationship instead
+                follow = Follow.objects.get(follower=receiverId, receiver=followerId)
+                follow.delete()
+                friend = Friendship(friend_a=followerId, friend_b=receiverId)
+                friend.save()
+
+            else:
+                # Create the entry in follow, essentially sending the friend request
+                follow = Follow(follower=followerId, receiver=receiverId)
+                follow.save()
+            
+
+            # redirect to a new URL: homepage
             return HttpResponseRedirect('/')
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = uploadForm()
+        form = friendRequestForm()
 
     return render(request, 'friendrequest/friendrequest.html', {'form': form})
