@@ -10,5 +10,5 @@ urlpatterns =[
     # path('',uploadView, name="post_list"),
     path("upload/", uploadView, name="upload"),
     path("post/<int:id>", postView, name="Post"),
-    path("profile/<>", profileView, name="profile")
+    path("profile/", profileView, name="profile")
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

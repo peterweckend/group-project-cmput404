@@ -14,6 +14,7 @@ class Author(models.Model):
     
     # def __str__(self):
     #     return self.user.get_username() 
+    def get
 
 @receiver(post_save, sender=User)
 def create_author_profile(sender, instance, created, **kwargs):

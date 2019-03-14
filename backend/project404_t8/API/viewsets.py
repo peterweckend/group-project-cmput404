@@ -137,8 +137,12 @@ def postView(request, id):
 
     return render(request, 'post/post.html', {"post":post, "imageExists":imageExists})
 
-def profileView(LoginRequiredMixin):
-    login_url: ''
-
+def profileView(request):
+    # LoginRequiredMixin
+    # login_url: ''
+    def getProfile(request):
+        profile = request.user.get_profile()
 #     def getPosts(self):
-    return None
+    a = getProfile(request)
+    print(a)
+    return render(request, 'profile/profile.html')
