@@ -136,3 +136,9 @@ def postView(request, id):
     
 
     return render(request, 'post/post.html', {"post":post, "imageExists":imageExists})
+
+def profileView(LoginRequiredMixin):
+    login_url: ''
+
+#     def getPosts(self):
+    return None
