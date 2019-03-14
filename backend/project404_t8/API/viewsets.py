@@ -9,6 +9,7 @@ from django.shortcuts import render, get_object_or_404
 from .forms import uploadForm
 from django.conf import settings
 from users.models import CustomUser
+# from django.contrib.auth.models import User
 
 # from rest_framework.decorators import api_view
 # from rest_framework.response import Response
@@ -137,12 +138,11 @@ def postView(request, id):
 
     return render(request, 'post/post.html', {"post":post, "imageExists":imageExists})
 
-def profileView(request):
+def profileView(request, username):
     # LoginRequiredMixin
     # login_url: ''
-    def getProfile(request):
-        profile = request.user.get_profile()
-#     def getPosts(self):
-    a = getProfile(request)
-    print(a)
-    return render(request, 'profile/profile.html')
+    # def getProfile(request, username):
+    user = CustomUser.objects.get(username=username)
+    profile = request.user.get_profile()
+    return render(request, 'profile/profile.html', {'user':user})
+    # getProfile(request,username)
