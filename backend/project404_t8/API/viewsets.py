@@ -255,7 +255,7 @@ def postsListView(request):
             SELECT id FROM API_post WHERE (author_id in  \
             (WITH friends(fid) AS (SELECT friend_b_id FROM API_friendship WHERE friend_a_id=%s) \
             SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
-            AND privacy_setting = 3 OR privacy_setting = 4) OR author_id = %s OR  privacy_setting = 6) \
+            AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
             SELECT * FROM API_post WHERE id in posts', [int(uid)]*6)
     except:
         post = Post.objects.all()
