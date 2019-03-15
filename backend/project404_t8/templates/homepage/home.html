@@ -9,15 +9,15 @@
     <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
     <h1 id="greeting">Hi {{ user.username }}!</h1>
     {% for p in post reversed %}
-        <div class="row">
-          <div class="panel panel-default">
-            <div class="puser">{{p.author}}</div>
-            <div class="panel-body">
-                <p class="ptitle">{{p.title}}</p>
-                <p class="pbody">{{p.body}}</p>
-            </div>
+      <div class="row">
+        <div class="panel panel-default">
+          <div class="puser">{{p.author}} (privacy option: {{p.privacy_setting}}) </div>
+          <div class="panel-body">
+              <p class="ptitle">{{p.title}} </p>
+              <p class="pbody">{{p.body}}</p>
           </div>
         </div>
+      </div>
     {% endfor %}
 {% else %}
   {% load static %}
