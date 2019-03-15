@@ -5,17 +5,19 @@
   <meta charset="utf-8">
   <title>{% block title %}Django Auth Tutorial{% endblock %}</title>
   {% load static %}
-  <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'signup/signup.css' %}">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <header>
     <div class="container">
-      <h1 class="logo">
+        <a href="/">
+            <h1 class="logo">
           <!-- <img src="" alt="logo" > -->
-        <img src="{% static 'img/logo.svg' %}" alt="logo" width=150px height=40px>
-      </h1>
+                <img src="{% static 'img/logo.svg' %}" alt="logo" width=150px height=40px>
+            </h1>
+        </a>
 
       <nav>
         

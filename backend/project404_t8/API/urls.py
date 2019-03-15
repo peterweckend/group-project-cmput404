@@ -9,6 +9,5 @@ from .viewsets import PostViewSet, uploadView, postView ,IndexView
 urlpatterns =[
     # path('',uploadView, name="post_list"),
     path("upload/", uploadView, name="upload"),
-    url("home", IndexView, name="home"),
     path("post/<int:id>", postView, name="Post"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

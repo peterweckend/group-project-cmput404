@@ -1,9 +1,18 @@
 p{
-    color:hsl(0, 0%, 4%);
+    color:hsl(0, 3%, 6%);
     margin:auto;
-    justify-content: left
+    justify-content: center;
+    text-align: left;
+    padding-left: 2.5%;
 
     
+}
+h2{
+  justify-content: center;
+}
+.button1{
+  margin:auto;
+
 }
 .sidebar-nav {
     margin-top: 20px;
