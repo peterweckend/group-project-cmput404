@@ -5,41 +5,25 @@
 
 {% block content %}
 {% if user.is_authenticated %}
-{% load static %}
-
-  <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
-  
-  <p id="greeting">Hi {{ user.username }}!</p>
-  <p>{{post.title}}</p>
-  {% for p in post %}
-    <div class="row">
+  {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
+    <h1 id="greeting">Hi {{ user.username }}!</h1>
+    {% for p in post reversed %}
+        <div class="row">
           <div class="panel panel-default">
-              <!-- <div class="panel-body"> -->
-              
-                  <!-- <div class="panel panel-default"> -->
-                      <!-- Default panel contents 1 -->
-                      <div class="panel-heading">{{p.title}}</div>
-                      <div class="panel-body">
-                          <p class="pbody">{{p.body}}</p>
-                      </div>
-                  <!-- </div> -->
-                  
-                  
-              <!-- </div> Missing div here -->
+            <div class="puser">{{p.author}}</div>
+            <div class="panel-body">
+                <p class="ptitle">{{p.title}}</p>
+                <p class="pbody">{{p.body}}</p>
+            </div>
           </div>
-      
-      
-    </div>
-    <!-- <div class = "posts"><li>{{p.title}} </li></div> -->
-    
-  {% endfor %}
-
+        </div>
+    {% endfor %}
 {% else %}
-{% load static %}
-  <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
-
-  <p>You are not logged in</p>
-  <p><a href="{% url 'signup' %}">Sign Up</a></p>
-  <p><a href="{% url 'login' %}">Log In </a></p>
-{% endif %}
+  {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
+    <p>You are not logged in</p>
+    <p><a href="{% url 'signup' %}">Sign Up</a></p>
+    <p><a href="{% url 'login' %}">Log In </a></p>
+  {% endif %}
 {% endblock %}

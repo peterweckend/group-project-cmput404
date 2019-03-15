@@ -266,21 +266,11 @@ def profileView(request, username):
     profile_posts = Post.objects.filter(author=request.user.id)
     return render(request, 'profile/profile.html', {'user':user, "posts":profile_posts})
 
-    
-
-    return render(request, 'post/post.html', {"post":post, "imageExists":imageExists})
-
-def IndexView(request):
-
-    # This is our post object with the given ID
-    post = Post.objects.all() #pk is primary key
-
-    # We could check to see if the user has permission to view this post in here
-    # Based on the privacy setting etc.
-    # imageExists = False
-    # if post.image_link != "":
-    #     imageExists = True
-
-    # filter by yourself,friends, friends of friends
+def postsListView(request):
+    try:
+        user = request.user
+        post = Post.objects.filter(author=user)
+    except:
+        post = Post.objects.all()
     return render(request, 'homepage/home.html', {"post":post})
     
