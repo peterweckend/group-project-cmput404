@@ -24,6 +24,7 @@ class Post(models.Model):
         ('4', 'friends of friends'),
         ('5', 'only friends on my host'),
         ('6', 'public'),
+        ('7', 'unlisted')
     )
 
     id = models.AutoField(primary_key=True)
