@@ -7,8 +7,11 @@
 {% load static %}
   <link rel="stylesheet" type="text/css" href="{% static 'profile/profile.css' %}">
 <div class='content-container'>
-  <h2>{{ user.username}}</h2>
-  <p>Test2</p>
+  {{user.username}}
+  {% for post in posts %}
+    <ul>{{ post.title }}<br>
+      {{post.body}}
+    </ul>
+  {% endfor %}
 </div>  
-<p>paragraph</p>
 {% endblock %}

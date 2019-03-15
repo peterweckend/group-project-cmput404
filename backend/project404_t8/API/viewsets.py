@@ -141,8 +141,7 @@ def postView(request, id):
 def profileView(request, username):
     # LoginRequiredMixin
     # login_url: ''
-    # def getProfile(request, username):
     user = CustomUser.objects.get(username=username)
-    profile = request.user.get_profile()
-    return render(request, 'profile/profile.html', {'user':user})
-    # getProfile(request,username)
+    profile_posts = Post.objects.filter(author=request.user.id)
+    return render(request, 'profile/profile.html', {'user':user, "posts":profile_posts})
+
