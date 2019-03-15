@@ -28,7 +28,12 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
+    
+    # def get_profile(self):
+    #     return self.username
 
     @property
     def is_admin(self):
         return self.admin
+
+        

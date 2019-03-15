@@ -6,10 +6,11 @@ from .models import Post, Comment, Friendship, Follow, Server
 from .serializers import UserSerializer, PostSerializer, CommentSerializer, FriendshipSerializer, FollowSerializer, ServerSerializer
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
-from .forms import uploadForm
 from django.views import generic
+from .forms import uploadForm, friendRequestForm
 from django.conf import settings
 from users.models import CustomUser
+from random import uniform
 
 # from rest_framework.decorators import api_view
 # from rest_framework.response import Response
@@ -22,7 +23,9 @@ from users.models import CustomUser
 # Create your views here.
 #@api_view(['GET','POST'])
 
-# class UserViewSet(viewsets.ViewSet): #this makes it so when you go to localhost/user/, you can't post
+# this makes it so when you go to localhost/user/, you can't post
+# class UserViewSet(viewsets.ViewSet): 
+# 
 #     def list(self, request):
 #         queryset = User.objects.all()
 #         serializer = UserSerializer(queryset, many=True)
@@ -90,8 +93,8 @@ def uploadView(request):
             # Probably just add that to the form.cleaned_data dictionary
             
             newPost = form.cleaned_data
-            print(newPost)
-            print(request.FILES)
+            # print(newPost)
+            # print(request.FILES)
             # Don't do anything if no image is uploaded
             newPost["imageLink"] = None
             if request.FILES != {}:
@@ -111,7 +114,7 @@ def uploadView(request):
                 is_markdown = newPost["markdown"]
             )
 
-            print(newPost)
+            # print(newPost)
             newPost.save()
             id = newPost.id
 
@@ -126,14 +129,143 @@ def uploadView(request):
 
 def postView(request, id):
 
-    # This is our post object with the given ID
-    post = get_object_or_404(Post, pk=id) #pk is primary key
-
     # We could check to see if the user has permission to view this post in here
     # Based on the privacy setting etc.
+
+
+    # This is our post object with the given ID
+    # If the post doesn't exist it instantly 404's
+    # This way we won't have to do any taxing database math
+    post = get_object_or_404(Post, pk=id) #pk is primary key
+    
+    # Do not display an image if the image does not exist
     imageExists = False
     if post.image_link != "":
         imageExists = True
+    
+    
+    # Perform privacy calculations
+    # Has permission will be passed in
+    # If its False we could either display a 404 or a "you do not have permission"
+    hasPermission = False
+    
+    # ('1', 'me'),
+    # This one will always apply, so it does not need an if conditional
+    if request.user.id == post.author.id:
+        hasPermission = True
+
+    # ('2', 'another author'),
+    if post.privacy_setting == '2':
+        if request.user.id == post.author or request.user.id == post.shared_author.id:
+            hasPermission = True
+
+    # ('3', 'my friends'),
+    # So first get the IDs of all the author's friends
+    if post.privacy_setting == '3':
+        # Get a list of all the rows in friends where friend_a/b == request.user.id
+        friends1 = Friendship.objects.filter(friend_a=post.author.id)
+        friends2 = Friendship.objects.filter(friend_b=post.author.id)
+        friends = set()
+        # alright this feels really messy but it should work I think
+        # If the models change things could get cringed but I actually think its fine
+        # Iterate through each queryset, and append the ids of each element to the list
+        for row in friends1:
+            friends.add(row.friend_b.id)
+        for row in friends2:
+            friends.add(row.friend_a.id)
+
+        # Friends are the authors friends
+        # If the requester is in the friends list they can view
+        if request.user.id in friends:
+            print(request.user.id, friends)
+            hasPermission = True
+
+    # ('4', 'friends of friends'),
+    # This is brutal enough to do in SQLite, how tf do we do it in Django???
+    # Can just bruteforce it I guess lol, for each user in authorsfriends
+    # query all their friends then add to another set
+
+    # ('5', 'only friends on my host'),
+    # Not sure how to implement this one, how do we know where the user's hosted on?
+    # This is a problem for the next deadline lel
+
+    # ('6', 'public')
+    # ('7', 'unlisted')
+    # The special thing about unlisted is the URL must be complicated or hard to guess
+    if post.privacy_setting in ["6","7"]:
+        hasPermission = True
+
+    # Post is the post data
+    # imageExists is whether or not there is an image to display
+    # Has permission determines whether or not to display content to the user
+    return render(request, 'post/post.html', {
+        "post":post,
+        "imageExists":imageExists,
+        "hasPermission":hasPermission
+        })
+
+def friendRequestView(request):
+    # When the user posts here, they will send a follow/friend request
+    # This will add an element to follow or something maybe?
+    # So I think this should all be done through ajax too to be honest
+    # So on the profile page when you click the button it just sends the 
+    # http request using AJAX instead of the browser
+
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = friendRequestForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            # Send the friend request
+
+            # Uncomment this code to add 10 friends to the currently logged in user
+            # You cant login to these accounts though lol
+            # 
+            # for i in range(10):
+            #     newUser = CustomUser(username=uniform(1,10),password=uniform(1,10))
+            #     newUser.save()
+            #     friend = Friendship(friend_a=request.user, friend_b=newUser)
+            #     friend.save()
+            
+            receiverId = form.cleaned_data["friendToAdd"]
+            receiverId = CustomUser.objects.get(pk=receiverId)
+            followerId = request.user
+
+            # If the inverse relationship exists, remove it,
+            # Then add the relationship to friends instead
+            # So first, query for the relationship
+            if Follow.objects.filter(follower=receiverId, receiver=followerId).exists():
+                # Delete this entry, then create a friend relationship instead
+                follow = Follow.objects.get(follower=receiverId, receiver=followerId)
+                follow.delete()
+                friend = Friendship(friend_a=followerId, friend_b=receiverId)
+                friend.save()
+
+            # maybe make sure the user cant send a new friend request after already
+            # being friends
+            else:
+                # Create the entry in follow, essentially sending the friend request
+                follow = Follow(follower=followerId, receiver=receiverId)
+                follow.save()
+            
+
+            # redirect to a new URL: homepage
+            return HttpResponseRedirect('/')
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = friendRequestForm()
+
+    return render(request, 'friendrequest/friendrequest.html', {'form': form})
+
+def profileView(request, username):
+    # LoginRequiredMixin
+    # login_url: ''
+    user = CustomUser.objects.get(username=username)
+    profile_posts = Post.objects.filter(author=request.user.id)
+    return render(request, 'profile/profile.html', {'user':user, "posts":profile_posts})
+
     
 
     return render(request, 'post/post.html', {"post":post, "imageExists":imageExists})
