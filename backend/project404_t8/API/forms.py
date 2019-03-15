@@ -10,7 +10,11 @@ privacyOptions = [
     ("3", "Friends"), 
     ("4", "Friends of Friends"),
     ("5", "Only Friends on Connectify"),
-    ("6","Public")]
+    ("6","Public"),
+    ("7","Unlisted")]
+
+    # unlisted posts should generate a random post ID (check its not taken first)
+    # large scale could be done better, for now can do it more simply
 
 class uploadForm(forms.Form):
     # Need an invisible field that sends the user ID
@@ -23,4 +27,12 @@ class uploadForm(forms.Form):
     privacy = forms.CharField(label='Privacy', widget=forms.Select(choices=privacyOptions))
     # If we wanted to get fancy, this could autofill from the user's friends
     sharedAuthor = forms.CharField(label='Shared Author', required = False)
-    pass
+
+class friendRequestForm(forms.Form):
+    # Basically will just be a char field
+    # Actually, this should just be a button that appears on a users profile
+    # Manually entering a name/id is so stupid lmfao
+    # we will do it this way for now though just as proof of concept
+    # So to be even more honest we might not even need a form for this, but its
+    # not a big deal right now
+    friendToAdd = forms.CharField(label="", max_length=50)

@@ -11,6 +11,7 @@
   <!--We also need to make sure the current use has permission to view the file
       This can be done in the viewsets.py first im pretty sure, then you could pass
       in a boolean, like hasPermission, and only display content if that is true -->
+{% if hasPermission %}
 
   <h1>{{ post.title }}</h1>
   {% if imageExists %}
@@ -24,7 +25,9 @@
   <!--Display the comments below here somehow
       Have a form element to add a new comment
       Could implement JS to show the new comment after the user posts it  -->
-  
+{% else %}
+<h1>You do not have permission to view this page</h1>
+{% endif %}
 {% else %}
 {% load static %}
   <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
