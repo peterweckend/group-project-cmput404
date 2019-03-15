@@ -20,7 +20,7 @@ class CustomUserManager(UserManager):
 
 class CustomUser(AbstractUser):
     username    = models.CharField(max_length=255, unique=True)
-    password    = models.CharField()
+    password    = models.CharField(max_length=500)
     admin       = models.BooleanField(default=False) # superuser 
     timestamp   = models.DateTimeField(auto_now_add=True)
 
