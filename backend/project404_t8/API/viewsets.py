@@ -257,3 +257,13 @@ def friendRequestView(request):
         form = friendRequestForm()
 
     return render(request, 'friendrequest/friendrequest.html', {'form': form})
+
+def profileView(request, username):
+    # LoginRequiredMixin
+    # login_url: ''
+    user = CustomUser.objects.get(username=username)
+    profile_posts = Post.objects.filter(author=request.user.id)
+    return render(request, 'profile/profile.html', {'user':user, "posts":profile_posts})
+
+    
+

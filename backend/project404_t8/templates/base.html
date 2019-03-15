@@ -16,15 +16,18 @@
           <!-- <img src="" alt="logo" > -->
         <img src="{% static 'img/logo.svg' %}" alt="logo" width=150px height=40px>
       </h1>
-
+      {% if user.is_authenticated %}
       <nav>
         <ul>
           <li><a href="/">Home</a></li>
-          <li><a href="#">Me</a></li>
+          <!-- this might break everything, not sure why but it failed once and I had to delete the entire line -->
+          <li><a href="{% url 'profile' username=user.username %}">Me</a></li>
+          <!-- <li><a href="#">Me</a></li> -->
           <li><a href="#">Friends</a></li>
           <li><a href="#">RUNESCAPE</a></li>
         </ul>
       </nav>
+      {% endif %}
     </div>
   </header>
 <body>

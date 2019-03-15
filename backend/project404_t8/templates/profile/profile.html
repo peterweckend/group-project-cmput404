@@ -1,0 +1,17 @@
+<!-- templates/registration/login.html -->
+{% extends '../base.html' %}
+
+{% block title %}{{user.username}}'s profile{% endblock %}
+
+{% block content %}
+{% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'profile/profile.css' %}">
+<div class='content-container'>
+  {{user.username}}
+  {% for post in posts %}
+    <ul>{{ post.title }}<br>
+      {{post.body}}
+    </ul>
+  {% endfor %}
+</div>  
+{% endblock %}
