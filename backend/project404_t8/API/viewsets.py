@@ -9,6 +9,7 @@ from django.shortcuts import render, get_object_or_404
 from .forms import uploadForm, friendRequestForm
 from django.conf import settings
 from users.models import CustomUser
+from random import uniform
 
 # from rest_framework.decorators import api_view
 # from rest_framework.response import Response
@@ -148,27 +149,59 @@ def postView(request, id):
     hasPermission = False
     
     # ('1', 'me'),
-    if post.privacy_setting == 1:
-        if request.user.id == post.author:
-            hasPermission = True
+    # This one will always apply, so it does not need an if conditional
+    if request.user.id == post.author.id:
+        hasPermission = True
 
     # ('2', 'another author'),
-    if post.privacy_setting == 2:
-        if request.user.id == post.author or request.user.id == post.shared_author:
+    if post.privacy_setting == '2':
+        if request.user.id == post.author or request.user.id == post.shared_author.id:
             hasPermission = True
 
     # ('3', 'my friends'),
-    # So first get the ID of all the author's friends
-    if post.privacy_setting == 3:
-        pass
+    # So first get the IDs of all the author's friends
+    if post.privacy_setting == '3':
+        # Get a list of all the rows in friends where friend_a/b == request.user.id
+        friends1 = Friendship.objects.filter(friend_a=post.author.id)
+        friends2 = Friendship.objects.filter(friend_b=post.author.id)
+        friends = set()
+        # alright this feels really messy but it should work I think
+        # If the models change things could get cringed but I actually think its fine
+        # Iterate through each queryset, and append the ids of each element to the list
+        for row in friends1:
+            friends.add(row.friend_b.id)
+        for row in friends2:
+            friends.add(row.friend_a.id)
 
+        # Friends are the authors friends
+        # If the requester is in the friends list they can view
+        if request.user.id in friends:
+            print(request.user.id, friends)
+            hasPermission = True
 
     # ('4', 'friends of friends'),
-    # ('5', 'only friends on my host'),
-    # ('6', 'public'),
-    # ('7', 'unlisted')
+    # This is brutal enough to do in SQLite, how tf do we do it in Django???
+    # Can just bruteforce it I guess lol, for each user in authorsfriends
+    # query all their friends then add to another set
 
-    return render(request, 'post/post.html', {"post":post, "imageExists":imageExists})
+    # ('5', 'only friends on my host'),
+    # Not sure how to implement this one, how do we know where the user's hosted on?
+    # This is a problem for the next deadline lel
+
+    # ('6', 'public')
+    # ('7', 'unlisted')
+    # The special thing about unlisted is the URL must be complicated or hard to guess
+    if post.privacy_setting in ["6","7"]:
+        hasPermission = True
+
+    # Post is the post data
+    # imageExists is whether or not there is an image to display
+    # Has permission determines whether or not to display content to the user
+    return render(request, 'post/post.html', {
+        "post":post,
+        "imageExists":imageExists,
+        "hasPermission":hasPermission
+        })
 
 def friendRequestView(request):
     # When the user posts here, they will send a follow/friend request
@@ -184,12 +217,15 @@ def friendRequestView(request):
         if form.is_valid():
             # process the data in form.cleaned_data as required
             # Send the friend request
-            # Maybe when two people friend request each other it should just accept
-            # That way we can just send the freind request accept as another fr
-            # Seems smart
-            # So if the follow relation already exists between the two ids
-            # instead of adding the inverse we will just erase, then add the relation
-            # to the friend table instead
+
+            # Uncomment this code to add 10 friends to the currently logged in user
+            # You cant login to these accounts though lol
+            # 
+            # for i in range(10):
+            #     newUser = CustomUser(username=uniform(1,10),password=uniform(1,10))
+            #     newUser.save()
+            #     friend = Friendship(friend_a=request.user, friend_b=newUser)
+            #     friend.save()
             
             receiverId = form.cleaned_data["friendToAdd"]
             receiverId = CustomUser.objects.get(pk=receiverId)
@@ -205,6 +241,8 @@ def friendRequestView(request):
                 friend = Friendship(friend_a=followerId, friend_b=receiverId)
                 friend.save()
 
+            # maybe make sure the user cant send a new friend request after already
+            # being friends
             else:
                 # Create the entry in follow, essentially sending the friend request
                 follow = Follow(follower=followerId, receiver=receiverId)
