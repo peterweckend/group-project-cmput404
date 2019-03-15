@@ -9,11 +9,31 @@
 
   <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
   
-  <p>Hi {{ user.username }}!</p>
+  <p id="greeting">Hi {{ user.username }}!</p>
+  <p>{{post.title}}</p>
+  {% for p in post %}
+    <div class="row">
+          <div class="panel panel-default">
+              <!-- <div class="panel-body"> -->
+              
+                  <!-- <div class="panel panel-default"> -->
+                      <!-- Default panel contents 1 -->
+                      <div class="panel-heading">{{p.title}}</div>
+                      <div class="panel-body">
+                          <p class="pbody">{{p.body}}</p>
+                      </div>
+                  <!-- </div> -->
+                  
+                  
+              <!-- </div> Missing div here -->
+          </div>
+      
+      
+    </div>
+    <!-- <div class = "posts"><li>{{p.title}} </li></div> -->
+    
+  {% endfor %}
 
-  <p><a href="{% url 'logout' %}">logout</a></p>
-  <p><a href="upload/">Create a post</a></p>
-  <p><a href="profile/edit/">Edit your profile</a></p>
 {% else %}
 {% load static %}
   <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">

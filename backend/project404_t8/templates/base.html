@@ -12,19 +12,20 @@
 </head>
 <header>
     <div class="container">
+    <a href="/">
       <h1 class="logo">
           <!-- <img src="" alt="logo" > -->
         <img src="{% static 'img/logo.svg' %}" alt="logo" width=150px height=40px>
       </h1>
+    </a>
       {% if user.is_authenticated %}
       <nav>
         <ul>
           <li><a href="/">Home</a></li>
           <!-- this might break everything, not sure why but it failed once and I had to delete the entire line -->
           <li><a href="{% url 'profile' username=user.username %}">Me</a></li>
-          <!-- <li><a href="#">Me</a></li> -->
           <li><a href="#">Friends</a></li>
-          <li><a href="#">RUNESCAPE</a></li>
+          <li><a href="www.runescape.com">RUNESCAPE</a></li>
         </ul>
       </nav>
       {% endif %}
@@ -41,8 +42,17 @@
             Main 
         {% endblock %}
       </div>
-      <div class="item4">Right</div>
-      <div class="item5">Footer</div>
+      <div class="item4">Right
+          {% if user.is_authenticated %}
+          <p class="links"><a href="upload/">Create a post</a></p>
+          <p class="links"><a href="profile/edit/">Edit your profile</a></p>
+          <p class ="links"><a href="friendrequest/">Make a friend request</a></p>
+          <p class="links"><a href="{% url 'logout' %}">logout</a></p>
+        {% endif %}
+      </div>
+      <div class="item5">Footer
+
+      </div>
     </div>
       
 

@@ -1,32 +1,25 @@
 p{
-    color:rgb(8, 8, 8);
-    text-align: center;
+    color:hsl(0, 3%, 6%);
     margin:auto;
-    font-size: 20px
+    justify-content: center;
+    text-align: left;
+    padding-left: 2.5%;
+
     
 }
-.panel-heading{
-  font-size: 20px;
-  text-align:left;
+h2{
+  justify-content: center;
 }
-.links{
-  text-align: center ;
-}
-.pbody{
-  font-size: 20px;
-  color:black;
-  text-align: left;
-  padding-left: 2%;
-  
+.button1{
+  margin:auto;
+
 }
 .sidebar-nav {
     margin-top: 20px;
     padding: 0;
     list-style: none;
 }
-#greeting{
-  text-align: left;
-}
+
 
 .item2 { grid-area: menu; }
 .item3 { grid-area: main; }
@@ -36,10 +29,10 @@ p{
 .grid-container {
   display: grid;
   grid-template-areas:
-    'menu menu main main right right'
-    'footer footer footer footer footer footer';
+    'menu main main main right right'
+    'menu footer footer footer footer footer';
   grid-gap: 10px;
-  background-color: rgb(255, 255, 255);
+  background-color: rgb(223, 231, 236);
   padding: 10px;
 }
 
