@@ -15,32 +15,24 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic.base import TemplateView # new
+from django.views.generic.base import TemplateView
 from django.conf.urls import url, include
 from .router import router
 from rest_framework.authtoken import views
 from django.conf.urls.static import static
 from django.conf import settings
-from API.viewsets import IndexView
-
-# from .views import *
-
+from API.viewsets import postsListView
 from API import urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('users/', include('users.urls')), # new
-    path('users/', include('django.contrib.auth.urls')), # new
-    # url(r'^', include('django.contrib.auth.urls')),
-    path('', IndexView, name='home'), # new
-    # path('api/', include('API.urls')),
-    # path('api/', include(router.urls)),
+    path('users/', include('users.urls')),
+    path('users/', include('django.contrib.auth.urls')), 
+    path('', postsListView, name='home'),
     url(r'^', include(router.urls)),
     url(r'^',include('API.urls')), 
-    url(r'^',include('users.urls')), 
-    # path("upload/", uploadView, name="upload"),
-    # path('api-token-auth/', views.obtain_auth_token, name='api-token-auth'),
-] #+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    url(r'^',include('users.urls')),
+]
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
