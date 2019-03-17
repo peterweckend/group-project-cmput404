@@ -11,7 +11,8 @@ from .forms import uploadForm, friendRequestForm
 from django.conf import settings
 from users.models import CustomUser
 from random import uniform
-
+from django.urls import reverse_lazy
+from django.views.generic.edit import DeleteView
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
 # Django REST API Tutorial: Filtering System - https://youtu.be/s9V9F9Jtj7Q
 
@@ -260,3 +261,12 @@ def postsListView(request):
     except:
         post = Post.objects.all()
     return render(request, 'homepage/home.html', {"post":post})
+class PostDelete(DeleteView):
+    model = Post
+    success_url= reverse_lazy("home")
+
+    template_name= 'delete/delete_post.html'
+# class PostEdit(UpdateView):
+#     template_name = "home.html"
+#     model = Post
+#     form_class= HomeForm

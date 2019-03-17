@@ -1,0 +1,9 @@
+{% extends '../base.html' %}
+{% block content %}
+
+Are you sure you want to delete {{object.title}}?
+<form method ="POST">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger"> Yes, I'm sure.</button>
+</form>
+{% endblock %}

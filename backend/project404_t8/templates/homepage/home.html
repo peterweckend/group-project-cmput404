@@ -12,6 +12,12 @@
       <div class="row">
         <div class="panel panel-default">
           <div class="puser">{{p.author}} (privacy option: {{p.privacy_setting}}) </div>
+          {% if user.id == p.author_id %}
+          <p class="delete_post">
+                
+              <a href="{% url 'delete_post' pk=p.pk  %}">Delete </a>
+            </p>
+          {% endif %}
           <div class="panel-body">
               <p class="ptitle">{{p.title}} </p>
               <p class="pbody">{{p.body}}</p>
