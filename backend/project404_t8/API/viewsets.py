@@ -286,6 +286,12 @@ class FriendDelete(DeleteView):
     template_name= 'delete/delete_friend.html'
     # overrided delete function so that not only will it delete the user who requests the friend deletion
     # but also will delete the friendship on other user side
+
+    # how to delete stuff
+    # burhan Khalid
+    # https://stackoverflow.com/questions/12796870/how-does-django-delete-the-object-from-a-view
+    # rudra
+    # https://stackoverflow.com/questions/30747075/django-class-based-delete-view-and-validation
     def delete (self,request, *args, **kwargs):
        self.object= self.get_object()
        
