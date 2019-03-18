@@ -241,7 +241,9 @@ def profileView(request, username):
     profile_posts = Post.objects.filter(author=request.user.id)
     return render(request, 'profile/profile.html', {'user':user, "posts":profile_posts})
 
-def postsListView(request):
+def homeListView(request):
+
+    # this try and except is to render posts into homepage
     try:
         uname = request.user
         uid = uname.id
@@ -260,7 +262,14 @@ def postsListView(request):
             SELECT * FROM API_post WHERE id in posts', [int(uid)]*6)
     except:
         post = Post.objects.all()
-    return render(request, 'homepage/home.html', {"post":post})
+
+    # get the user and friends and pass it to homepage
+    # user = CustomUser.objects.get(username=request.user)
+    friend = Friendship.objects.all()
+    
+
+    
+    return render(request, 'homepage/home.html', {"post":post,"friends":friend})
 class PostDelete(DeleteView):
     model = Post
     success_url= reverse_lazy("home")
@@ -270,3 +279,8 @@ class PostDelete(DeleteView):
 #     template_name = "home.html"
 #     model = Post
 #     form_class= HomeForm
+class FriendDelete(DeleteView):
+    model = Friendship
+    success_url= reverse_lazy("home")
+
+    template_name= 'delete/delete_friend.html'

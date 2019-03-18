@@ -28,11 +28,12 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', include('users.urls')),
     path('users/', include('django.contrib.auth.urls')), 
-    path('', postsListView, name='home'),
+    path('', homeListView, name='home'),
     url(r'^', include(router.urls)),
     url(r'^',include('API.urls')), 
     url(r'^',include('users.urls')),
-    url(r'^delete/(?P<pk>\d+)/$', PostDelete.as_view(), name="delete_post")
+    url(r'^deletePost/(?P<pk>\d+)/$', PostDelete.as_view(), name="delete_post"),
+    url(r'^deleteFriend/(?P<pk>\d+)/$', FriendDelete.as_view(), name="delete_friend")
 ]
 
 if settings.DEBUG:

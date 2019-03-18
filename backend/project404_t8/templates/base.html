@@ -48,6 +48,16 @@
           <p class="links"><a href="profile/edit/">Edit your profile</a></p>
           <p class ="links"><a href="friendrequest/">Make a friend request</a></p>
           <p class="links"><a href="{% url 'logout' %}">logout</a></p>
+          <h1 style= "font-size: 1em"> <strong>Friends</strong>  </h1>
+        
+          {% for friend in friends %}
+            {% if user.id == friend.friend_a_id %}
+                
+              <p> <a href="{% url 'profile' username=friend.friend_b %}">{{friend.friend_b}}</a></p>
+              <a href ="{% url 'delete_friend' pk=friend.pk %}"> <button type="button" class="btn btn-default">Remove Friend</button></a>
+            {% endif %}
+          {% endfor %}
+          
         {% endif %}
       </div>
       <div class="item5">Footer

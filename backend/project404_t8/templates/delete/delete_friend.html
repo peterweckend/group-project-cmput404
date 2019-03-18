@@ -1,16 +1,18 @@
 {% extends '../base.html' %}
 {% block content %}
 {% if user.is_authenticated %}
-    {% if user.id == p.author_id %}
-        Are you sure you want to delete {{object.title}}?
+ 
+  {{friend}}
+  {% if user.id == object.friend_a_id %}
+  Are you sure you want to remove '{{object.friend_b}}' as a friend?
 
-        <form method ="POST">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger"> Yes, I'm sure.</button>
-        </form>
-    {% else %}
-        <p>You do not have access to this page.</p>
-    {% endif %}
+  <form method ="POST">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger"> Yes, I'm sure.</button>
+  </form>
+  {% else %}
+      <p>You do not have access to this page.</p>
+{% endif %}
 {% else %}
   {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
