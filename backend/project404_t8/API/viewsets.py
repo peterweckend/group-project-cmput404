@@ -284,3 +284,11 @@ class FriendDelete(DeleteView):
     success_url= reverse_lazy("home")
 
     template_name= 'delete/delete_friend.html'
+    def delete (self,request, *args, **kwargs):
+       self.object= self.get_object()
+       
+       Friendship.objects.filter(friend_a=self.object.friend_b, friend_b=self.object.friend_a ).delete()
+
+       self.object.delete() 
+       return HttpResponseRedirect(self.success_url)
+        
