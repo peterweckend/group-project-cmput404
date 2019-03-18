@@ -284,6 +284,8 @@ class FriendDelete(DeleteView):
     success_url= reverse_lazy("home")
 
     template_name= 'delete/delete_friend.html'
+    # overrided delete function so that not only will it delete the user who requests the friend deletion
+    # but also will delete the friendship on other user side
     def delete (self,request, *args, **kwargs):
        self.object= self.get_object()
        
