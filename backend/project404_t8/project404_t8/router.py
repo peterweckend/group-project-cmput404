@@ -1,5 +1,5 @@
 from rest_framework import routers
-from API.viewsets import UserViewSet, PostViewSet, CommentViewSet, FriendshipViewSet, FollowViewSet, ServerViewSet, uploadView
+from API.viewsets import UserViewSet, PostViewSet, CommentViewSet, FriendshipViewSet, FollowViewSet, ServerViewSet, uploadView, postView
 
 router = routers.DefaultRouter()
 

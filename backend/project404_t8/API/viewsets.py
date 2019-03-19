@@ -6,31 +6,16 @@ from .models import Post, Comment, Friendship, Follow, Server
 from .serializers import UserSerializer, PostSerializer, CommentSerializer, FriendshipSerializer, FollowSerializer, ServerSerializer
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
+from django.views import generic
 from .forms import uploadForm, friendRequestForm
 from django.conf import settings
 from users.models import CustomUser
 from random import uniform
-
-# from rest_framework.decorators import api_view
-# from rest_framework.response import Response
-# from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-# from .serializers import *
-
+from django.urls import reverse_lazy
+from django.views.generic.edit import DeleteView
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
 # Django REST API Tutorial: Filtering System - https://youtu.be/s9V9F9Jtj7Q
 
-# Create your views here.
-#@api_view(['GET','POST'])
-
-# this makes it so when you go to localhost/user/, you can't post
-# class UserViewSet(viewsets.ViewSet): 
-# 
-#     def list(self, request):
-#         queryset = User.objects.all()
-#         serializer = UserSerializer(queryset, many=True)
-#         return Response(serializer.data)
-
-# get newest value for user
 class UserViewSet(viewsets.ModelViewSet):
         queryset = CustomUser.objects.all()
         serializer_class = UserSerializer
@@ -42,23 +27,8 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
 
 class PostViewSet(viewsets.ModelViewSet):
-    """
-    Provides a get method handler.
-    """
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-
-    # if request.method == 'GET':
-    #     queryset = Posts.objects.all()
-    #     serializer = PostsSerializer(queryset, many=True)
-    #     return Response(serializer.data)
-    
-    # elif request.method == 'POST':
-    #     serializer = PostsSerializer(data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
@@ -241,6 +211,12 @@ def friendRequestView(request):
                 friend = Friendship(friend_a=followerId, friend_b=receiverId)
                 friend.save()
 
+                # Addition by TOLU
+                # we have to add this because we need the relationship going both ways
+                # for the database SQL queries of friend of friends
+                friend = Friendship(friend_a=receiverId, friend_b=followerId)
+                friend.save()
+
             # maybe make sure the user cant send a new friend request after already
             # being friends
             else:
@@ -265,5 +241,69 @@ def profileView(request, username):
     profile_posts = Post.objects.filter(author=request.user.id)
     return render(request, 'profile/profile.html', {'user':user, "posts":profile_posts})
 
+def homeListView(request):
+
+    # this try and except is to render posts into homepage
+    try:
+        uname = request.user
+        uid = uname.id
+        post = Post.objects.raw(' \
+        WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
+        (SELECT f2.friend_a_id AS fofid \
+            FROM API_friendship f \
+            JOIN API_friendship f2 ON f.friend_a_id = f2.friend_b_id \
+            WHERE fofid NOT IN (SELECT friend_a_ID FROM API_friendship  \
+            WHERE friend_b_id = %s) AND f.friend_b_id = %s AND fofid != %s) AND privacy_setting = 4 \
+        UNION \
+            SELECT id FROM API_post WHERE (author_id in  \
+            (WITH friends(fid) AS (SELECT friend_b_id FROM API_friendship WHERE friend_a_id=%s) \
+            SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
+            AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
+            SELECT * FROM API_post WHERE id in posts', [int(uid)]*6)
+    except:
+        post = Post.objects.all()
+    #     # Do not display an image if the image does not exist
+    # imageExists = False
+    # if post.image_link != "":
+    #     imageExists = True
+
+    # get the user and friends and pass it to homepage
+    # user = CustomUser.objects.get(username=request.user)
+    friend = Friendship.objects.all()
+
+
+    
     
 
+    
+    return render(request, 'homepage/home.html', {"post":post,"friends":friend})
+class PostDelete(DeleteView):
+    model = Post
+    success_url= reverse_lazy("home")
+
+    template_name= 'delete/delete_post.html'
+# class PostEdit(UpdateView):
+#     template_name = "home.html"
+#     model = Post
+#     form_class= HomeForm
+class FriendDelete(DeleteView):
+    model = Friendship
+    success_url= reverse_lazy("home")
+
+    template_name= 'delete/delete_friend.html'
+    # overrided delete function so that not only will it delete the user who requests the friend deletion
+    # but also will delete the friendship on other user side
+
+    # how to delete stuff
+    # burhan Khalid
+    # https://stackoverflow.com/questions/12796870/how-does-django-delete-the-object-from-a-view
+    # rudra
+    # https://stackoverflow.com/questions/30747075/django-class-based-delete-view-and-validation
+    def delete (self,request, *args, **kwargs):
+       self.object= self.get_object()
+       
+       Friendship.objects.filter(friend_a=self.object.friend_b, friend_b=self.object.friend_a ).delete()
+
+       self.object.delete() 
+       return HttpResponseRedirect(self.success_url)
+        

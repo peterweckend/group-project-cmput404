@@ -5,21 +5,37 @@
 
 {% block content %}
 {% if user.is_authenticated %}
-{% load static %}
-
-  <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
-  
-  <p>Hi {{ user.username }}!</p>
-
-  <p><a href="{% url 'logout' %}">logout</a></p>
-  <p><a href="upload/">Create a post</a></p>
-  <p><a href="profile/edit/">Edit your profile</a></p>
+  {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
+    <h1 id="greeting">Hi {{ user.username }}!</h1>
+    {% for p in post reversed %}
+      <div class="row">
+        <div class="panel panel-default">
+          <div class="puser">{{p.author}} (privacy option: {{p.privacy_setting}}) </div>
+          {% if user.id == p.author_id %}
+          <p class="delete_post">
+                
+              <a href="{% url 'delete_post' pk=p.pk  %}">Delete </a>
+            </p>
+          {% endif %}
+          <div class="panel-body">
+              <p class="ptitle">{{p.title}} </p>
+              <p class="pbody">{{p.body}}</p>
+              {% if p.image_link != "" %}
+              {% load static %}
+              <!--CSS should ensure images fit within a certain size
+                  Atleast when they are being displayed on the homepage -->
+              <img class= "pimage" src="{% get_media_prefix %}{{ p.image_link }}">
+              {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
 {% else %}
-{% load static %}
-  <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
-
-  <p>You are not logged in</p>
-  <p><a href="{% url 'signup' %}">Sign Up</a></p>
-  <p><a href="{% url 'login' %}">Log In </a></p>
-{% endif %}
+  {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
+    <p>You are not logged in</p>
+    <p><a href="{% url 'signup' %}">Sign Up</a></p>
+    <p><a href="{% url 'login' %}">Log In </a></p>
+  {% endif %}
 {% endblock %}

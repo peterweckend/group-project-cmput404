@@ -12,19 +12,20 @@
 </head>
 <header>
     <div class="container">
+    <a href="/">
       <h1 class="logo">
           <!-- <img src="" alt="logo" > -->
-        <img src="{% static 'img/logo.svg' %}" alt="logo" width=150px height=40px>
+        <img src="{% static 'img/logo.png' %}" alt="logo" width=150px height=40px>
       </h1>
+    </a>
       {% if user.is_authenticated %}
       <nav>
         <ul>
           <li><a href="/">Home</a></li>
           <!-- this might break everything, not sure why but it failed once and I had to delete the entire line -->
           <li><a href="{% url 'profile' username=user.username %}">Me</a></li>
-          <!-- <li><a href="#">Me</a></li> -->
           <li><a href="#">Friends</a></li>
-          <li><a href="#">RUNESCAPE</a></li>
+          <li><a href="www.runescape.com">RUNESCAPE</a></li>
         </ul>
       </nav>
       {% endif %}
@@ -41,8 +42,27 @@
             Main 
         {% endblock %}
       </div>
-      <div class="item4">Right</div>
-      <div class="item5">Footer</div>
+      <div class="item4">Right
+          {% if user.is_authenticated %}
+          <p class="links"><a href="/upload/">Create a post</a></p>
+          <p class="links"><a href="profile/edit/">Edit your profile</a></p>
+          <p class ="links"><a href="friendrequest/">Make a friend request</a></p>
+          <p class="links"><a href="{% url 'logout' %}">logout</a></p>
+          <h1 style= "font-size: 1em"> <strong>Friends</strong>  </h1>
+        
+          {% for friend in friends %}
+            {% if user.id == friend.friend_a_id %}
+                
+              <p> <a href="{% url 'profile' username=friend.friend_b %}">{{friend.friend_b}}</a></p>
+              <a href ="{% url 'delete_friend' pk=friend.pk %}"> <button type="button" class="btn btn-default">Remove Friend</button></a>
+            {% endif %}
+          {% endfor %}
+          
+        {% endif %}
+      </div>
+      <div class="item5">Footer
+
+      </div>
     </div>
       
 

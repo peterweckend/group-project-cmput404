@@ -22,6 +22,7 @@ class CustomUser(AbstractUser):
     username    = models.CharField(max_length=255, unique=True)
     password    = models.CharField(max_length=50)
     displayname = models.CharField(max_length=15)
+    password    = models.CharField(max_length=500)
     admin       = models.BooleanField(default=False) # superuser 
     timestamp   = models.DateTimeField(auto_now_add=True)
 
