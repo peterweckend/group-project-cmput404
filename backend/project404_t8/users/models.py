@@ -21,6 +21,7 @@ class CustomUserManager(UserManager):
 class CustomUser(AbstractUser):
     username    = models.CharField(max_length=255, unique=True)
     password    = models.CharField(max_length=50)
+    displayname = models.CharField(max_length=15)
     admin       = models.BooleanField(default=False) # superuser 
     timestamp   = models.DateTimeField(auto_now_add=True)
 
@@ -29,9 +30,6 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.username
     
-    # def get_profile(self):
-    #     return self.username
-
     @property
     def is_admin(self):
         return self.admin
