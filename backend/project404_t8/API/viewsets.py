@@ -11,7 +11,8 @@ from .forms import uploadForm, friendRequestForm
 from django.conf import settings
 from users.models import CustomUser
 from random import uniform
-
+from django.urls import reverse_lazy
+from django.views.generic.edit import DeleteView
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
 # Django REST API Tutorial: Filtering System - https://youtu.be/s9V9F9Jtj7Q
 
@@ -240,7 +241,9 @@ def profileView(request, username):
     profile_posts = Post.objects.filter(author=request.user.id)
     return render(request, 'profile/profile.html', {'user':user, "posts":profile_posts})
 
-def postsListView(request):
+def homeListView(request):
+
+    # this try and except is to render posts into homepage
     try:
         uname = request.user
         uid = uname.id
@@ -259,4 +262,41 @@ def postsListView(request):
             SELECT * FROM API_post WHERE id in posts', [int(uid)]*6)
     except:
         post = Post.objects.all()
-    return render(request, 'homepage/home.html', {"post":post})
+
+    # get the user and friends and pass it to homepage
+    # user = CustomUser.objects.get(username=request.user)
+    friend = Friendship.objects.all()
+    
+
+    
+    return render(request, 'homepage/home.html', {"post":post,"friends":friend})
+class PostDelete(DeleteView):
+    model = Post
+    success_url= reverse_lazy("home")
+
+    template_name= 'delete/delete_post.html'
+# class PostEdit(UpdateView):
+#     template_name = "home.html"
+#     model = Post
+#     form_class= HomeForm
+class FriendDelete(DeleteView):
+    model = Friendship
+    success_url= reverse_lazy("home")
+
+    template_name= 'delete/delete_friend.html'
+    # overrided delete function so that not only will it delete the user who requests the friend deletion
+    # but also will delete the friendship on other user side
+
+    # how to delete stuff
+    # burhan Khalid
+    # https://stackoverflow.com/questions/12796870/how-does-django-delete-the-object-from-a-view
+    # rudra
+    # https://stackoverflow.com/questions/30747075/django-class-based-delete-view-and-validation
+    def delete (self,request, *args, **kwargs):
+       self.object= self.get_object()
+       
+       Friendship.objects.filter(friend_a=self.object.friend_b, friend_b=self.object.friend_a ).delete()
+
+       self.object.delete() 
+       return HttpResponseRedirect(self.success_url)
+        

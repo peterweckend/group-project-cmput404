@@ -42,7 +42,10 @@ p{
 }
 
 .item2 { grid-area: menu; }
-.item3 { grid-area: main; }
+.item3 { 
+  grid-area: main;
+  z-index:2;
+}
 .item4 { grid-area: right; }
 .item5 { grid-area: footer; }
 
@@ -136,4 +139,7 @@ nav a::before {
 
 nav a:hover::before {
   width: 100%;
+}
+.delete_post{
+  float: right;
 }
