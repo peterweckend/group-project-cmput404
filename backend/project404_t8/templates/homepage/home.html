@@ -21,6 +21,12 @@
           <div class="panel-body">
               <p class="ptitle">{{p.title}} </p>
               <p class="pbody">{{p.body}}</p>
+              {% if p.image_link != "" %}
+              {% load static %}
+              <!--CSS should ensure images fit within a certain size
+                  Atleast when they are being displayed on the homepage -->
+              <img class= "pimage" src="{% get_media_prefix %}{{ p.image_link }}">
+              {% endif %}
           </div>
         </div>
       </div>

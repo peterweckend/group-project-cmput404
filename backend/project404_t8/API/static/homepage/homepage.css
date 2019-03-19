@@ -32,6 +32,10 @@ p{
   text-align: left;
   padding-left: 5%;
 }
+.pimage{
+  width:500px;
+  height:300px;
+}
 .sidebar-nav {
     margin-top: 20px;
     padding: 0;

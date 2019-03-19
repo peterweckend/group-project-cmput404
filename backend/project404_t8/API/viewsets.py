@@ -262,10 +262,17 @@ def homeListView(request):
             SELECT * FROM API_post WHERE id in posts', [int(uid)]*6)
     except:
         post = Post.objects.all()
+    #     # Do not display an image if the image does not exist
+    # imageExists = False
+    # if post.image_link != "":
+    #     imageExists = True
 
     # get the user and friends and pass it to homepage
     # user = CustomUser.objects.get(username=request.user)
     friend = Friendship.objects.all()
+
+
+    
     
 
     
