@@ -13,6 +13,8 @@ from users.models import CustomUser
 from random import uniform
 from django.urls import reverse_lazy
 from django.views.generic.edit import DeleteView
+import API.services as Services
+
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
 # Django REST API Tutorial: Filtering System - https://youtu.be/s9V9F9Jtj7Q
 
@@ -112,57 +114,11 @@ def postView(request, id):
     if post.image_link != "":
         imageExists = True
     
-    
     # Perform privacy calculations
     # Has permission will be passed in
     # If its False we could either display a 404 or a "you do not have permission"
-    hasPermission = False
-    
-    # ('1', 'me'),
-    # This one will always apply, so it does not need an if conditional
-    if request.user.id == post.author.id:
-        hasPermission = True
-
-    # ('2', 'another author'),
-    if post.privacy_setting == '2':
-        if request.user.id == post.author or request.user.id == post.shared_author.id:
-            hasPermission = True
-
-    # ('3', 'my friends'),
-    # So first get the IDs of all the author's friends
-    if post.privacy_setting == '3':
-        # Get a list of all the rows in friends where friend_a/b == request.user.id
-        friends1 = Friendship.objects.filter(friend_a=post.author.id)
-        friends2 = Friendship.objects.filter(friend_b=post.author.id)
-        friends = set()
-        # alright this feels really messy but it should work I think
-        # If the models change things could get cringed but I actually think its fine
-        # Iterate through each queryset, and append the ids of each element to the list
-        for row in friends1:
-            friends.add(row.friend_b.id)
-        for row in friends2:
-            friends.add(row.friend_a.id)
-
-        # Friends are the authors friends
-        # If the requester is in the friends list they can view
-        if request.user.id in friends:
-            print(request.user.id, friends)
-            hasPermission = True
-
-    # ('4', 'friends of friends'),
-    # This is brutal enough to do in SQLite, how tf do we do it in Django???
-    # Can just bruteforce it I guess lol, for each user in authorsfriends
-    # query all their friends then add to another set
-
-    # ('5', 'only friends on my host'),
-    # Not sure how to implement this one, how do we know where the user's hosted on?
-    # This is a problem for the next deadline lel
-
-    # ('6', 'public')
-    # ('7', 'unlisted')
-    # The special thing about unlisted is the URL must be complicated or hard to guess
-    if post.privacy_setting in ["6","7"]:
-        hasPermission = True
+    requesting_user_id = request.user.id
+    hasPermission = Services.has_permission_to_see_post(requesting_user_id, post)
 
     # Post is the post data
     # imageExists is whether or not there is an image to display
