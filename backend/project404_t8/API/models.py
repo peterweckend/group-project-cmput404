@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 import uuid
 from django.dispatch import receiver
 from django.db.models.signals import post_save
+from django.db.models import DateTimeField, BooleanField
 
 # @receiver(post_save, sender=User)
 # def create_author_profile(sender, instance, created, **kwargs):
@@ -40,6 +41,7 @@ class Post(models.Model):
 
     # If true, post can be in markdown
     is_markdown = models.BooleanField(default=False)
+    published = DateTimeField(auto_now_add=True)
 
 
     def __str__(self):

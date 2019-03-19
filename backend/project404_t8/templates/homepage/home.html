@@ -11,7 +11,8 @@
     {% for p in post reversed %}
       <div class="row">
         <div class="panel panel-default">
-          <div class="puser">{{p.author}} (privacy option: {{p.privacy_setting}}) </div>
+          {% load tz %}
+          <div class="puser">{{p.author}} (privacy option: {{p.privacy_setting}}) {{p.published|timezone:"America/Edmonton"}} </div>
           {% if user.id == p.author_id %}
           <p class="delete_post">
                 
