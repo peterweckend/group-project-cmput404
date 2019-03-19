@@ -12,6 +12,10 @@ p{
 .links{
   text-align: center ;
 }
+.timePub{
+  font-size: 10px;
+  color:lightgrey;
+}
 .puser{
   font-size: 20px;
   color:black;

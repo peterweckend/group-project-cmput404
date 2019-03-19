@@ -12,11 +12,11 @@
       <div class="row">
         <div class="panel panel-default">
           {% load tz %}
-          <div class="puser">{{p.author}} (privacy option: {{p.privacy_setting}}) {{p.published|timezone:"America/Edmonton"}} </div>
+          <div class="puser">{{p.author}} (privacy option: {{p.privacy_setting}}) <div class="timePub">{{p.published|timezone:"America/Edmonton"}}</div> </div>
           {% if user.id == p.author_id %}
           <p class="delete_post">
                 
-              <a href="{% url 'delete_post' pk=p.pk  %}">Delete </a>
+              <a href="{% url 'delete_post' pk=p.pk  %}"><span class="glyphicon glyphicon-trash"> </a>
             </p>
           {% endif %}
           <div class="panel-body">
