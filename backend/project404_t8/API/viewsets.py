@@ -7,7 +7,7 @@ from .serializers import UserSerializer, PostSerializer, CommentSerializer, Frie
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
-from .forms import uploadForm, friendRequestForm
+from .forms import uploadForm, friendRequestForm,commentForm
 from django.conf import settings
 from users.models import CustomUser
 from random import uniform
@@ -205,10 +205,19 @@ def homeListView(request):
             SELECT * FROM API_post WHERE id in posts', [int(uid)]*6)
     except:
         post = Post.objects.all()
+    #     # Do not display an image if the image does not exist
+    # imageExists = False
+    # if post.image_link != "":
+    #     imageExists = True
 
     # get the user and friends and pass it to homepage
     # user = CustomUser.objects.get(username=request.user)
     friend = Friendship.objects.all()
+
+    # if request.user != None:
+    #     user = CustomUser.objects.get(username=request.user)        
+    #     print(user.github_id)
+    
     
     # Only pass in post and friends if they aren't none
     # If they are we cannot pass them in{"post":post,"":friend}
@@ -232,7 +241,7 @@ def homeListView(request):
         pass
         
     if friend:
-        pageVariables["friend"] = friend
+        pageVariables["friends"] = friend
 
     return render(request, 'homepage/home.html', pageVariables)
 
@@ -266,4 +275,28 @@ class FriendDelete(DeleteView):
 
        self.object.delete() 
        return HttpResponseRedirect(self.success_url)
-        
+def comment_thread(request,pk):
+    post = get_object_or_404(Post,pk =pk)
+    if request.method =='POST':
+        # pass
+        form = commentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            # newPost = Post(
+            #     author = request.user,
+            #     title = newPost["title"],
+            #     body = newPost["body"],
+            #     image_link = newPost["imageLink"],
+            #     privacy_setting = newPost["privacy"],
+            #     shared_author = newPost["sharedAuthor"],
+            #     is_markdown = newPost["markdown"]
+            # )
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+            return HttpResponseRedirect('/')
+    else:
+        form =commentForm()
+    template = "comments/comment_thread.html"
+    context = {'form':form}
+    return render(request,template,context)

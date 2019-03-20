@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 from django.urls import path
 
 # from . import views
-from .viewsets import uploadView, postView, profileView, friendRequestView
+from .viewsets import uploadView, postView, profileView, friendRequestView, comment_thread
 
 urlpatterns =[
     # path('',uploadView, name="post_list"),
@@ -12,5 +12,6 @@ urlpatterns =[
     path("post/<int:id>", postView, name="Post"),
     # path("profile/", profileView, name="profile"),
     url(r'profile/(?P<username>[a-zA-Z0-9]+)$', profileView, name='profile'),
+    
     path("friendrequest/", friendRequestView, name="Friend Request")
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
