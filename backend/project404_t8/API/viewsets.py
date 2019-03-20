@@ -18,7 +18,7 @@ from django.urls import reverse_lazy
 from django.views.generic.edit import DeleteView
 import API.services as Services
 from rest_framework.exceptions import APIException, MethodNotAllowed, NotFound
-
+from markdownx.utils import markdownify
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
 # Django REST API Tutorial: Filtering System - https://youtu.be/s9V9F9Jtj7Q
 
@@ -123,8 +123,12 @@ def postView(request, id):
     requesting_user_id = request.user.id
     hasPermission = Services.has_permission_to_see_post(requesting_user_id, post)
 
+    if post.is_markdown:
+        post.body = markdownify(post.body)
+
     # Post is the post data
     # imageExists is whether or not there is an image to display
+    # markDown is whether or not to display the plaintext or markdown contents
     # Has permission determines whether or not to display content to the user
     return render(request, 'post/post.html', {
         "post":post,
@@ -211,9 +215,33 @@ def homeListView(request):
     # user = CustomUser.objects.get(username=request.user)
     friend = Friendship.objects.all()
     
-
+    # Only pass in post and friends if they aren't none
+    # If they are we cannot pass them in{"post":post,"":friend}
+    pageVariables = {}
     
-    return render(request, 'homepage/home.html', {"post":post,"friends":friend})
+    # Check to see if any posts exist
+    try:
+        # This will index the first result of the query
+        # will crash if there are no results, taking us to except
+        post[0]
+
+        # Now that we are here, loop through each element
+        # And markdownify the body if it is_markdown
+        for p in post:
+            if p.is_markdown:
+                p.body = markdownify(p.body)
+
+        pageVariables["post"] = post
+    except:
+        # The raw query set returns no post, so do not pass in any post to the html
+        pass
+        
+    if friend:
+        pageVariables["friend"] = friend
+
+    return render(request, 'homepage/home.html', pageVariables)
+
+
 class PostDelete(DeleteView):
     model = Post
     success_url= reverse_lazy("home")

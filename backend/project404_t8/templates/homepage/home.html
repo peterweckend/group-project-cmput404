@@ -20,7 +20,7 @@
           {% endif %}
           <div class="panel-body">
               <p class="ptitle">{{p.title}} </p>
-              <p class="pbody">{{p.body}}</p>
+              <p class="pbody">{{p.body|safe}}</p>
           </div>
         </div>
       </div>

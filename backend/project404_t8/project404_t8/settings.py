@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'users',
+    'markdownx',
 ]
 
 AUTH_USER_MODEL = 'users.CustomUser'
