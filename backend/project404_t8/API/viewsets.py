@@ -119,10 +119,8 @@ def postView(request, id):
     requesting_user_id = request.user.id
     hasPermission = Services.has_permission_to_see_post(requesting_user_id, post)
 
-    print(post.body)
     if post.is_markdown:
         post.body = markdownify(post.body)
-    print(post.body)
 
     # Post is the post data
     # imageExists is whether or not there is an image to display
