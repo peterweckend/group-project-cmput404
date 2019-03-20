@@ -219,7 +219,6 @@ def homeListView(request):
         # This will index the first result of the query
         # will crash if there are no results, taking us to except
         post[0]
-        pageVariables["post"] = post
 
         # Now that we are here, loop through each element
         # And markdownify the body if it is_markdown
@@ -227,9 +226,11 @@ def homeListView(request):
             if p.is_markdown:
                 p.body = markdownify(p.body)
 
+        pageVariables["post"] = post
     except:
         # The raw query set returns no post, so do not pass in any post to the html
         pass
+        
     if friend:
         pageVariables["friend"] = friend
 
