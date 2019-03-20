@@ -21,7 +21,7 @@
           {% endif %}
           <div class="panel-body">
               <p class="ptitle">{{p.title}} </p>
-              <p class="pbody">{{p.body}}</p>
+              <p class="pbody">{{p.body|safe}}</p>
               {% if p.image_link != "" %}
               {% load static %}
               <!--CSS should ensure images fit within a certain size
@@ -40,6 +40,7 @@
               {% empty %}
               <p>There is no comments.</p>
               {% endfor %}
+              
           </div>
         </div>
       </div>
