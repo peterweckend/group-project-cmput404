@@ -266,4 +266,27 @@ class FriendDelete(DeleteView):
 
        self.object.delete() 
        return HttpResponseRedirect(self.success_url)
-        
+
+def friendsView(request):
+    # This will be a list of the users friends and friend requests
+    # In the future this could appear right on their profile as per the mockups
+    # but for now it will exist as its own page     
+    # It will also allow them to accept/ignore friend requests
+
+    # Probably at the top display all requests
+    # Then underneath display friends
+
+    # Right now, a friend request is an unignored follow
+    # So, get all the logged in users unignored follows
+    requests = Follow.objects.filter(receiver=request.user.id, ignored=False)
+
+    # Now we have the id's of all the unignored followers
+    # Convert that to a list of usernames
+    # We can do this by querying for each 
+
+
+    pageVariables = {}
+    if requests:
+        pageVariables["requests"] = requests
+    
+    return render(request, 'friends/friends.html', pageVariables)

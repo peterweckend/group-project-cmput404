@@ -1,0 +1,27 @@
+<!-- templates/friendrequest/friendrequest.html -->
+{% extends 'base.html' %}
+
+{% block title %}Send friend request{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+{% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'upload/upload.css' %}">
+
+<!--This is the friends page
+    In the future this will probably be on the users profile page
+    But again, this is like the first iteration of the thingy, proof of concept
+     -->
+<h1>Friends</h1>
+{% for request in requests %}
+  <div>{{ request.follower }}</div>    
+{% endfor %}
+
+{% else %}
+{% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
+
+  <p>You are not logged in</p>
+  <a href="{% url 'login' %}">login</a>
+{% endif %}
+{% endblock %}

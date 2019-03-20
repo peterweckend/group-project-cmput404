@@ -34,3 +34,8 @@ class friendRequestForm(forms.Form):
     # So to be even more honest we might not even need a form for this, but its
     # not a big deal right now
     friendToAdd = forms.CharField(label="Username", max_length=255)
+
+class acceptIgnoreRequestForm(forms.Form):
+    # This will simply be a button with an invisible value
+    # nvm this might be a stupid idea
+    pass
