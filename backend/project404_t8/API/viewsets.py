@@ -244,7 +244,8 @@ class FriendDelete(DeleteView):
        self.object.delete() 
        return HttpResponseRedirect(self.success_url)
         
-#### API Methods
+############ API Methods
+# todo: add comments explaining which classes are associated with which API endpoints
 class PostsViewSet(viewsets.ModelViewSet):
     http_method_names = ['get']
     queryset = Post.objects.filter()
@@ -299,6 +300,30 @@ class AuthorViewSet(viewsets.ModelViewSet):
             SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
             AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
             SELECT * FROM API_post WHERE id in posts', [int(uid)]*6)
+
+        serializer_class = PostSerializer(allowed_posts, many=True)
+        return Response(serializer_class.data)
+
+    # the API endpoint accessible at http://service/author/{author_id}/posts
+    @action(methods=['get'], detail=True, url_path="posts")
+    def userPosts(self, request, pk=None):
+        author_id = int(self.kwargs['pk'])
+        uname = request.user
+        uid = uname.id
+        allowed_posts = Post.objects.raw(' \
+        WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
+        (SELECT f2.friend_a_id AS fofid \
+            FROM API_friendship f \
+            JOIN API_friendship f2 ON f.friend_a_id = f2.friend_b_id \
+            WHERE fofid NOT IN (SELECT friend_a_ID FROM API_friendship  \
+            WHERE friend_b_id = %s) AND f.friend_b_id = %s AND fofid != %s) AND privacy_setting = 4 \
+        UNION \
+            SELECT id FROM API_post WHERE (author_id in  \
+            (WITH friends(fid) AS (SELECT friend_b_id FROM API_friendship WHERE friend_a_id=%s) \
+            SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
+            AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
+            SELECT * FROM API_post WHERE id in posts \
+            AND author_id = %s', [int(uid)]*6 + [author_id])
 
         serializer_class = PostSerializer(allowed_posts, many=True)
         return Response(serializer_class.data)
