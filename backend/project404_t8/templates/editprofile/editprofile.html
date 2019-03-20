@@ -3,13 +3,12 @@
 {% load static %}
 
 {% if user.is_authenticated %}
+    <!-- check if the logged in username is the same as the profile username -->
     {% if user.username == profile_author.username %} 
         <form method="POST" action="{% url 'editprofile' pk=user.pk %}">
             {% csrf_token %}
             <div class="form-group">
                 {{form.as_p}}
-                <!-- <label for ="displayname">Display Name</label>
-                <input id="displayname" class="form-control" type="text" maxlength="15" autofocus="true" required="true" value="{{user.displayname}}"></input> -->
             </div> 
             <input type="submit" value="Save Changes">
         </form>
