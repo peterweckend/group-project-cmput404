@@ -2,8 +2,7 @@
 {% block content %}
 {% load static %}
 {% if user.is_authenticated %}
-    {% if user.username == logged.username %}
-        <!-- {{ form }} <br> -->
+    {% if author.username == logged.username %}
         <form method="POST" action="{% url 'editprofile' username=user.username %}">
             {% csrf_token %}
             <div class="form-group">

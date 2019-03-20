@@ -245,12 +245,14 @@ def profileView(request, username):
 
 def editProfile(request, username):
     author = CustomUser.objects.get(username=username) 
-    form_class = EditProfileForm
+    # form_class = EditProfileForm
     if request.user.is_authenticated:
         logged_in = CustomUser.objects.get(username=request.user.username)
-        return render(request, 'editprofile/editprofile.html', {'author':author, "form":form_class, "logged": logged_in})
+        # return render(request, 'editprofile/editprofile.html', {'author':author, "form":form_class, "logged": logged_in})
+        return render(request, 'editprofile/editprofile.html', {'author':author, "logged": logged_in})
     else:
-        return render(request, 'editprofile/editprofile.html', {'author':author, "form":form_class})
+        # return render(request, 'editprofile/editprofile.html', {'author':author, "form":form_class})
+        return render(request, 'editprofile/editprofile.html', {'author':author})
 
 def homeListView(request):
 
