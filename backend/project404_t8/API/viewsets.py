@@ -119,6 +119,8 @@ def postView(request, id):
     requesting_user_id = request.user.id
     hasPermission = Services.has_permission_to_see_post(requesting_user_id, post)
 
+    post.title = "OVERWRIDDEN"
+
     # Post is the post data
     # imageExists is whether or not there is an image to display
     # Has permission determines whether or not to display content to the user
@@ -206,9 +208,23 @@ def homeListView(request):
     # user = CustomUser.objects.get(username=request.user)
     friend = Friendship.objects.all()
     
-
+    # Only pass in post and friends if they aren't none
+    # If they are we cannot pass them in{"post":post,"":friend}
+    pageVariables = {}
     
-    return render(request, 'homepage/home.html', {"post":post,"friends":friend})
+    # Check to see if any posts exist
+    try:
+        post[0]
+        pageVariables["post"] = post
+    except:
+        # The raw query set returns no post, so do not pass in any post to the html
+        pass
+    if friend:
+        pageVariables["friend"] = friend
+
+    return render(request, 'homepage/home.html', pageVariables)
+
+
 class PostDelete(DeleteView):
     model = Post
     success_url= reverse_lazy("home")
