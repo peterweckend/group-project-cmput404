@@ -7,13 +7,12 @@ from .serializers import UserSerializer, PostSerializer, CommentSerializer, Frie
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
-from .forms import uploadForm, friendRequestForm
+from .forms import uploadForm, friendRequestForm, EditProfileForm
 from django.conf import settings
 from users.models import CustomUser
 from random import uniform
 from django.urls import reverse_lazy
-from django.views.generic.edit import DeleteView
-from users.forms import EditProfileForm
+from django.views.generic.edit import DeleteView, UpdateView
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
 # Django REST API Tutorial: Filtering System - https://youtu.be/s9V9F9Jtj7Q
 
@@ -237,23 +236,53 @@ def friendRequestView(request):
 
 # still need to prevent users who aren't logged in from viewing
 def profileView(request, username):
-    # LoginRequiredMixin
-    # login_url: ''
+
     author = CustomUser.objects.get(username=username)
     profile_posts = Post.objects.filter(author=request.user.id)
     return render(request, 'profile/profile.html', {'author':author, "posts":profile_posts})
 
-def editProfile(request, username):
-    author = CustomUser.objects.get(username=username) 
-    # form_class = EditProfileForm
-    if request.user.is_authenticated:
-        logged_in = CustomUser.objects.get(username=request.user.username)
-        # return render(request, 'editprofile/editprofile.html', {'author':author, "form":form_class, "logged": logged_in})
-        return render(request, 'editprofile/editprofile.html', {'author':author, "logged": logged_in})
-    else:
-        # return render(request, 'editprofile/editprofile.html', {'author':author, "form":form_class})
-        return render(request, 'editprofile/editprofile.html', {'author':author})
+class editProfile(UpdateView):
 
+    model = CustomUser
+    form_class = EditProfileForm
+    template_name = "editprofile/editprofile.html"  
+    # success_url = reverse_lazy("home")
+    
+    def get(self, request, *args, **kwargs):
+        # author_username = self.kwargs.get('username', self.request.user.username)
+        # # if author_username == self.request.user.username:
+        # #     return HttpResponse(status=403)
+        # return super(editProfile, self).get(request, *args, **kwargs)
+        self.object = self.get_object()
+        # print(self.object)
+        return super(editProfile, self).get(request, *args, **kwargs)
+
+    # def get_object(self, queryset=None):
+    #     # print(self.request.user)
+    #     self.object = CustomUser.objects.get(id=self.kwargs['pk'])
+    #     obj = CustomUser.objects.get(id=self.kwargs['pk'])
+    #     return obj
+        
+    def get_context_data(self, **kwargs):
+        # context = super(editProfile, self).get_context_data(**kwargs)
+        # authorID = self.kwargs.get('authorID', self.request.user.id)
+        # print(authorID)
+        # profile_author = get_object_or_404(CustomUser, id=authorID)
+        # context['profile_author']= profile_author
+        # return context
+        context = super().get_context_data(**kwargs)
+        context['profile_author'] = get_object_or_404(CustomUser, id=self.object.id)
+        return context
+    
+    def form_valid(self, form):
+        #save cleaned post data
+        clean = form.cleaned_data
+        self.object = form.save()
+        return super(editProfile, self).form_valid(form)
+
+    def get_success_url(self, *args, **kwargs):
+        return reverse_lazy("home")
+  
 def homeListView(request):
 
     # this try and except is to render posts into homepage

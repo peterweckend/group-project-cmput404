@@ -1,4 +1,5 @@
 from django import forms
+from users.models import CustomUser
 
 # This must support markdown
 # Maybe have a button that tells the post to display it in markdown
@@ -36,3 +37,19 @@ class friendRequestForm(forms.Form):
     # So to be even more honest we might not even need a form for this, but its
     # not a big deal right now
     friendToAdd = forms.CharField(label="", max_length=50)
+
+class EditProfileForm(forms.ModelForm):
+    
+    class Meta:
+        model = CustomUser
+        fields = ['displayname']
+        labels = {
+            "displayname": "Display Name"
+        }
+        
+    def save(self, user=None):
+        user_profile = super(EditProfileForm, self).save(commit=False)
+        if user:
+            user_profile = user 
+        user_profile.save()
+        return user_profile

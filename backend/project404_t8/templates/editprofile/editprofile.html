@@ -1,23 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
 {% load static %}
+
 {% if user.is_authenticated %}
-    {% if author.username == logged.username %}
-        <form method="POST" action="{% url 'editprofile' username=user.username %}">
+    {% if user.username == profile_author.username %} 
+        <form method="POST" action="{% url 'editprofile' pk=user.pk %}">
             {% csrf_token %}
             <div class="form-group">
-                <label for ="displayname">Display Name</label>
-                <input id="displayname" class="form-control" type="text" maxlength="15" autofocus="true" required="true" value="{{user.displayname}}"></input>
-            </div>
+                {{form.as_p}}
+                <!-- <label for ="displayname">Display Name</label>
+                <input id="displayname" class="form-control" type="text" maxlength="15" autofocus="true" required="true" value="{{user.displayname}}"></input> -->
+            </div> 
             <input type="submit" value="Save Changes">
         </form>
     {% else %}
-        <h2>This is not your page. You cannot edit this.</h2>
+    <h2>You do not have permission to access this page.</h2>
     {% endif %}
 {% else %}
-  <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
-
-  <p>You are not logged in</p>
-  <a href="{% url 'login' %}">login</a>
+    <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
+    <p>You are not logged in</p>
+    <a href="{% url 'login' %}">login</a>
 {% endif %}
 {% endblock %}

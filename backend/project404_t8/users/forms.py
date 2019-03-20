@@ -8,6 +8,9 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm):
         model = CustomUser
         fields = ('username', 'displayname', 'email')
+        labels = {
+            'displayname': 'Display name'
+        }
         widgets = {
             'password': forms.PasswordInput(),
         }
@@ -22,8 +25,3 @@ class CustomUserChangeForm(UserChangeForm):
             
         }
 
-class EditProfileForm(ModelForm):
-    
-    class Meta:
-        model = CustomUser
-        fields = ['displayname']
