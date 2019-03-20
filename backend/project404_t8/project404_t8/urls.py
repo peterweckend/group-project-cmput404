@@ -35,12 +35,8 @@ urlpatterns = [
     url(r'^',include('users.urls')),
     url(r'^deletePost/(?P<pk>\d+)/$', PostDelete.as_view(), name="delete_post"),
     url(r'^deleteFriend/(?P<pk>\d+)/$', FriendDelete.as_view(), name="delete_friend"),
-<<<<<<< HEAD
     url(r'^post/(?P<pk>\d+)/commentPost/', comment_thread, name="comment"),
-
-=======
     url(r'^markdownx/', include('markdownx.urls'))
->>>>>>> origin/master
 ]
 
 if settings.DEBUG:

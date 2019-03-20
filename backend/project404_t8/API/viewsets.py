@@ -214,7 +214,9 @@ def homeListView(request):
     # user = CustomUser.objects.get(username=request.user)
     friend = Friendship.objects.all()
 
-
+    # if request.user != None:
+    #     user = CustomUser.objects.get(username=request.user)        
+    #     print(user.github_id)
     
     
     # Only pass in post and friends if they aren't none
@@ -229,7 +231,7 @@ def homeListView(request):
         # The raw query set returns no post, so do not pass in any post to the html
         pass
     if friend:
-        pageVariables["friend"] = friend
+        pageVariables["friends"] = friend
 
     return render(request, 'homepage/home.html', pageVariables)
 
