@@ -103,7 +103,6 @@ def postView(request, id):
     # We could check to see if the user has permission to view this post in here
     # Based on the privacy setting etc.
 
-
     # This is our post object with the given ID
     # If the post doesn't exist it instantly 404's
     # This way we won't have to do any taxing database math
@@ -153,33 +152,17 @@ def friendRequestView(request):
             #     friend = Friendship(friend_a=request.user, friend_b=newUser)
             #     friend.save()
             
-            receiverId = form.cleaned_data["friendToAdd"]
-            receiverId = CustomUser.objects.get(pk=receiverId)
-            followerId = request.user
+            receiver_username = form.cleaned_data["friendToAdd"]
+            receiver_username = CustomUser.objects.get(username=receiver_username)
+            follower_username = request.user
 
-            # If the inverse relationship exists, remove it,
-            # Then add the relationship to friends instead
-            # So first, query for the relationship
-            if Follow.objects.filter(follower=receiverId, receiver=followerId).exists():
-                # Delete this entry, then create a friend relationship instead
-                follow = Follow.objects.get(follower=receiverId, receiver=followerId)
-                follow.delete()
-                friend = Friendship(friend_a=followerId, friend_b=receiverId)
-                friend.save()
+            if receiver_username == follower_username:
+                # just return a redirect for now
+                return HttpResponseRedirect('/')
 
-                # Addition by TOLU
-                # we have to add this because we need the relationship going both ways
-                # for the database SQL queries of friend of friends
-                friend = Friendship(friend_a=receiverId, friend_b=followerId)
-                friend.save()
+            # not yet functionality to prevent multiple requests in a row
 
-            # maybe make sure the user cant send a new friend request after already
-            # being friends
-            else:
-                # Create the entry in follow, essentially sending the friend request
-                follow = Follow(follower=followerId, receiver=receiverId)
-                follow.save()
-            
+            Services.handle_friend_request(receiver_username, follower_username)
 
             # redirect to a new URL: homepage
             return HttpResponseRedirect('/')

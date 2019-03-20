@@ -55,3 +55,30 @@ def has_permission_to_see_post(requesting_user_id, post):
         hasPermission = True
 
     return hasPermission
+
+
+def handle_friend_request(receiver_username, follower_username):
+    print("1", receiver_username)
+    print("2", follower_username)
+    # If the inverse relationship exists, remove it,
+    # Then add the relationship to friends instead
+    # So first, query for the relationship
+    if Follow.objects.filter(follower=receiver_username, receiver=follower_username).exists():
+        # Delete this entry, then create a friend relationship instead
+        follow = Follow.objects.get(follower=receiver_username, receiver=follower_username)
+        follow.delete()
+        friend = Friendship(friend_a=follower_username, friend_b=receiver_username)
+        friend.save()
+
+        # Addition by TOLU
+        # we have to add this because we need the relationship going both ways
+        # for the database SQL queries of friend of friends
+        friend = Friendship(friend_a=receiver_username, friend_b=follower_username)
+        friend.save()
+
+    # maybe make sure the user cant send a new friend request after already
+    # being friends
+    else:
+        # Create the entry in follow, essentially sending the friend request
+        follow = Follow(follower=follower_username, receiver=receiver_username)
+        follow.save()

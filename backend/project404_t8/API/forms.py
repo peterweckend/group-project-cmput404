@@ -31,8 +31,6 @@ class uploadForm(forms.Form):
 class friendRequestForm(forms.Form):
     # Basically will just be a char field
     # Actually, this should just be a button that appears on a users profile
-    # Manually entering a name/id is so stupid lmfao
-    # we will do it this way for now though just as proof of concept
     # So to be even more honest we might not even need a form for this, but its
     # not a big deal right now
-    friendToAdd = forms.CharField(label="", max_length=50)
+    friendToAdd = forms.CharField(label="Username", max_length=255)
