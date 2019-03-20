@@ -2,13 +2,71 @@ from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from rest_framework.test import APITestCase, APIClient
 from rest_framework.views import status
-from .models import Post
+from .models import Post, Friendship
 from .serializers import PostSerializer
 from .viewsets import uploadView, postView
 import users.models as UserModels
 import API.serializers as Serializers
 import json
 import API.services as Services
+
+class PrivacyTestCase(TestCase):
+
+    def setUp(self):
+        self.userTestModel = UserTestModel()
+        self.author = UserModels.CustomUser.objects.create(id=100, username='user1')
+        self.someUser = UserModels.CustomUser.objects.create(id=101, username='user2')
+        self.strangerUser = UserModels.CustomUser.objects.create(id=102, username='user3')
+        self.friendship = Friendship.objects.create(friend_a=self.author, friend_b=self.someUser)
+        Post.objects.create(id=1001, title="this is a post", body="hello", author=self.author, privacy_setting="1")
+        Post.objects.create(id=1002, title="this is a post", body="hello", author=self.author, privacy_setting="2", shared_author=self.someUser)
+        Post.objects.create(id=1003, title="this is a post", body="hello", author=self.author, privacy_setting="3")
+        Post.objects.create(id=1006, title="this is a post", body="hello", author=self.author, privacy_setting="6")
+
+        # use this to create HTTP Requests
+        self.factory = RequestFactory()
+
+    def test_user_can_see_their_own_posts(self):
+        """Users can see their own posts"""
+        myPost = Post.objects.get(id=1001)
+
+        hasPermission = Services.has_permission_to_see_post(100, myPost)
+        self.assertEqual(True, hasPermission)
+
+    def test_user_can_see_another_author_posts_when_allowed(self):
+        """Authorized users can see the post when the post privacy is set to Another Author"""
+        myPost = Post.objects.get(id=1002)
+
+        hasPermission = Services.has_permission_to_see_post(101, myPost)
+        self.assertEqual(True, hasPermission)
+
+    def test_user_cannot_see_another_author_posts_when_not_allowed(self):
+        """Users cannot see Another Author posts if they aren't authorized"""
+        myPost = Post.objects.get(id=1002)
+        hasPermission = Services.has_permission_to_see_post(102, myPost)
+        self.assertEqual(False, hasPermission)
+
+    def test_user_can_see_their_friends_posts_when_allowed(self):
+        """Users can see their friends' posts when the posts are set to My Friends"""
+        myPost = Post.objects.get(id=1003)
+        hasPermission = Services.has_permission_to_see_post(101, myPost)
+        self.assertEqual(True, hasPermission)
+
+    def test_user_cannot_see_friends_posts_of_non_friends(self):
+        """Users can't see My Friends posts when they aren't friends"""
+        myPost = Post.objects.get(id=1003)
+        hasPermission = Services.has_permission_to_see_post(102, myPost)
+        self.assertEqual(False, hasPermission)
+
+    # friends of friends isn't implemented
+
+    # friends of host isn't implemented
+
+    def test_user_can_see_public_posts(self):
+        """Users can see public posts"""
+        myPost = Post.objects.get(id=1006)
+        hasPermission = Services.has_permission_to_see_post(102, myPost)
+        self.assertEqual(True, hasPermission)
 
 class postTestCase(APITestCase):
     client = APIClient()
@@ -59,21 +117,4 @@ class FriendTestCase(TestCase):
 # todo: refactor this
 class UserTestModel():
         user = None
-
-class PrivacyTestCase(TestCase):
-
-    def setUp(self):
-        self.userTestModel = UserTestModel()
-        self.author = UserModels.CustomUser.objects.create(id=100, username='user1')
-        Post.objects.create(id=1000, title="this is a post", body="hello", author=self.author, privacy_setting="1")
-
-        # use this to create HTTP Requests
-        self.factory = RequestFactory()
-
-    def test_post_view(self):
-        # # """Users can see their own posts"""
-        myPost = Post.objects.get(id=1000)
-
-        hasPermission = Services.has_permission_to_see_post(100, myPost)
-        self.assertEqual(True, hasPermission)
 

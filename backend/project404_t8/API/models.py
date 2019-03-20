@@ -36,7 +36,7 @@ class Post(models.Model):
     privacy_setting = models.CharField(max_length=1, choices=PRIVACYCHOICE, default='1')
 
     # This is null if privacy_setting != 2. Specifies the ID of the shared author.
-    shared_author = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True) 
+    shared_author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True, related_name='shared_author') 
 
     # If true, post can be in markdown
     is_markdown = models.BooleanField(default=False)

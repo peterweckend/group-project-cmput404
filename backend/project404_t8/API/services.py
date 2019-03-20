@@ -54,4 +54,4 @@ def has_permission_to_see_post(requesting_user_id, post):
     if post.privacy_setting in ["6","7"]:
         hasPermission = True
 
-    return True
+    return hasPermission
