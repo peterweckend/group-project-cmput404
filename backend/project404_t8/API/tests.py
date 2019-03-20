@@ -2,7 +2,7 @@ from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from rest_framework.test import APITestCase, APIClient
 from rest_framework.views import status
-from .models import Post, Friendship
+from .models import Post, Friendship, Follow
 from .serializers import PostSerializer
 from .viewsets import uploadView, postView
 import users.models as UserModels
@@ -13,7 +13,6 @@ import API.services as Services
 class PrivacyTestCase(TestCase):
 
     def setUp(self):
-        self.userTestModel = UserTestModel()
         self.author = UserModels.CustomUser.objects.create(id=100, username='user1')
         self.someUser = UserModels.CustomUser.objects.create(id=101, username='user2')
         self.strangerUser = UserModels.CustomUser.objects.create(id=102, username='user3')
@@ -68,6 +67,55 @@ class PrivacyTestCase(TestCase):
         hasPermission = Services.has_permission_to_see_post(102, myPost)
         self.assertEqual(True, hasPermission)
 
+class FriendFollowerTestCase(TestCase):
+
+    def setUp(self):
+        self.userA = UserModels.CustomUser.objects.create(id=200, username='user10')
+        self.userB = UserModels.CustomUser.objects.create(id=201, username='user11')
+
+    def test_adding_new_friend(self):
+        """Check that after adding a friend, the user is following that friend"""
+        Services.handle_friend_request(self.userA, self.userB)
+        
+        if not Follow.objects.filter(follower=self.userB, receiver=self.userA).exists():
+            self.assertTrue(False)
+        elif Follow.objects.filter(follower=self.userA, receiver=self.userB).exists():
+            self.assertTrue(False)
+        elif Friendship.objects.filter(friend_a=self.userA, friend_b=self.userB).exists():
+            self.assertTrue(False)
+        elif Friendship.objects.filter(friend_a=self.userB, friend_b=self.userA).exists():
+            self.assertTrue(False)
+
+
+    def test_accepting_request(self):
+        """Check that after adding a friend, the user is following that friend"""
+        Services.handle_friend_request(self.userA, self.userB)
+        Services.handle_friend_request(self.userB, self.userA) 
+        
+        if Follow.objects.filter(follower=self.userB, receiver=self.userA).exists():
+            self.assertTrue(False)
+        elif Follow.objects.filter(follower=self.userA, receiver=self.userB).exists():
+            self.assertTrue(False)
+        elif not Friendship.objects.filter(friend_a=self.userA, friend_b=self.userB).exists():
+            self.assertTrue(False)
+        elif not Friendship.objects.filter(friend_a=self.userB, friend_b=self.userA).exists():
+            self.assertTrue(False)
+        
+
+    def test_test_cannot_add_yourself_as_friend(self):
+        """Check that you cannot add yourself as a friend"""
+        Services.handle_friend_request(self.userA, self.userA)
+        
+        if Follow.objects.filter(follower=self.userB, receiver=self.userA).exists():
+            self.assertTrue(False)
+        elif Follow.objects.filter(follower=self.userA, receiver=self.userB).exists():
+            self.assertTrue(False)
+        elif Friendship.objects.filter(friend_a=self.userA, friend_b=self.userB).exists():
+            self.assertTrue(False)
+        elif Friendship.objects.filter(friend_a=self.userB, friend_b=self.userA).exists():
+            self.assertTrue(False)
+
+
 class postTestCase(APITestCase):
     client = APIClient()
 
@@ -79,8 +127,6 @@ class postTestCase(APITestCase):
     def setUp(self):
         # add test data
         self.create_post(" glue", "i like glue with all my heart")
-        self.create_post("simple post", "ben is a loser")
-        self.create_post("love is wicked", "that hoe is a bitch")
         self.create_post("jam rock", "jamming like its the 90s")
 
 class GetAllPostsTest(postTestCase):
@@ -100,21 +146,4 @@ class GetAllPostsTest(postTestCase):
         # self.assertEqual(response.data, serialized.data)
         # self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-class FriendTestCase(TestCase):
-    def setUp(self):
-        # Animal.objects.create(name="lion", sound="roar")
-        # Animal.objects.create(name="cat", sound="meow")
-        return None
-
-    def test_something(self):
-        # """Animals that can speak are correctly identified"""
-        # lion = Animal.objects.get(name="lion")
-        # cat = Animal.objects.get(name="cat")
-        # self.assertEqual(lion.speak(), 'The lion says "roar"')
-        # self.assertEqual(cat.speak(), 'The cat says "meow"')
-        return None
-
-# todo: refactor this
-class UserTestModel():
-        user = None
 

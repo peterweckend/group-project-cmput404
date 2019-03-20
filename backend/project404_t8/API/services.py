@@ -58,8 +58,6 @@ def has_permission_to_see_post(requesting_user_id, post):
 
 
 def handle_friend_request(receiver_username, follower_username):
-    print("1", receiver_username)
-    print("2", follower_username)
     # If the inverse relationship exists, remove it,
     # Then add the relationship to friends instead
     # So first, query for the relationship
