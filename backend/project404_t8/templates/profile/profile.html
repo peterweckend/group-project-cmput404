@@ -4,14 +4,21 @@
 {% block title %}{{user.username}}'s profile{% endblock %}
 
 {% block content %}
+<!-- {{user.is_authenticated}} -->
+{% if user.is_authenticated %}
 {% load static %}
   <link rel="stylesheet" type="text/css" href="{% static 'profile/profile.css' %}">
-<div class='content-container'>
-  {{user.username}}
-  {% for post in posts %}
-    <ul>{{ post.title }}<br>
-      {{post.body}}
-    </ul>
-  {% endfor %}
+  <div class='content-container'>
+    <u>Hello, {{user.displayname}}!</u>
+    {% for post in posts %}
+      <ul>{{ post.title }}<br>
+        {{post.body}}
+      </ul>
+  </div>
+    {% endfor %}
+{% else %}
+  {% load static %} -->
+    <p>You can't see this</p>
+  {% endif %}
 </div>  
 {% endblock %}

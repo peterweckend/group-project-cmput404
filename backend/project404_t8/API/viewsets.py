@@ -13,6 +13,7 @@ from users.models import CustomUser
 from random import uniform
 from django.urls import reverse_lazy
 from django.views.generic.edit import DeleteView
+from users.forms import EditProfileForm
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
 # Django REST API Tutorial: Filtering System - https://youtu.be/s9V9F9Jtj7Q
 
@@ -234,12 +235,22 @@ def friendRequestView(request):
 
     return render(request, 'friendrequest/friendrequest.html', {'form': form})
 
+# still need to prevent users who aren't logged in from viewing
 def profileView(request, username):
     # LoginRequiredMixin
     # login_url: ''
     user = CustomUser.objects.get(username=username)
     profile_posts = Post.objects.filter(author=request.user.id)
     return render(request, 'profile/profile.html', {'user':user, "posts":profile_posts})
+
+def editProfile(request, username):
+    user = CustomUser.objects.get(username=username) 
+    form_class = EditProfileForm
+    if request.user.is_authenticated:
+        logged_in = CustomUser.objects.get(username=request.user.username)
+        return render(request, 'editprofile/editprofile.html', {'user':user, "form":form_class, "logged": logged_in})
+    else:
+        return render(request, 'editprofile/editprofile.html', {'user':user, "form":form_class})
 
 def homeListView(request):
 

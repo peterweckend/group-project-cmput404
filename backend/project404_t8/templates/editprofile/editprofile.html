@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+{{user.is_authenticated}}
+{% if user.username == logged.username %}
+    {{ form }} <br>
+    <input type="submit" value="Save Changes">
+{% else %}
+    <h2>You cannot view this page.</h2>
+{% endif %}
+{% endblock %}
