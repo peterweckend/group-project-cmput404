@@ -45,7 +45,7 @@
       <div class="item4">Right
           {% if user.is_authenticated %}
           <p class="links"><a href="/upload/">Create a post</a></p>
-          <p class="links"><a href="profile/edit/">Edit your profile</a></p>
+          <p class="links"><a href="{% url 'editprofile' username=user.username %}">Edit your profile</a></p>
           <p class ="links"><a href="friendrequest/">Make a friend request</a></p>
           <p class="links"><a href="{% url 'logout' %}">logout</a></p>
           <h1 style= "font-size: 1em"> <strong>Friends</strong>  </h1>
