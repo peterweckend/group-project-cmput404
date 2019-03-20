@@ -1,8 +1,10 @@
 {% extends '../base.html' %}
 {% block content %}
 {% if user.is_authenticated %}
-    {% if user.id == p.author_id %}
-        Are you sure you want to delete {{object.title}}?
+    {{p.author_id }}
+    {{user.id}}
+    {% if user.id == object.author_id %}
+        Are you sure you want to delete '{{object.title}}'?
 
         <form method ="POST">
             {% csrf_token %}
