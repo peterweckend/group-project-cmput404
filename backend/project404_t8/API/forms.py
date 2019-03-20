@@ -21,7 +21,7 @@ class uploadForm(forms.Form):
     # Alternatively could just post infer it when the user posts the form in the view
     # Furthermore, a post should require at least a summary or an image
     title = forms.CharField(label='Title', max_length=24)
-    body = forms.CharField(label='Body', max_length=100, required = False)
+    body = forms.CharField(label='Body', max_length=250, required = False, widget=forms.Textarea)
     markdown = forms.BooleanField(required = False)
     imageLink = forms.ImageField(label="Image",required = False)
     privacy = forms.CharField(label='Privacy', widget=forms.Select(choices=privacyOptions))

@@ -7,6 +7,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.db.models import DateTimeField, BooleanField
 
+
 # @receiver(post_save, sender=User)
 # def create_author_profile(sender, instance, created, **kwargs):
 #     if created:

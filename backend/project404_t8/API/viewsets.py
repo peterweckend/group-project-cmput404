@@ -14,7 +14,7 @@ from random import uniform
 from django.urls import reverse_lazy
 from django.views.generic.edit import DeleteView
 import API.services as Services
-
+from markdownx.utils import markdownify
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
 # Django REST API Tutorial: Filtering System - https://youtu.be/s9V9F9Jtj7Q
 
@@ -119,10 +119,14 @@ def postView(request, id):
     requesting_user_id = request.user.id
     hasPermission = Services.has_permission_to_see_post(requesting_user_id, post)
 
-    post.title = "OVERWRIDDEN"
+    print(post.body)
+    if post.is_markdown:
+        post.body = markdownify(post.body)
+    print(post.body)
 
     # Post is the post data
     # imageExists is whether or not there is an image to display
+    # markDown is whether or not to display the plaintext or markdown contents
     # Has permission determines whether or not to display content to the user
     return render(request, 'post/post.html', {
         "post":post,
