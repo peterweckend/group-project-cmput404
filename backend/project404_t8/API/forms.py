@@ -1,5 +1,5 @@
 from django import forms
-
+from .models import Comment,Post
 # This must support markdown
 # Maybe have a button that tells the post to display it in markdown
 # When the user selects 2/shared author, another HTML form should become unhidden
@@ -36,3 +36,7 @@ class friendRequestForm(forms.Form):
     # So to be even more honest we might not even need a form for this, but its
     # not a big deal right now
     friendToAdd = forms.CharField(label="", max_length=50)
+class commentForm(forms.ModelForm):
+    class Meta:
+        model=Comment
+        fields= ('datetime','body')

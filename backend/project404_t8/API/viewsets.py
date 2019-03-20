@@ -7,7 +7,7 @@ from .serializers import UserSerializer, PostSerializer, CommentSerializer, Frie
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
-from .forms import uploadForm, friendRequestForm
+from .forms import uploadForm, friendRequestForm,commentForm
 from django.conf import settings
 from users.models import CustomUser
 from random import uniform
@@ -306,4 +306,28 @@ class FriendDelete(DeleteView):
 
        self.object.delete() 
        return HttpResponseRedirect(self.success_url)
-        
+def comment_thread(request,pk):
+    post = get_object_or_404(Post,pk =pk)
+    if request.method =='POST':
+        # pass
+        form = commentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            # newPost = Post(
+            #     author = request.user,
+            #     title = newPost["title"],
+            #     body = newPost["body"],
+            #     image_link = newPost["imageLink"],
+            #     privacy_setting = newPost["privacy"],
+            #     shared_author = newPost["sharedAuthor"],
+            #     is_markdown = newPost["markdown"]
+            # )
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+            return HttpResponseRedirect('/')
+    else:
+        form =commentForm()
+    template = "comments/comment_thread.html"
+    context = {'form':form}
+    return render(request,template,context)

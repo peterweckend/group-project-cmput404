@@ -40,6 +40,17 @@ p{
   width:500px;
   height:300px;
 }
+.commentUser{
+  float: left;
+}
+.commentDate{
+  font-size: 10px;
+  color:lightgrey;
+
+}
+.commentBody{
+  
+}
 .sidebar-nav {
     margin-top: 20px;
     padding: 0;

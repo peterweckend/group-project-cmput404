@@ -28,6 +28,18 @@
                   Atleast when they are being displayed on the homepage -->
               <img class= "pimage" src="{% get_media_prefix %}{{ p.image_link }}">
               {% endif %}
+
+              <div class="comment"><a href="{% url 'comment' pk=p.pk %}">leave a comment </a></div>
+            
+              {% for comment in p.comments.all %}
+              <hr>
+              <p class="commentUser">{{comment.author}} </p>
+              <p class ="commentDate">{{comment.datetime}} </p>
+              <p class="commentBody">{{comment.body}} </p>
+              
+              {% empty %}
+              <p>There is no comments.</p>
+              {% endfor %}
           </div>
         </div>
       </div>
