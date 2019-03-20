@@ -243,7 +243,19 @@ class FriendDelete(DeleteView):
 
        self.object.delete() 
        return HttpResponseRedirect(self.success_url)
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
 ############ API Methods
 # todo: add comments explaining which classes are associated with which API endpoints
 class PostsViewSet(viewsets.ModelViewSet):
@@ -268,6 +280,15 @@ class PostsViewSet(viewsets.ModelViewSet):
         # permission_classes = (IsAuthenticated,)
         queryset = Post.objects.filter(pk=pk)
         serializer_class = PostSerializer(queryset, many=True)
+        return Response(serializer_class.data)
+    
+    # the API endpoint accessible at GET http://service/posts/{post_id}/comments
+    # not yet completed - to do when posts info is merged
+    @action(methods=['get'], detail=True, url_path="comments")
+    def userPostComments(self, request, pk=None):
+        post_id = pk
+        queryset = Comment.objects.filter(privacy_setting="6", post=post_id)
+        serializer_class = CommentSerializer(queryset, many=True)
         return Response(serializer_class.data)
 
 class AuthorViewSet(viewsets.ModelViewSet):
@@ -304,7 +325,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
         serializer_class = PostSerializer(allowed_posts, many=True)
         return Response(serializer_class.data)
 
-    # the API endpoint accessible at http://service/author/{author_id}/posts
+    # the API endpoint accessible at GET http://service/author/{author_id}/posts
     @action(methods=['get'], detail=True, url_path="posts")
     def userPosts(self, request, pk=None):
         author_id = int(self.kwargs['pk'])
@@ -325,5 +346,15 @@ class AuthorViewSet(viewsets.ModelViewSet):
             SELECT * FROM API_post WHERE id in posts \
             AND author_id = %s', [int(uid)]*6 + [author_id])
 
+        serializer_class = PostSerializer(allowed_posts, many=True)
+        return Response(serializer_class.data)
+
+    # the API endpoint accessible at GET http://service/author/<authorid>/friends/
+    @action(methods=['get'], detail=True, url_path="friends")
+    def userPosts(self, request, pk=None):
+        author_id = pk
+        # since the friendship table is 2-way, request a list of users whose 
+        # IDs are in the friendship table, not including the author
+        # make sure to format this the appropriate way
         serializer_class = PostSerializer(allowed_posts, many=True)
         return Response(serializer_class.data)
