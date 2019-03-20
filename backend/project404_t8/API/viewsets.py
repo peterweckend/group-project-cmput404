@@ -3,6 +3,9 @@ from rest_framework import generics,status,viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from .models import Post, Comment, Friendship, Follow, Server
+from users.models import CustomUser
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from .serializers import UserSerializer, PostSerializer, CommentSerializer, FriendshipSerializer, FollowSerializer, ServerSerializer
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
@@ -14,6 +17,7 @@ from random import uniform
 from django.urls import reverse_lazy
 from django.views.generic.edit import DeleteView
 import API.services as Services
+from rest_framework.exceptions import APIException, MethodNotAllowed, NotFound
 
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
 # Django REST API Tutorial: Filtering System - https://youtu.be/s9V9F9Jtj7Q
@@ -186,6 +190,7 @@ def homeListView(request):
     try:
         uname = request.user
         uid = uname.id
+        # todo: properly escape this using https://docs.djangoproject.com/en/1.9/topics/db/sql/#passing-parameters-into-raw
         post = Post.objects.raw(' \
         WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
         (SELECT f2.friend_a_id AS fofid \
@@ -239,3 +244,61 @@ class FriendDelete(DeleteView):
        self.object.delete() 
        return HttpResponseRedirect(self.success_url)
         
+#### API Methods
+class PostsViewSet(viewsets.ModelViewSet):
+    http_method_names = ['get']
+    queryset = Post.objects.filter()
+    serializer_class = PostSerializer
+
+    # Instantiates and returns the list of permissions that this view requires.
+    # def get_permissions(self):
+    #     if self.action == 'list':
+    #         permission_classes = []
+    #     else:
+    #         permission_classes = [IsAuthenticated]
+    #     return [permission() for permission in permission_classes]
+
+    def list(self, request):
+        queryset = Post.objects.filter(privacy_setting="6")
+        serializer_class = PostSerializer(queryset, many=True)
+        return Response(serializer_class.data)
+    
+    def retrieve(self, request, pk=None):
+        # permission_classes = (IsAuthenticated,)
+        queryset = Post.objects.filter(pk=pk)
+        serializer_class = PostSerializer(queryset, many=True)
+        return Response(serializer_class.data)
+
+class AuthorViewSet(viewsets.ModelViewSet):
+    # http_method_names = ['get', 'post', 'head']
+    permission_classes = (IsAuthenticated,)
+    queryset = CustomUser.objects.filter()
+    serializer_class = UserSerializer
+
+    def list(self, request):
+        raise NotFound()
+
+    def create(self, request):
+        raise NotFound()
+
+    @action(methods=['get'], detail=False)
+    def posts(self, request, pk=None):
+        uname = request.user
+        uid = uname.id
+        # todo: properly escape this using https://docs.djangoproject.com/en/1.9/topics/db/sql/#passing-parameters-into-raw
+        allowed_posts = Post.objects.raw(' \
+        WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
+        (SELECT f2.friend_a_id AS fofid \
+            FROM API_friendship f \
+            JOIN API_friendship f2 ON f.friend_a_id = f2.friend_b_id \
+            WHERE fofid NOT IN (SELECT friend_a_ID FROM API_friendship  \
+            WHERE friend_b_id = %s) AND f.friend_b_id = %s AND fofid != %s) AND privacy_setting = 4 \
+        UNION \
+            SELECT id FROM API_post WHERE (author_id in  \
+            (WITH friends(fid) AS (SELECT friend_b_id FROM API_friendship WHERE friend_a_id=%s) \
+            SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
+            AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
+            SELECT * FROM API_post WHERE id in posts', [int(uid)]*6)
+
+        serializer_class = PostSerializer(allowed_posts, many=True)
+        return Response(serializer_class.data)

@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic.base import TemplateView
 from django.conf.urls import url, include
-from .router import router
+from .router import router, api_router
 from rest_framework.authtoken import views
 from django.conf.urls.static import static
 from django.conf import settings
@@ -30,6 +30,7 @@ urlpatterns = [
     path('users/', include('django.contrib.auth.urls')), 
     path('', homeListView, name='home'),
     url(r'^', include(router.urls)),
+    url(r'^', include(api_router.urls)),
     url(r'^',include('API.urls')), 
     url(r'^',include('users.urls')),
     url(r'^deletePost/(?P<pk>\d+)/$', PostDelete.as_view(), name="delete_post"),
