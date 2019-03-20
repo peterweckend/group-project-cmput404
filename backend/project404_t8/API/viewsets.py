@@ -234,7 +234,6 @@ def friendRequestView(request):
 
     return render(request, 'friendrequest/friendrequest.html', {'form': form})
 
-# still need to prevent users who aren't logged in from viewing
 def profileView(request, username):
 
     author = CustomUser.objects.get(username=username)
@@ -246,40 +245,26 @@ class editProfile(UpdateView):
     model = CustomUser
     form_class = EditProfileForm
     template_name = "editprofile/editprofile.html"  
-    # success_url = reverse_lazy("home")
     
     def get(self, request, *args, **kwargs):
-        # author_username = self.kwargs.get('username', self.request.user.username)
-        # # if author_username == self.request.user.username:
-        # #     return HttpResponse(status=403)
-        # return super(editProfile, self).get(request, *args, **kwargs)
         self.object = self.get_object()
         # print(self.object)
         return super(editProfile, self).get(request, *args, **kwargs)
 
-    # def get_object(self, queryset=None):
-    #     # print(self.request.user)
-    #     self.object = CustomUser.objects.get(id=self.kwargs['pk'])
-    #     obj = CustomUser.objects.get(id=self.kwargs['pk'])
-    #     return obj
-        
     def get_context_data(self, **kwargs):
-        # context = super(editProfile, self).get_context_data(**kwargs)
-        # authorID = self.kwargs.get('authorID', self.request.user.id)
-        # print(authorID)
-        # profile_author = get_object_or_404(CustomUser, id=authorID)
-        # context['profile_author']= profile_author
-        # return context
         context = super().get_context_data(**kwargs)
+        # if the profile doesn't exist, return 404, otherwise return the profile author object 
         context['profile_author'] = get_object_or_404(CustomUser, id=self.object.id)
         return context
     
+    # update the model
     def form_valid(self, form):
         #save cleaned post data
         clean = form.cleaned_data
         self.object = form.save()
         return super(editProfile, self).form_valid(form)
 
+    # redirects to homepage after successful edit 
     def get_success_url(self, *args, **kwargs):
         return reverse_lazy("home")
   
