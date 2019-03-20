@@ -55,7 +55,7 @@ class Comment(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
     post = models.ForeignKey(Post, on_delete=models.CASCADE, blank=True, null=True,related_name="comments")
     datetime = models.DateTimeField(default=datetime.now, blank=True)
-    body = models.TextField()
+    body = models.TextField(default="comment")
 
     def __str__(self):
             return '%s %s %s %s' % (self.id, self.author, self.post, self.datetime)
