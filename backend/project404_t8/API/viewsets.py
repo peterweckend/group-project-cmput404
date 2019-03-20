@@ -214,10 +214,11 @@ def homeListView(request):
     # user = CustomUser.objects.get(username=request.user)
     friend = Friendship.objects.all()
 
-    # if request.user != None:
-    #     user = CustomUser.objects.get(username=request.user)        
-    #     print(user.github_id)
-    
+    try:
+        user = CustomUser.objects.get(username=request.user)        
+        print(user.github_id,1)
+    except:
+        pass
     
     # Only pass in post and friends if they aren't none
     # If they are we cannot pass them in{"post":post,"":friend}
