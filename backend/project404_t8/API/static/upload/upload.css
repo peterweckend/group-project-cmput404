@@ -1,0 +1,13 @@
+:root{
+    --dark-main: #34495e;
+    --light-main: #f4f7f7;
+    --dark-secondary: #5da0a2;
+    --light-secondary: #aacfd0;
+    --orange-color: #da6342;
+    --beige-color: #e9dcd3;
+    --letter-grey: #afaeae;
+  }
+
+body {
+    background-color: var(--light-main);
+}
