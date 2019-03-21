@@ -7,7 +7,10 @@
 {% if user.is_authenticated %}
 {% load static %}
   <div class='content-container'>
+    <h1 class="page-header">Your Profile</h1>
     <u>Hello, {{author.displayname}}!</u>
+
+    <h1 class="section-header">Posts</h1>
     {% for post in posts %}
       <ul>{{ post.title }}<br>
         {{post.body}}

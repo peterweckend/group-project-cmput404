@@ -9,7 +9,7 @@
   <link rel="stylesheet" type="text/css" href="{% static 'homepage.css' %}">
 
   {{ user.username }}!
-  <p><a href="{% url 'logout' %}">logout</a></p>
+  <p><a href="{% url 'logout' %}">Logout</a></p>
 {% else %}
 {% load static %}
   <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">

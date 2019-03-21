@@ -13,6 +13,7 @@ body {
   /* height: 100%; */
 }
 
+
 p{
     color:rgb(8, 8, 8);
     /* text-align: center; */
@@ -20,12 +21,31 @@ p{
     font-size: 20px
     
 }
-.panel-heading{
+.panel-heading {
   font-size: 20px;
   text-align:left;
 }
+
+.page-header {
+  margin-top: 0px !important;
+}
+
+.side-menu-item {
+  margin-top: 20px;
+}
+
+.friends-menu {
+  margin-top: 40px;
+}
+
+.section-header {
+  text-decoration: underline;
+}
+
 .links{
-  text-align: center ;
+  text-align: center;
+  margin-top: 20px;
+  color: var(--dark-secondary);
 }
 .timePub{
   font-size: 10px;
