@@ -14,7 +14,7 @@
     The accept and ignore buttons should use AJAX to send/ignore the request
     Then refresh the dom/friend list
      -->
-<h1>Friend Requests</h1>
+<h1 class="section-header">Friend Requests</h1>
 {% for r in requests %}
   <div>
     {{ r }} 
@@ -23,7 +23,7 @@
   </div>    
 {% endfor %}
 </br>
-<h1>Friends</h1>
+<h1 class="section-header">Friends</h1>
 {% for friend in friends %}
   <!-- this should be a hyperlink to their profile -->
   <div>
