@@ -49,8 +49,8 @@
 {% else %}
   {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
-    <p>You are not logged in</p>
-    <p><a href="{% url 'signup' %}">Sign Up</a></p>
-    <p><a href="{% url 'login' %}">Log In </a></p>
+    <p class="login-objects">You are not logged in</p>
+    <p class="login-objects"><a href="{% url 'signup' %}">Sign Up</a></p>
+    <p class="login-objects"><a href="{% url 'login' %}">Log In </a></p>
   {% endif %}
 {% endblock %}

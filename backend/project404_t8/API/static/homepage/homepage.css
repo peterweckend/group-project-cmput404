@@ -13,6 +13,14 @@ html, body {
   background-color: var(--light-main);
 }
 
+.create-post {
+  margin-bottom: 20%;
+}
+
+textarea {
+  rows: 6;
+}
+
 /* ---------- HEADER ---------- */
 header {
   background: var(--dark-main);
@@ -197,6 +205,8 @@ height:300px;
 .commentDate{
   font-size: 11px;
   color: #657786;
+  padding-right: 7%;
+  text-align: center;
 }
 .commentBody{
   font-family: Arial, Garamond !important; 
@@ -209,6 +219,8 @@ height:300px;
 
 .comment {
   font-size: 15px;
+  text-align: center;
+  padding-left: 4%;
 }
 
 .nocomments {
@@ -330,6 +342,10 @@ nav a:hover {
 
 .delete_post{
   float: right;
-  margin-top: -7%;
+  margin-top: -9%;
   padding: 1% 1%;
+}
+
+.login-objects {
+  /* margin-left: 200px; */
 }
