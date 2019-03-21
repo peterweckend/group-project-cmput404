@@ -101,6 +101,7 @@ def handle_friend_request(receiver_username, follower_username):
         follow.save()
 
     updateNotifications(receiver_username)
+    updateNotifications(follower_username)
 
 
 def updateNotifications(username):
