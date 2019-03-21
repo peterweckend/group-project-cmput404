@@ -5,6 +5,9 @@
     --light-secondary: #aacfd0;
 }
 
+body {
+    background-color: var(--light-main);
+}
 p {
     color:var(--dark-main);
 }

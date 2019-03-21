@@ -3,7 +3,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>{% block title %}Django Auth Tutorial{% endblock %}</title>
+  <title>{% block title %}Connectify{% endblock %}</title>
   {% load static %}
   <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -14,92 +14,97 @@
   type="text/javascript"></script>
 </head>
 <header>
-    <div class="container">
+  <div class="container">
     <a href="/">
-          <!-- <img src="" alt="logo" > -->
-        <img class="mainlogo" src="{% static 'img/logo_light.png' %}" alt="logo" width=150px height=40px>
+      <!-- <img src="" alt="logo" > -->
+      <img class="mainlogo" src="{% static 'img/connectifylogo.png' %}" alt="logo">
     </a>
-      <!-- if the user is not authenticated, it cannot grab a username  -->
+    <!-- if the user is not authenticated, it cannot grab a username  -->
+    {% if user.is_authenticated %}
+    <nav>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <!--Display some extra stuff regarding friends if the user has 
+            unignored friend requests
+            Would this just be an if/else??? -->
+        {% if user.friend_requests > 0 %}
+        <li><a href="/friends/">My Friends <font color="red">({{user.friend_requests}})</font></a></li>
+        {% else %}
+        <li><a href="/friends/">My Friends</a></li>
+        {% endif %}
+        <li><a href="{% url 'profile' username=user.username %}">My Profile</a></li>
+      </ul>
+    </nav>
+    {% endif %}
+  </div>
+</header>
+<body>
+  <div class="row">
+    <!-- -------------------- LEFT COLUMN -------------------- -->
+    <div class="leftcolumn">
       {% if user.is_authenticated %}
-      <nav>
-        <ul>
-          <li><a href="/">Home</a></li>
-          <!--Display some extra stuff regarding friends if the user has 
-              unignored friend requests
-              Would this just be an if/else??? -->
-          {% if user.friend_requests > '0' %}
-          <li><a href="/friends/">My Friends <font color="red">({{user.friend_requests}})</font></a></li>
-          {% else %}
-          <li><a href="/friends/">My Friends</a></li>
-          {% endif %}
-          <li><a href="{% url 'profile' username=user.username %}">My Profile</a></li>
-        </ul>
-      </nav>
+
+        <h1>Actions</h1>
+        <p class="links"><a href="/upload/">Create a post</a></p>
+        <p class="links"><a href="{% url 'editprofile' pk=user.pk %}">Edit your profile</a></p>
+        <p class ="links"><a href="/friendrequest/">Make a friend request</a></p>
+        <p class="links"><a href="{% url 'logout' %}">Logout</a></p>
+        
+        <h1 class="side-menu-item friends-menu" style= "font-size: 1em"> 
+
       {% endif %}
     </div>
-  </header>
-<body>
-  <main>
-    <div class="grid-container">
-     
-      <div class="item2">
 
+    <!-- -------------------- MAIN COLUMN -------------------- -->
+    <div class="midcolumn">
+      <!-- <div class="item3"> -->
+        {% block content %}
+          <!-- Main -->
+        {% endblock %}
+      <!-- </div> -->
+    </div>
 
+    <!-- -------------------- RIGHT COLUMN -------------------- -->
+    <div class="rightcolumn">
+      {% if user.is_authenticated %}
+        <h1>Friends</h1>
+      
+        {% for friend in friends %}
+          {% if user.id == friend.friend_a_id %}
+              
+            <p> <a href="{% url 'profile' username=friend.friend_b %}">{{friend.friend_b}}</a></p>
+            <a href ="{% url 'delete_friend' pk=friend.pk %}"> <button type="button" class="btn btn-default">Remove Friend</button></a>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+
+      <!-- <div class="item2">
         <style type="text/css">
         @import url("http://www.google.com/uds/solutions/dynamicfeed/gfdynamicfeedcontrol.css");
 
         #feedControl {
-        margin-top : 10px;
-        margin-left: auto;
-        margin-right: auto;
-        width : 440px;
-        font-size: 12px;
-        color: #9CADD0;
+          margin-top : 10px;
+          margin-left: auto;
+          margin-right: auto;
+          width : 440px;
+          font-size: 12px;
+          color: #9CADD0;
         }
         </style>
-        <script type="text/javascript">
-        function load() {
-        var feed ="http://feeds.bbci.co.uk/news/world/rss.xml";
-        new GFdynamicFeedControl(feed, "feedControl");
-
-        }
-        google.load("feeds", "1");
-        google.setOnLoadCallback(load);
+          <script type="text/javascript">
+          function load() {
+            var feed ="http://feeds.bbci.co.uk/news/world/rss.xml";
+            new GFdynamicFeedControl(feed, "feedControl");
+          }
+          google.load("feeds", "1");
+          google.setOnLoadCallback(load);
         </script>
-      </div>
-
-      <div class="item3">
-        {% block content %}
-            Main 
-        {% endblock %}
-      </div>
-      <div class="item4 side-menu-item">Actions
-          {% if user.is_authenticated %}
-          <p class="links"><a href="/upload/">Create a post</a></p>
-          <p class="links"><a href="{% url 'editprofile' pk=user.pk %}">Edit your profile</a></p>
-          <p class ="links"><a href="/friendrequest/">Make a friend request</a></p>
-          <p class="links"><a href="{% url 'logout' %}">Logout</a></p>
-          
-          <h1 class="side-menu-item friends-menu" style= "font-size: 1em"> <strong>Friends</strong>  </h1>
-        
-          {% for friend in friends %}
-            {% if user.id == friend.friend_a_id %}
-                
-              <p> <a href="{% url 'profile' username=friend.friend_b %}">{{friend.friend_b}}</a></p>
-              <a href ="{% url 'delete_friend' pk=friend.pk %}"> <button type="button" class="btn btn-default">Remove Friend</button></a>
-            {% endif %}
-          {% endfor %}
-          
-        {% endif %}
-      </div>
-      <div class="item5">Footer
-        
-      </div>
+      </div> -->
     </div>
-      
-
- 
-
-  </main>
+  </div>
+  
+  <div class="footer navbar-fixed-bottom">
+    <p>Connectify © 2019</p>
+  </div>
 </body>
 </html>

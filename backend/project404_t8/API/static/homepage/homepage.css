@@ -3,78 +3,200 @@
   --light-main: #f4f7f7;
   --dark-secondary: #5da0a2;
   --light-secondary: #aacfd0;
+  --orange-color: #da6342;
+  --beige-color: #e9dcd3;
+  --letter-grey: #afaeae;
 }
-/* var(--variablename) */
-
 * { padding: 0; margin: 0; }
 
-body {
+html, body {
   background-color: var(--light-main);
-  /* height: 100%; */
 }
 
+.create-post {
+  margin-bottom: 20%;
+}
 
+textarea {
+  rows: 6;
+}
+
+/* ---------- HEADER ---------- */
+header {
+  background: var(--dark-main);
+  height: 65px;
+  position: sticky !important;
+  top: 0;
+  z-index: 2;
+  padding: 10px;
+}
+.mainlogo {
+  margin-top: 5px;
+  width: 20%;
+  height: 20%;
+}
+header::after {
+  content: '';
+  display: table;
+  clear: both;
+}
+nav {
+  float: right;
+}
+nav ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+nav li {
+  display: inline-block;
+  margin-left: 70px;
+  padding-top: 15px;
+  position: relative;
+}
+nav a {
+  color: var(--light-main);
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 20px;
+}
+nav a:hover {
+  /* color: var(--dark-secondary); */
+  color: white;
+}
+nav a::before {
+  content: '';
+  display: block;
+  height: 5px;
+  background-color: var(--light-main);
+  position: absolute;
+  top: 0;
+  width: 0%;
+  transition: all ease-in-out 250ms;
+}
+nav a:hover::before {
+  width: 100%;
+}
+
+/* ---------- PAGE OUTLINE ---------- */
+.leftcolumn {   
+  float: left;
+  width: 25%;
+  padding-left: 50px;
+  position: sticky !important;
+  top: 10%;
+  z-index: 2;
+  text-align: left !important;
+}
+.midcolumn {   
+  float: left;
+  width: 50%;
+  padding-left: 30px;
+  padding-right: 60px;
+
+}
+.rightcolumn {
+  float: right;
+  width: 25%;
+  padding-right: 50px;
+  position: sticky !important;
+  top: 10%;
+  z-index: 2;
+}
+
+.row h1{
+  color: var(--dark-main);
+}
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Footer */
+.footer {
+  bottom: 0;
+  z-index: 2;
+  width: 100%;
+  height: 50px;
+  position: sticky;
+  text-align: center;
+  background: var(--dark-main);
+}
+.footer p {
+  padding-top: 13px;
+  color: var(--light-main);
+  font-size: 15px !important;
+}
+/* Responsive layout - when the screen is less than 800px wide, make the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 800px) {
+  .leftcolumn, .rightcolumn {   
+    width: 100%;
+    padding: 0;
+  }
+}
+
+/* ---------- NEXT PART HERE ---------- */
 p{
-    color:rgb(8, 8, 8);
-    /* text-align: center; */
-    margin:auto;
-    font-size: 20px
-    
+  color:rgb(8, 8, 8);
+  margin:auto;
+  font-size: 20px;
 }
 .panel-heading {
-  font-size: 20px;
-  text-align:left;
+font-size: 20px;
+text-align:left;
 }
 
 .page-header {
-  margin-top: 0px !important;
+margin-top: 0px !important;
 }
 
 .side-menu-item {
-  margin-top: 20px;
+margin-top: 20px;
 }
 
 .friends-menu {
-  margin-top: 40px;
+margin-top: 40px;
 }
 
 .section-header {
-  text-decoration: underline;
+text-decoration: underline;
 }
 
 .links{
-  text-align: center;
-  margin-top: 20px;
-  color: var(--dark-secondary);
+/* text-align: center; */
+margin-top: 20px;
+color: var(--dark-secondary);
 }
 .timePub{
-  font-size: 10px;
-  color:#657786;
+font-size: 10px;
+color: #657786;
 }
 .puser{
-  font-size: 20px;
-  color:black;
-  text-align: left;
-  padding-left: 15px;
-  padding-top: 2%;
+font-size: 20px;
+color:black;
+text-align: left;
+padding-left: 15px;
+padding-top: 2%;
 }
 .ptitle{
-  font-size: 25px;
-  color:rgb(43, 43, 43);
-  text-align: left;
-  padding-left: 8px;
-  padding-top: 10px;
-  
+font-size: 25px;
+color:rgb(43, 43, 43);
+text-align: left;
+padding-left: 8px;
+padding-top: 10px;
+
 }
 .pbody{
-  font-size: 20px;
-  color:rgb(43, 43, 43);
-  text-align: left;
-  padding-left: 5%;
+font-size: 20px;
+color:rgb(43, 43, 43);
+text-align: left;
+padding-left: 5%;
 }
 .pimage{
-  width:500px;
-  height:300px;
+width:500px;
+height:300px;
 }
 .commentUser{
   float: left;
@@ -83,6 +205,8 @@ p{
 .commentDate{
   font-size: 11px;
   color: #657786;
+  padding-right: 7%;
+  text-align: center;
 }
 .commentBody{
   font-family: Arial, Garamond !important; 
@@ -95,6 +219,8 @@ p{
 
 .comment {
   font-size: 15px;
+  text-align: center;
+  padding-left: 4%;
 }
 
 .nocomments {
@@ -116,39 +242,39 @@ p{
   padding-bottom: 5%;
 }
 .sidebar-nav {
-    margin-top: 20px;
-    padding: 0;
-    list-style: none;
+  margin-top: 20px;
+  padding: 0;
+  list-style: none;
 }
 #greeting{
-  font-weight: bolder;
-  color: var(--dark-main);
-  text-align: left;
+font-weight: bolder;
+color: var(--dark-main);
+text-align: left;
 }
 
 .item2 { grid-area: menu; }
 .item3 { 
-  grid-area: main;
-  z-index:2;
+grid-area: main;
+z-index:2;
 }
 .item4 { grid-area: right; }
 .item5 { grid-area: footer;}
 
 .grid-container {
-  display: grid;
-  grid-template-areas:
-    'menu menu main main right right'
-    'footer footer footer footer footer footer';
-  grid-gap: 10px;
-  background-color: var(--light-main);
-  padding: 10px;
+display: grid;
+grid-template-areas:
+  'menu menu main main right right'
+  'footer footer footer footer footer footer';
+grid-gap: 10px;
+background-color: var(--light-main);
+padding: 10px;
 }
 
 .grid-container > div {
-  background-color: var(--light-main);
-  text-align: center;
-  padding: 20px 0;
-  font-size: 30px;
+background-color: var(--light-main);
+text-align: center;
+padding: 20px 0;
+font-size: 30px;
 }
 @import url('https://fonts.googleapis.com/css?family=Work+Sans:400,600');
 body {
@@ -213,25 +339,13 @@ nav a:hover {
   color: white;
 }
 
-nav a::before {
-  content: '';
-  display: block;
-  height: 5px;
-  background-color: var(--light-main);
 
-  position: absolute;
-  top: 0;
-  width: 0%;
-
-  transition: all ease-in-out 250ms;
-}
-
-nav a:hover::before {
-  width: 100%;
-}
 .delete_post{
   float: right;
-  /* margin-top: -50px; */
-  margin-top: -7%;
+  margin-top: -9%;
   padding: 1% 1%;
+}
+
+.login-objects {
+  /* margin-left: 200px; */
 }
