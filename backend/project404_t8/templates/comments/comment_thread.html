@@ -1,0 +1,27 @@
+<!-- templates/friendrequest/friendrequest.html -->
+{% extends 'base.html' %}
+
+{% block title %}Add new comment{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+{% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'upload/upload.css' %}">
+
+<!--This is the friend request page
+    This is for testing honestly, not final
+    Will just be a JS/AJAX button instead down the road -->
+<h1>Add new comment</h1>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Send">
+</form>
+{% else %}
+{% load static %}
+  <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
+
+  <p>You are not logged in</p>
+  <a href="{% url 'login' %}">login</a>
+{% endif %}
+{% endblock %}

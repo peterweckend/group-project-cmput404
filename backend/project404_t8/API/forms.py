@@ -1,6 +1,6 @@
 from django import forms
 from users.models import CustomUser
-
+from .models import Comment,Post
 # This must support markdown
 # Maybe have a button that tells the post to display it in markdown
 # When the user selects 2/shared author, another HTML form should become unhidden
@@ -22,7 +22,7 @@ class uploadForm(forms.Form):
     # Alternatively could just post infer it when the user posts the form in the view
     # Furthermore, a post should require at least a summary or an image
     title = forms.CharField(label='Title', max_length=24)
-    body = forms.CharField(label='Body', max_length=100, required = False)
+    body = forms.CharField(label='Body', max_length=250, required = False, widget=forms.Textarea)
     markdown = forms.BooleanField(required = False)
     imageLink = forms.ImageField(label="Image",required = False)
     privacy = forms.CharField(label='Privacy', widget=forms.Select(choices=privacyOptions))
@@ -51,3 +51,9 @@ class EditProfileForm(forms.ModelForm):
             user_profile = user 
         user_profile.save()
         return user_profile
+        
+class commentForm(forms.ModelForm):
+    class Meta:
+        model=Comment
+        fields= ('datetime','body')
+    

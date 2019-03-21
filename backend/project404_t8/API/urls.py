@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 from django.urls import path
 
 # from . import views
-from .viewsets import uploadView, postView, profileView, friendRequestView, editProfile
+from .viewsets import uploadView, postView, profileView, friendRequestView, editProfile, comment_thread
 
 urlpatterns =[
     # path('',uploadView, name="post_list"),

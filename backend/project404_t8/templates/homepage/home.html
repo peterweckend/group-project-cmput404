@@ -11,22 +11,36 @@
     {% for p in post reversed %}
       <div class="row">
         <div class="panel panel-default">
-          <div class="puser">{{p.author}} (privacy option: {{p.privacy_setting}}) </div>
+          {% load tz %}
+          <div class="puser">{{p.author}} (privacy option: {{p.privacy_setting}}) <div class="timePub">{{p.published|timezone:"America/Edmonton"}}</div> </div>
           {% if user.id == p.author_id %}
           <p class="delete_post">
                 
-              <a href="{% url 'delete_post' pk=p.pk  %}">Delete </a>
+              <a href="{% url 'delete_post' pk=p.pk  %}"><span class="glyphicon glyphicon-trash"> </a>
             </p>
           {% endif %}
           <div class="panel-body">
               <p class="ptitle">{{p.title}} </p>
-              <p class="pbody">{{p.body}}</p>
+              <p class="pbody">{{p.body|safe}}</p>
               {% if p.image_link != "" %}
               {% load static %}
               <!--CSS should ensure images fit within a certain size
                   Atleast when they are being displayed on the homepage -->
               <img class= "pimage" src="{% get_media_prefix %}{{ p.image_link }}">
               {% endif %}
+
+              <div class="comment"><a href="{% url 'comment' pk=p.pk %}">leave a comment </a></div>
+            
+              {% for comment in p.comments.all %}
+              <hr>
+              <p class="commentUser">{{comment.author}} </p>
+              <p class ="commentDate">{{comment.datetime}} </p>
+              <p class="commentBody">{{comment.body}} </p>
+              
+              {% empty %}
+              <p>There is no comments.</p>
+              {% endfor %}
+              
           </div>
         </div>
       </div>

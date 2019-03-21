@@ -25,7 +25,8 @@ class CustomUser(AbstractUser):
     password    = models.CharField(max_length=500)
     admin       = models.BooleanField(default=False) # superuser 
     timestamp   = models.DateTimeField(auto_now_add=True)
-
+    github_id   = models.CharField(max_length=255)
+    github_url  = models.CharField(max_length=255)
     objects = CustomUserManager()
 
     def __str__(self):

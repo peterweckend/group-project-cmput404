@@ -7,14 +7,14 @@ from .serializers import UserSerializer, PostSerializer, CommentSerializer, Frie
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
-from .forms import uploadForm, friendRequestForm, EditProfileForm
+from .forms import uploadForm, friendRequestForm, EditProfileForm, commentForm
 from django.conf import settings
 from users.models import CustomUser
 from random import uniform
 from django.urls import reverse_lazy
 from django.views.generic.edit import DeleteView, UpdateView
 import API.services as Services
-
+from markdownx.utils import markdownify
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
 # Django REST API Tutorial: Filtering System - https://youtu.be/s9V9F9Jtj7Q
 
@@ -119,8 +119,12 @@ def postView(request, id):
     requesting_user_id = request.user.id
     hasPermission = Services.has_permission_to_see_post(requesting_user_id, post)
 
+    if post.is_markdown:
+        post.body = markdownify(post.body)
+
     # Post is the post data
     # imageExists is whether or not there is an image to display
+    # markDown is whether or not to display the plaintext or markdown contents
     # Has permission determines whether or not to display content to the user
     return render(request, 'post/post.html', {
         "post":post,
@@ -237,12 +241,39 @@ def homeListView(request):
     # user = CustomUser.objects.get(username=request.user)
     friend = Friendship.objects.all()
 
+    try:
+        user = CustomUser.objects.get(username=request.user)        
+        print(user.github_id,1)
+    except:
+        pass
+    
+    # Only pass in post and friends if they aren't none
+    # If they are we cannot pass them in{"post":post,"":friend}
+    pageVariables = {}
+    
+    # Check to see if any posts exist
+    try:
+        # This will index the first result of the query
+        # will crash if there are no results, taking us to except
+        post[0]
 
-    
-    
+        # Now that we are here, loop through each element
+        # And markdownify the body if it is_markdown
+        for p in post:
+            if p.is_markdown:
+                p.body = markdownify(p.body)
 
-    
-    return render(request, 'homepage/home.html', {"post":post,"friends":friend})
+        pageVariables["post"] = post
+    except:
+        # The raw query set returns no post, so do not pass in any post to the html
+        pass
+        
+    if friend:
+        pageVariables["friends"] = friend
+
+    return render(request, 'homepage/home.html', pageVariables)
+
+
 class PostDelete(DeleteView):
     model = Post
     success_url= reverse_lazy("home")
@@ -272,4 +303,28 @@ class FriendDelete(DeleteView):
 
        self.object.delete() 
        return HttpResponseRedirect(self.success_url)
-        
+def comment_thread(request,pk):
+    post = get_object_or_404(Post,pk =pk)
+    if request.method =='POST':
+        # pass
+        form = commentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            # newPost = Post(
+            #     author = request.user,
+            #     title = newPost["title"],
+            #     body = newPost["body"],
+            #     image_link = newPost["imageLink"],
+            #     privacy_setting = newPost["privacy"],
+            #     shared_author = newPost["sharedAuthor"],
+            #     is_markdown = newPost["markdown"]
+            # )
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+            return HttpResponseRedirect('/')
+    else:
+        form =commentForm()
+    template = "comments/comment_thread.html"
+    context = {'form':form}
+    return render(request,template,context)
