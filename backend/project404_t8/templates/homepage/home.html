@@ -12,7 +12,8 @@
       <div class="row">
         <div class="panel panel-default">
           {% load tz %}
-          <div class="puser">{{p.author}} (privacy option: {{p.privacy_setting}}) <div class="timePub">{{p.published|timezone:"America/Edmonton"}}</div> </div>
+          <div class="puser"><a href="{% url 'profile' username=user.username %}">{{p.author}}</a>
+          <div class="timePub">{{p.published|timezone:"America/Edmonton"}}</div> </div>
           {% if user.id == p.author_id %}
           <p class="delete_post">
                 
@@ -29,16 +30,16 @@
               <img class= "pimage" src="{% get_media_prefix %}{{ p.image_link }}">
               {% endif %}
 
-              <div class="comment"><a href="{% url 'comment' pk=p.pk %}">leave a comment </a></div>
+              <div class="comment"><a href="{% url 'comment' pk=p.pk %}">Leave a comment</a></div>
             
               {% for comment in p.comments.all %}
               <hr>
-              <p class="commentUser">{{comment.author}} </p>
+              <p class="commentUser"><a href="{% url 'profile' username=comment.author %}"> {{comment.author}} </a></p>
               <p class ="commentDate">{{comment.datetime}} </p>
               <p class="commentBody">{{comment.body}} </p>
               
               {% empty %}
-              <p>There is no comments.</p>
+              <p>There are currently no comments.</p>
               {% endfor %}
               
           </div>

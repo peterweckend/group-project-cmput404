@@ -163,20 +163,22 @@ color: var(--dark-secondary);
 }
 .timePub{
 font-size: 10px;
-color:lightgrey;
+color: #657786;
 }
 .puser{
-font-size: 15px;
+font-size: 20px;
 color:black;
 text-align: left;
-padding-left: 2%;
+padding-left: 15px;
 padding-top: 2%;
 }
 .ptitle{
 font-size: 25px;
 color:rgb(43, 43, 43);
 text-align: left;
-padding-left: 2%;
+padding-left: 8px;
+padding-top: 10px;
+
 }
 .pbody{
 font-size: 20px;
@@ -189,16 +191,44 @@ width:500px;
 height:300px;
 }
 .commentUser{
-float: left;
+  float: left;
+  padding-left: 15px;
 }
 .commentDate{
-font-size: 10px;
-color:lightgrey;
-
+  font-size: 11px;
+  color: #657786;
 }
-/* .commentBody{
+.commentBody{
+  font-family: Arial, Garamond !important; 
+  /* font-weight: book; */
+  font-style: italic;
+  float: left;
+  padding-left: 8px;
+  font-size: 17px;
+}
 
-} */
+.comment {
+  font-size: 15px;
+}
+
+.nocomments {
+  font-size: 13px;
+  color: #657786;
+}
+
+.displayname{
+  color: #14171a;
+  text-align: left;
+  margin-left: -2%;
+}
+.username{
+  color: #657786;
+  text-align: left;
+  font-size: 20px;
+  margin-top: -0.5%;
+  margin-left: -2%;
+  padding-bottom: 5%;
+}
 .sidebar-nav {
   margin-top: 20px;
   padding: 0;
@@ -235,20 +265,71 @@ padding: 20px 0;
 font-size: 30px;
 }
 @import url('https://fonts.googleapis.com/css?family=Work+Sans:400,600');
-/* body {
-margin: 0;
-background: #222;
-font-family: 'Work Sans', sans-serif;
-font-weight: 800;
-} */
+body {
+  margin: 0;
+  background: #222;
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 800;
+}
 
 .container {
-width: 80%;
-margin: 0 auto;
+  width: 80%;
+  margin: 0 auto;
+}
+
+header {
+  background: var(--dark-main);
+  height: 65px;
+}
+
+.mainlogo {
+  margin-top: 10px;
+}
+
+header::after {
+  content: '';
+  display: table;
+  clear: both;
+}
+
+.logo {
+  float: left;
+  font-size: 30px;
+}
+
+nav {
+  float: right;
+}
+
+nav ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+nav li {
+  display: inline-block;
+  margin-left: 70px;
+  padding-top: 23px;
+
+  position: relative;
+}
+
+nav a {
+  color: var(--light-main);
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 14px;
+}
+
+nav a:hover {
+  /* color: var(--dark-secondary); */
+  color: white;
 }
 
 
 .delete_post{
   float: right;
-  margin: 30px !important;
+  margin-top: -7%;
+  padding: 1% 1%;
 }

@@ -5,6 +5,7 @@
 {% block content %}
 {% if user.is_authenticated %}
 {% load static %}
+
 <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
 <h1 id="greeting">{{ user.displayname }}'s Profile.</h1>
 <br>
@@ -13,7 +14,8 @@
   <div class="row">
     <div class="panel panel-default">
       {% load tz %}
-      <div class="puser">{{p.author}} (privacy option: {{p.privacy_setting}}) <div class="timePub">{{p.published|timezone:"America/Edmonton"}}</div> </div>
+      <div class="puser"><a href="{% url 'profile' username=user.username %}">{{post.author}}</a> 
+      <div class="timePub">{{p.published|timezone:"America/Edmonton"}}</div> </div>
       {% if user.id == p.author_id %}
       <p class="delete_post">
           <a href="{% url 'delete_post' pk=p.pk  %}"><span class="glyphicon glyphicon-trash"> </a>
@@ -33,18 +35,19 @@
         
           {% for comment in p.comments.all %}
           <hr>
-          <p class="commentUser">{{comment.author}} </p>
+          <p class="commentUser"><a href="{% url 'profile' username=comment.author %}">{{comment.author}}</a> </p>
           <p class ="commentDate">{{comment.datetime}} </p>
           <p class="commentBody">{{comment.body}} </p>
           
           {% empty %}
-          <p>There is no comments.</p>
+          hr><br><p class="nocomments">There are currently no comments.</p><br>
           {% endfor %}
           
       </div>
     </div>
   </div>
 {% endfor %}
+
 {% else %}
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">

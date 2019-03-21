@@ -182,9 +182,11 @@ def friendRequestView(request):
     return render(request, 'friendrequest/friendrequest.html', {'form': form})
 
 def profileView(request, username):
-
+    
+    # will probably change the edit profile functionality later, and check if profile author == logged in user here
+    # get the profile author
     author = CustomUser.objects.get(username=username)
-    profile_posts = Post.objects.filter(author=request.user.id)
+    profile_posts = Post.objects.filter(author=author.id)
     return render(request, 'profile/profile.html', {'author':author, "posts":profile_posts})
 
 class editProfile(UpdateView):
