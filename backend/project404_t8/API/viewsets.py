@@ -13,7 +13,6 @@ from users.models import CustomUser
 from random import uniform
 from django.urls import reverse_lazy
 from django.views.generic.edit import DeleteView, UpdateView
-from django.views.generic.edit import DeleteView
 import API.services as Services
 
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
