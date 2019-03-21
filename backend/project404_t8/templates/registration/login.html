@@ -1,9 +1,10 @@
 <!-- templates/registration/login.html -->
 {% extends 'base.html' %}
-
+{% load static %}
 {% block title %}Login{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
 <h2>Login</h2>
 <form method="post">
   {% csrf_token %}
