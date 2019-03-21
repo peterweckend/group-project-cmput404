@@ -217,6 +217,10 @@ def homeListView(request):
     try:
         user = CustomUser.objects.get(username=request.user)        
         print(user.github_id,1)
+        if user.github_id != 1:
+            user.github_url = "https://api.github.com/users/%s/events/public".format(user.github_id)
+            github_url= user.github_url
+
     except:
         pass
     
@@ -240,9 +244,10 @@ def homeListView(request):
     except:
         # The raw query set returns no post, so do not pass in any post to the html
         pass
-        
-    if friend:
+    if user:
         pageVariables["friends"] = friend
+    if friend:
+        pageVariables["githubUrl"] = github_url
 
     return render(request, 'homepage/home.html', pageVariables)
 
