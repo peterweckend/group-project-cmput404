@@ -315,9 +315,10 @@ def comment_thread(request,pk):
 
 
 ############ API Methods
-# todo: add comments explaining which classes are associated with which API endpoints
+# https://www.django-rest-framework.org/api-guide/routers/
+# https://www.django-rest-framework.org/api-guide/viewsets/#api-reference
 class PostsViewSet(viewsets.ModelViewSet):
-    http_method_names = ['get']
+    http_method_names = ['get'] # only GETs allowed right now
     queryset = Post.objects.filter()
     serializer_class = PostSerializer
 
@@ -329,11 +330,13 @@ class PostsViewSet(viewsets.ModelViewSet):
     #         permission_classes = [IsAuthenticated]
     #     return [permission() for permission in permission_classes]
 
+    # http://service/posts (all posts marked as public on the server)
     def list(self, request):
         queryset = Post.objects.filter(privacy_setting="6")
         serializer_class = PostSerializer(queryset, many=True)
         return Response(serializer_class.data)
     
+    # http://service/posts/{POST_ID} access to a single post with id = {POST_ID}
     def retrieve(self, request, pk=None):
         # permission_classes = (IsAuthenticated,)
         queryset = Post.objects.filter(pk=pk)
@@ -350,17 +353,20 @@ class PostsViewSet(viewsets.ModelViewSet):
         return Response(serializer_class.data)
 
 class AuthorViewSet(viewsets.ModelViewSet):
-    # http_method_names = ['get', 'post', 'head']
+    # http_method_names = ['get', 'post', 'head'] # specify which types of requests are allowed
     permission_classes = (IsAuthenticated,)
     queryset = CustomUser.objects.filter()
     serializer_class = UserSerializer
 
+    # we don't want there to be any functionality for http://service/author
     def list(self, request):
         raise NotFound()
 
+    # we don't want there to be any functionality for http://service/author
     def create(self, request):
         raise NotFound()
 
+    # http://service/author/posts (posts that are visible to the currently authenticated user)
     @action(methods=['get'], detail=False)
     def posts(self, request, pk=None):
         uname = request.user
@@ -408,12 +414,16 @@ class AuthorViewSet(viewsets.ModelViewSet):
         return Response(serializer_class.data)
 
     # the API endpoint accessible at GET http://service/author/<authorid>/friends/
+    # not yet finished!
     @action(methods=['get'], detail=True, url_path="friends")
     def userPosts(self, request, pk=None):
         author_id = pk
         # since the friendship table is 2-way, request a list of users whose 
         # IDs are in the friendship table, not including the author
         # make sure to format this the appropriate way
+
         serializer_class = PostSerializer(allowed_posts, many=True)
         return Response(serializer_class.data)
+
+
 
