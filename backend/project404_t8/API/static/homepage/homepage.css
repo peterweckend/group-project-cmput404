@@ -226,6 +226,8 @@ height:300px;
 .nocomments {
   font-size: 13px;
   color: #657786;
+  text-align: center;
+  padding-left: 4%
 }
 
 .displayname{
@@ -342,7 +344,7 @@ nav a:hover {
 
 .delete_post{
   float: right;
-  margin-top: -9%;
+  margin-top: -7%;
   padding: 1% 1%;
 }
 

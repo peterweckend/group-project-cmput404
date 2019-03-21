@@ -5,6 +5,7 @@
 {% if user.is_authenticated %}
     <!-- check if the logged in username is the same as the profile username -->
     {% if user.username == profile_author.username %} 
+        <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
         <form method="POST" action="{% url 'editprofile' pk=user.pk %}">
             {% csrf_token %}
             <div class="form-group">
