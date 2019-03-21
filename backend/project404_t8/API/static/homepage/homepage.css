@@ -49,7 +49,7 @@ p{
 }
 .timePub{
   font-size: 10px;
-  color:lightgrey;
+  color:#657786;
 }
 .puser{
   font-size: 20px;
@@ -81,16 +81,16 @@ p{
   padding-left: 15px;
 }
 .commentDate{
-  font-size: 10px;
-  color:lightgrey;
-
+  font-size: 11px;
+  color: #657786;
 }
 .commentBody{
-  font-family: 'Garamond'; 
-  font-weight: book;
+  font-family: Arial, Garamond !important; 
+  /* font-weight: book; */
   font-style: italic;
   float: left;
   padding-left: 8px;
+  font-size: 17px;
 }
 
 .comment {
@@ -99,9 +99,15 @@ p{
 
 .nocomments {
   font-size: 13px;
-  color: #D3D3D3;
+  color: #657786;
 }
 
+.displayname{
+  color: #14171a;
+}
+.username{
+  color: #657786;
+}
 .sidebar-nav {
     margin-top: 20px;
     padding: 0;

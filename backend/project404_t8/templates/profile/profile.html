@@ -13,13 +13,14 @@
   <div class="row">
     <div class="panel panel-default">
       {% load tz %}
+      <div class="puser">{{post.author}} (privacy option: {{post.privacy_setting}}) <div class="timePub">{{post.published|timezone:"America/Edmonton"}}</div> </div>
       <p class="ptitle">{{post.title}} </p>
       <p class="pbody">{{post.body|safe}}</p>
       {% if post.image_link != "" %}
       {% load static %}
       <!--CSS should ensure images fit within a certain size
           Atleast when they are being displayed on the homepage -->
-      <img class= "pimage" src="{% get_media_prefix %}{{ p.image_link }}">
+      <img class= "pimage" src="{% get_media_prefix %}{{ post.image_link }}">
       {% endif %}      
       <div class="comment"><a href="{% url 'comment' pk=post.pk %}">Leave a comment</a></div> 
       {% for comment in post.comments.all %}
