@@ -27,7 +27,7 @@
         <!--Display some extra stuff regarding friends if the user has 
             unignored friend requests
             Would this just be an if/else??? -->
-        {% if user.friend_requests > 0 %}
+        {% if user.friend_requests > '0' %}
         <li><a href="/friends/">My Friends <font color="red">({{user.friend_requests}})</font></a></li>
         {% else %}
         <li><a href="/friends/">My Friends</a></li>
