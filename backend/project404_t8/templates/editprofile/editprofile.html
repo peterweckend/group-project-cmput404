@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+
+{% if user.is_authenticated %}
+    <!-- check if the logged in username is the same as the profile username -->
+    {% if user.username == profile_author.username %} 
+        <form method="POST" action="{% url 'editprofile' pk=user.pk %}">
+            {% csrf_token %}
+            <div class="form-group">
+                {{form.as_p}}
+            </div> 
+            <input type="submit" value="Save Changes">
+        </form>
+    {% else %}
+    <h2>You do not have permission to access this page.</h2>
+    {% endif %}
+{% else %}
+    <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
+    <p>You are not logged in</p>
+    <a href="{% url 'login' %}">login</a>
+{% endif %}
+{% endblock %}

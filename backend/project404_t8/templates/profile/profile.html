@@ -1,17 +1,25 @@
 <!-- templates/registration/login.html -->
-{% extends '../base.html' %}
+{% extends 'base.html' %}
 
-{% block title %}{{user.username}}'s profile{% endblock %}
+{% block title %}{{author.username}}'s profile{% endblock %}
 
 {% block content %}
+{% if user.is_authenticated %}
 {% load static %}
   <link rel="stylesheet" type="text/css" href="{% static 'profile/profile.css' %}">
-<div class='content-container'>
-  {{user.username}}
-  {% for post in posts %}
-    <ul>{{ post.title }}<br>
-      {{post.body}}
-    </ul>
-  {% endfor %}
-</div>  
+  <div class='content-container'>
+    <u>Hello, {{author.displayname}}!</u>
+    {% for post in posts %}
+      <ul>{{ post.title }}<br>
+        {{post.body}}
+      </ul> 
+    {% endfor %}
+  </div>
+{% else %}
+
+  <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
+
+  <p>You are not logged in.</p>
+  <a href="{% url 'login' %}">login</a>
+{% endif %} 
 {% endblock %}

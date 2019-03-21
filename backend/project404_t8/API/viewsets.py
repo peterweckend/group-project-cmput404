@@ -7,12 +7,12 @@ from .serializers import UserSerializer, PostSerializer, CommentSerializer, Frie
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
-from .forms import uploadForm, friendRequestForm,commentForm
+from .forms import uploadForm, friendRequestForm, EditProfileForm, commentForm
 from django.conf import settings
 from users.models import CustomUser
 from random import uniform
 from django.urls import reverse_lazy
-from django.views.generic.edit import DeleteView
+from django.views.generic.edit import DeleteView, UpdateView
 import API.services as Services
 from markdownx.utils import markdownify
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
@@ -178,12 +178,39 @@ def friendRequestView(request):
     return render(request, 'friendrequest/friendrequest.html', {'form': form})
 
 def profileView(request, username):
-    # LoginRequiredMixin
-    # login_url: ''
-    user = CustomUser.objects.get(username=username)
-    profile_posts = Post.objects.filter(author=request.user.id)
-    return render(request, 'profile/profile.html', {'user':user, "posts":profile_posts})
 
+    author = CustomUser.objects.get(username=username)
+    profile_posts = Post.objects.filter(author=request.user.id)
+    return render(request, 'profile/profile.html', {'author':author, "posts":profile_posts})
+
+class editProfile(UpdateView):
+
+    model = CustomUser
+    form_class = EditProfileForm
+    template_name = "editprofile/editprofile.html"  
+    
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        # print(self.object)
+        return super(editProfile, self).get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # if the profile doesn't exist, return 404, otherwise return the profile author object 
+        context['profile_author'] = get_object_or_404(CustomUser, id=self.object.id)
+        return context
+    
+    # update the model
+    def form_valid(self, form):
+        #save cleaned post data
+        clean = form.cleaned_data
+        self.object = form.save()
+        return super(editProfile, self).form_valid(form)
+
+    # redirects to homepage after successful edit 
+    def get_success_url(self, *args, **kwargs):
+        return reverse_lazy("home")
+  
 def homeListView(request):
 
     # this try and except is to render posts into homepage
