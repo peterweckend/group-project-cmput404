@@ -4,22 +4,19 @@ p{
     justify-content: center;
     text-align: left;
     padding-left: 2.5%;
-
-    
 }
+
 h2{
   justify-content: center;
 }
 .button1{
   margin:auto;
-
 }
 .sidebar-nav {
     margin-top: 20px;
     padding: 0;
     list-style: none;
 }
-
 
 .item2 { grid-area: menu; }
 .item3 { grid-area: main; }
@@ -56,7 +53,7 @@ body {
 }
 
 header {
-  background: #55d6aa;
+  background: #34495E;
 }
 
 header::after {
