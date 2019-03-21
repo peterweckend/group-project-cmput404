@@ -1,4 +1,5 @@
 from .models import Post, Comment, Friendship, Follow, Server
+from users.models import CustomUser
 
 # Exists between the data layers and the UI.
 # Holds the logic of the views.
@@ -43,10 +44,12 @@ def has_permission_to_see_post(requesting_user_id, post):
     # This is brutal enough to do in SQLite, how tf do we do it in Django???
     # Can just bruteforce it I guess lol, for each user in authorsfriends
     # query all their friends then add to another set
+    # TODO
 
     # ('5', 'only friends on my host'),
     # Not sure how to implement this one, how do we know where the user's hosted on?
     # This is a problem for the next deadline lel
+    # TODO
 
     # ('6', 'public')
     # ('7', 'unlisted')
@@ -58,6 +61,21 @@ def has_permission_to_see_post(requesting_user_id, post):
 
 
 def handle_friend_request(receiver_username, follower_username):
+    # Do nothing if a friendship between the two users exists
+    
+    check1 = Friendship.objects.filter(friend_a=receiver_username, friend_b=follower_username)
+    check2 = Friendship.objects.filter(friend_b=receiver_username, friend_a=follower_username)
+
+    if check1.exists() or check2.exists():
+        # Friendship already exists, so do nothing
+        return
+  
+    # Do nothing if the follow relationship already exists
+    check1 = Follow.objects.filter(receiver=receiver_username, follower=follower_username)
+    if check1.exists():
+        # Follow / friend request already exists, do nothing
+        return
+
     # If the inverse relationship exists, remove it,
     # Then add the relationship to friends instead
     # So first, query for the relationship
@@ -73,6 +91,7 @@ def handle_friend_request(receiver_username, follower_username):
         # for the database SQL queries of friend of friends
         friend = Friendship(friend_a=receiver_username, friend_b=follower_username)
         friend.save()
+        
 
     # maybe make sure the user cant send a new friend request after already
     # being friends
@@ -80,3 +99,14 @@ def handle_friend_request(receiver_username, follower_username):
         # Create the entry in follow, essentially sending the friend request
         follow = Follow(follower=follower_username, receiver=receiver_username)
         follow.save()
+
+    updateNotifications(receiver_username)
+
+
+def updateNotifications(username):
+    # This will update the number of friend requests the user
+    user = CustomUser.objects.get(username=username)
+    total = Follow.objects.filter(receiver=user.id, ignored=0)
+    total = len(total)
+    user.friend_requests = total
+    user.save()

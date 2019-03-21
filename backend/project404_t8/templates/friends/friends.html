@@ -11,12 +11,25 @@
 <!--This is the friends page
     In the future this will probably be on the users profile page
     But again, this is like the first iteration of the thingy, proof of concept
+    The accept and ignore buttons should use AJAX to send/ignore the request
+    Then refresh the dom/friend list
      -->
-<h1>Friends</h1>
-{% for request in requests %}
-  <div>{{ request.follower }}</div>    
+<h1>Friend Requests</h1>
+{% for r in requests %}
+  <div>
+    {{ r }} 
+    <input type="submit" value="Accept"> 
+    <input type="submit" value="Ignore">
+  </div>    
 {% endfor %}
-
+</br>
+<h1>Friends</h1>
+{% for friend in friends %}
+  <!-- this should be a hyperlink to their profile -->
+  <div>
+    {{ friend }}
+  </div>
+{% endfor %}
 {% else %}
 {% load static %}
   <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
