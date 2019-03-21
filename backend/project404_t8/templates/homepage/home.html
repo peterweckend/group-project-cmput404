@@ -29,7 +29,7 @@
               <img class= "pimage" src="{% get_media_prefix %}{{ p.image_link }}">
               {% endif %}
 
-              <div class="comment"><a href="{% url 'comment' pk=p.pk %}">leave a comment </a></div>
+              <div class="comment"><a href="{% url 'comment' pk=p.pk %}">Leave a comment</a></div>
             
               {% for comment in p.comments.all %}
               <hr>
@@ -38,7 +38,7 @@
               <p class="commentBody">{{comment.body}} </p>
               
               {% empty %}
-              <p>There is no comments.</p>
+              <p>There are currently no comments.</p>
               {% endfor %}
               
           </div>

@@ -6,17 +6,34 @@
 {% block content %}
 {% if user.is_authenticated %}
 {% load static %}
-  <div class='content-container'>
-    <h1 class="page-header">Your Profile</h1>
-    <u>Hello, {{author.displayname}}!</u>
-
-    <h1 class="section-header">Posts</h1>
-    {% for post in posts %}
-      <ul>{{ post.title }}<br>
-        {{post.body}}
-      </ul> 
-    {% endfor %}
+  <!-- <link rel="stylesheet" type="text/css" href="{% static 'profile/profile.css' %}"> -->
+  <div class="displayname">{{author.displayname}}</div><br>
+  <div class="username">@{{author.username}}</div>
+  {% for post in posts reversed %}
+  <div class="row">
+    <div class="panel panel-default">
+      {% load tz %}
+      <p class="ptitle">{{post.title}} </p>
+      <p class="pbody">{{post.body|safe}}</p>
+      {% if post.image_link != "" %}
+      {% load static %}
+      <!--CSS should ensure images fit within a certain size
+          Atleast when they are being displayed on the homepage -->
+      <img class= "pimage" src="{% get_media_prefix %}{{ p.image_link }}">
+      {% endif %}      
+      <div class="comment"><a href="{% url 'comment' pk=post.pk %}">Leave a comment</a></div> 
+      {% for comment in post.comments.all %}
+      <hr>
+      <p class="commentUser">{{comment.author}} </p>
+      <p class ="commentDate">{{comment.datetime}} </p>
+      <p class="commentBody">{{comment.body}} </p><br>
+      
+      {% empty %}
+      <hr><br><p class="nocomments">There are currently no comments.</p><br>
+      {% endfor %}
+    </div>
   </div>
+  {% endfor %}
 {% else %}
 
   <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
