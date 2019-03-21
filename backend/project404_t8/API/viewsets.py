@@ -182,11 +182,22 @@ def friendRequestView(request):
     return render(request, 'friendrequest/friendrequest.html', {'form': form})
 
 def profileView(request, username):
-    
+    author = CustomUser.objects.get(username=username)
+
     # will probably change the edit profile functionality later, and check if profile author == logged in user here
     # get the profile author
-    author = CustomUser.objects.get(username=username)
-    profile_posts = Post.objects.filter(author=author.id)
+    if request.user.username == username:
+        profile_posts = Post.objects.filter(author=author.id)
+    else:
+        print("in else")
+        profile_posts_all = Post.objects.filter(author=author.id)
+        profile_posts = []
+        for post in profile_posts_all:
+            print("in post for loop")
+            if Services.has_permission_to_see_post(request.user.id, post):
+                print("has permission")
+                profile_posts.append(post)
+    
     return render(request, 'profile/profile.html', {'author':author, "posts":profile_posts})
 
 class editProfile(UpdateView):
