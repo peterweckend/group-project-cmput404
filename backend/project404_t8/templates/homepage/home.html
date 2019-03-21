@@ -7,7 +7,7 @@
 {% if user.is_authenticated %}
   {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
-    <h1 id="greeting">Hi {{ user.username }}!</h1>
+    <h1 id="greeting">Hi {{ user.displayname }}!</h1>
     {% for p in post reversed %}
       <div class="row">
         <div class="panel panel-default">
