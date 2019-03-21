@@ -7,13 +7,14 @@
 {% if user.is_authenticated %}
 {% load static %}
   <!-- <link rel="stylesheet" type="text/css" href="{% static 'profile/profile.css' %}"> -->
-  <div class="displayname">{{author.displayname}}</div><br>
+  <div class="displayname">{{author.displayname}}</div>
   <div class="username">@{{author.username}}</div>
   {% for post in posts reversed %}
   <div class="row">
     <div class="panel panel-default">
       {% load tz %}
-      <div class="puser">{{post.author}} (privacy option: {{post.privacy_setting}}) <div class="timePub">{{post.published|timezone:"America/Edmonton"}}</div> </div>
+      <div class="puser"><a href="{% url 'profile' username=user.username %}">{{post.author}}</a> 
+      <div class="timePub">{{post.published|timezone:"America/Edmonton"}}</div> </div>
       <p class="ptitle">{{post.title}} </p>
       <p class="pbody">{{post.body|safe}}</p>
       {% if post.image_link != "" %}
@@ -25,7 +26,7 @@
       <div class="comment"><a href="{% url 'comment' pk=post.pk %}">Leave a comment</a></div> 
       {% for comment in post.comments.all %}
       <hr>
-      <p class="commentUser">{{comment.author}} </p>
+      <p class="commentUser"><a href="{% url 'profile' username=comment.author %}">{{comment.author}}</a> </p>
       <p class ="commentDate">{{comment.datetime}} </p>
       <p class="commentBody">{{comment.body}} </p><br>
       
