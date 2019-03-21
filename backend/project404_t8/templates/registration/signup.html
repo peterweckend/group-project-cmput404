@@ -7,9 +7,17 @@
   
 {% block content %}
 <h2>Sign up</h2>
+<!-- <form method="post">
+  {% csrf_token %}
+  {{ form.as_table }}
+  <button class="button1" type="submit">Sign up</button>
+</form> -->
+
 <form method="post">
   {% csrf_token %}
-  {{ form.as_p }}
+  <table >
+    {{ form }}
+  </table>
   <button class="button1" type="submit">Sign up</button>
 </form>
 {% endblock %}

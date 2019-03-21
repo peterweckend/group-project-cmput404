@@ -1,5 +1,6 @@
 from django import forms
-
+from users.models import CustomUser
+from .models import Comment,Post
 # This must support markdown
 # Maybe have a button that tells the post to display it in markdown
 # When the user selects 2/shared author, another HTML form should become unhidden
@@ -39,3 +40,24 @@ class acceptIgnoreRequestForm(forms.Form):
     # This will simply be a button with an invisible value
     # nvm this might be a stupid idea
     pass
+
+class EditProfileForm(forms.ModelForm):
+    
+    class Meta:
+        model = CustomUser
+        fields = ['displayname']
+        labels = {
+            "displayname": "Display Name"
+        }
+        
+    def save(self, user=None):
+        user_profile = super(EditProfileForm, self).save(commit=False)
+        if user:
+            user_profile = user 
+        user_profile.save()
+        return user_profile
+        
+class commentForm(forms.ModelForm):
+    class Meta:
+        model=Comment
+        fields= ('datetime','body')

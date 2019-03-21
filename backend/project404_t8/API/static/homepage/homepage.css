@@ -12,6 +12,10 @@ p{
 .links{
   text-align: center ;
 }
+.timePub{
+  font-size: 10px;
+  color:lightgrey;
+}
 .puser{
   font-size: 20px;
   color:black;
@@ -31,6 +35,21 @@ p{
   color:rgb(43, 43, 43);
   text-align: left;
   padding-left: 5%;
+}
+.pimage{
+  width:500px;
+  height:300px;
+}
+.commentUser{
+  float: left;
+}
+.commentDate{
+  font-size: 10px;
+  color:lightgrey;
+
+}
+.commentBody{
+  
 }
 .sidebar-nav {
     margin-top: 20px;

@@ -20,19 +20,20 @@ class CustomUserManager(UserManager):
 
 class CustomUser(AbstractUser):
     username    = models.CharField(max_length=255, unique=True)
+    password    = models.CharField(max_length=50)
+    displayname = models.CharField(max_length=15, blank=True)
     password    = models.CharField(max_length=500)
     admin       = models.BooleanField(default=False) # superuser 
     timestamp   = models.DateTimeField(auto_now_add=True)
     friend_requests = models.CharField(max_length=100,default=0)
+    github_id   = models.CharField(max_length=255)
+    github_url  = models.CharField(max_length=255)
 
     objects = CustomUserManager()
 
     def __str__(self):
         return self.username
     
-    # def get_profile(self):
-    #     return self.username
-
     @property
     def is_admin(self):
         return self.admin
