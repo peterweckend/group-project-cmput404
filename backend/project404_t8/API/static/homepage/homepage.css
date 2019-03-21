@@ -1,3 +1,18 @@
+:root{
+  --dark-main: #34495e;
+  --light-main: #f4f7f7;
+  --dark-secondary: #5da0a2;
+  --light-secondary: #aacfd0;
+}
+/* var(--variablename) */
+
+* { padding: 0; margin: 0; }
+
+body {
+  background-color: var(--light-main);
+  /* height: 100%; */
+}
+
 p{
     color:rgb(8, 8, 8);
     /* text-align: center; */
@@ -57,6 +72,8 @@ p{
     list-style: none;
 }
 #greeting{
+  font-weight: bolder;
+  color: var(--dark-main);
   text-align: left;
 }
 
@@ -66,7 +83,7 @@ p{
   z-index:2;
 }
 .item4 { grid-area: right; }
-.item5 { grid-area: footer; }
+.item5 { grid-area: footer;}
 
 .grid-container {
   display: grid;
@@ -74,12 +91,12 @@ p{
     'menu menu main main right right'
     'footer footer footer footer footer footer';
   grid-gap: 10px;
-  background-color: rgb(255, 255, 255);
+  background-color: var(--light-main);
   padding: 10px;
 }
 
 .grid-container > div {
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: var(--light-main);
   text-align: center;
   padding: 20px 0;
   font-size: 30px;
@@ -98,7 +115,12 @@ body {
 }
 
 header {
-  background: #55d6aa;
+  background: var(--dark-main);
+  height: 65px;
+}
+
+.mainlogo {
+  margin-top: 10px;
 }
 
 header::after {
@@ -109,9 +131,7 @@ header::after {
 
 .logo {
   float: left;
-  
   font-size: 30px;
- 
 }
 
 nav {
@@ -133,21 +153,22 @@ nav li {
 }
 
 nav a {
-  color: #444;
+  color: var(--light-main);
   text-decoration: none;
   text-transform: uppercase;
   font-size: 14px;
 }
 
 nav a:hover {
-  color: #000;
+  /* color: var(--dark-secondary); */
+  color: white;
 }
 
 nav a::before {
   content: '';
   display: block;
   height: 5px;
-  background-color: #444;
+  background-color: var(--light-main);
 
   position: absolute;
   top: 0;

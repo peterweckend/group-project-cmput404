@@ -8,7 +8,7 @@
 {% load static %}
   <link rel="stylesheet" type="text/css" href="{% static 'homepage.css' %}">
 
-  fuck you {{ user.username }}!
+  {{ user.username }}!
   <p><a href="{% url 'logout' %}">logout</a></p>
 {% else %}
 {% load static %}

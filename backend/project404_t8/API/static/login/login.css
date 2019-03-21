@@ -1,3 +1,10 @@
+:root{
+    --dark-main: #34495e;
+    --light-main: #f4f7f7;
+    --dark-secondary: #5da0a2;
+    --light-secondary: #aacfd0;
+}
+
 p {
-    color:green;
+    color:var(--dark-main);
 }

@@ -16,26 +16,23 @@
 <header>
     <div class="container">
     <a href="/">
-      <h1 class="logo">
           <!-- <img src="" alt="logo" > -->
-        <img src="{% static 'img/logo.png' %}" alt="logo" width=150px height=40px>
-      </h1>
+        <img class="mainlogo" src="{% static 'img/logo_light.png' %}" alt="logo" width=150px height=40px>
     </a>
       <!-- if the user is not authenticated, it cannot grab a username  -->
       {% if user.is_authenticated %}
       <nav>
         <ul>
           <li><a href="/">Home</a></li>
-          <li><a href="{% url 'profile' username=user.username %}">Me</a></li>
           <!--Display some extra stuff regarding friends if the user has 
               unignored friend requests
               Would this just be an if/else??? -->
           {% if user.friend_requests > 0 %}
-          <li><a href="friends/">Friends({{user.friend_requests}})</a></li>
+          <li><a href="friends/">My Friends({{user.friend_requests}})</a></li>
           {% else %}
-          <li><a href="friends/">Friends</a></li>
+          <li><a href="friends/">My Friends</a></li>
           {% endif %}
-          <li><a href="https://www.runescape.com">RUNESCAPE</a></li>
+          <li><a href="{% url 'profile' username=user.username %}">My Profile</a></li>
         </ul>
       </nav>
       {% endif %}
@@ -45,7 +42,7 @@
   <main>
     <div class="grid-container">
      
-      <div class="item2">Menu
+      <div class="item2">
 
 
         <style type="text/css">
@@ -76,7 +73,7 @@
             Main 
         {% endblock %}
       </div>
-      <div class="item4">Right
+      <div class="item4">Actions
           {% if user.is_authenticated %}
           <p class="links"><a href="/upload/">Create a post</a></p>
           <p class="links"><a href="{% url 'editprofile' pk=user.pk %}">Edit your profile</a></p>
@@ -95,7 +92,7 @@
         {% endif %}
       </div>
       <div class="item5">Footer
-
+        
       </div>
     </div>
       
