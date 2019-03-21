@@ -36,6 +36,11 @@ class friendRequestForm(forms.Form):
     # not a big deal right now
     friendToAdd = forms.CharField(label="Username", max_length=255)
 
+class acceptIgnoreRequestForm(forms.Form):
+    # This will simply be a button with an invisible value
+    # nvm this might be a stupid idea
+    pass
+
 class EditProfileForm(forms.ModelForm):
     
     class Meta:
@@ -56,4 +61,3 @@ class commentForm(forms.ModelForm):
     class Meta:
         model=Comment
         fields= ('datetime','body')
-    

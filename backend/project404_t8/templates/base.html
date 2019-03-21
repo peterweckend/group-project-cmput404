@@ -27,8 +27,15 @@
         <ul>
           <li><a href="/">Home</a></li>
           <li><a href="{% url 'profile' username=user.username %}">Me</a></li>
-          <li><a href="#">Friends</a></li>
-          <li><a href="www.runescape.com">RUNESCAPE</a></li>
+          <!--Display some extra stuff regarding friends if the user has 
+              unignored friend requests
+              Would this just be an if/else??? -->
+          {% if user.friend_requests %}
+          <li><a href="friends/">Friends({{user.friend_requests}})</a></li>
+          {% else %}
+          <li><a href="friends/">Friends</a></li>
+          {% endif %}
+          <li><a href="https://www.runescape.com">RUNESCAPE</a></li>
         </ul>
       </nav>
       {% endif %}

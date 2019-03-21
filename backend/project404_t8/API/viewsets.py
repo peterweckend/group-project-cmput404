@@ -309,6 +309,49 @@ class FriendDelete(DeleteView):
        self.object.delete() 
        return HttpResponseRedirect(self.success_url)
 
+
+def friendsView(request):
+    # This will be a list of the users friends and friend requests
+    # In the future this could appear right on their profile as per the mockups
+    # but for now it will exist as its own page     
+    # It will also allow them to accept/ignore friend requests
+
+    # Right now, a friend request is an unignored follow
+    # So, get all the logged in users unignored follows
+    requests = Follow.objects.filter(receiver=request.user.id, ignored=False)
+
+    # Now we have the id's of all the unignored followers
+    # Convert that to a list of usernames
+    # We can do this by querying for each username based on the id
+    requests2 = []
+    for r in requests: 
+        requests2.append(CustomUser.objects.get(id=r.follower_id).username)
+    requests = requests2
+
+    # Get the users friends
+    friends1 = Friendship.objects.filter(friend_a=request.user.id)
+    friends2 = Friendship.objects.filter(friend_b=request.user.id)
+    friends = set()
+    # alright this feels really messy but it should work I think
+    # If the models change things could get cringed but I actually think its fine
+    # Iterate through each queryset, and append the ids of each element to the list
+    for row in friends1:
+        friends.add(row.friend_b.username)
+    for row in friends2:
+        friends.add(row.friend_a.username)
+    friends = list(friends)
+    friends.sort()
+
+    # Make sure None isn't being passed to the template at all
+    pageVariables = {}
+    if friends != {}:
+        pageVariables["friends"] = friends
+    if requests != []:
+        pageVariables["requests"] = requests
+    
+
+    return render(request, 'friends/friends.html', pageVariables)
+
 def comment_thread(request,pk):
     post = get_object_or_404(Post,pk =pk)
     if request.method =='POST':
@@ -451,6 +494,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
 
         serializer_class = PostSerializer(allowed_posts, many=True)
         return Response(serializer_class.data)
+
 
 
 
