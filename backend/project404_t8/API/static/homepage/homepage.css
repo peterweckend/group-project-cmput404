@@ -104,9 +104,16 @@ p{
 
 .displayname{
   color: #14171a;
+  text-align: left;
+  margin-left: -2%;
 }
 .username{
   color: #657786;
+  text-align: left;
+  font-size: 20px;
+  margin-top: -0.5%;
+  margin-left: -2%;
+  padding-bottom: 5%;
 }
 .sidebar-nav {
     margin-top: 20px;
@@ -224,5 +231,7 @@ nav a:hover::before {
 }
 .delete_post{
   float: right;
-  margin-top: -50px;
+  /* margin-top: -50px; */
+  margin-top: -7%;
+  padding: 1% 1%;
 }
