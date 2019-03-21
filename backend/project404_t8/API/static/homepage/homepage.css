@@ -49,20 +49,21 @@ p{
 }
 .timePub{
   font-size: 10px;
-  color:lightgrey;
+  color:#657786;
 }
 .puser{
   font-size: 20px;
   color:black;
   text-align: left;
-  padding-left: 2%;
+  padding-left: 15px;
   padding-top: 2%;
 }
 .ptitle{
   font-size: 25px;
   color:rgb(43, 43, 43);
   text-align: left;
-  padding-left: 2%;
+  padding-left: 8px;
+  padding-top: 10px;
   
 }
 .pbody{
@@ -77,14 +78,35 @@ p{
 }
 .commentUser{
   float: left;
+  padding-left: 15px;
 }
 .commentDate{
-  font-size: 10px;
-  color:lightgrey;
-
+  font-size: 11px;
+  color: #657786;
 }
 .commentBody{
-  
+  font-family: Arial, Garamond !important; 
+  /* font-weight: book; */
+  font-style: italic;
+  float: left;
+  padding-left: 8px;
+  font-size: 17px;
+}
+
+.comment {
+  font-size: 15px;
+}
+
+.nocomments {
+  font-size: 13px;
+  color: #657786;
+}
+
+.displayname{
+  color: #14171a;
+}
+.username{
+  color: #657786;
 }
 .sidebar-nav {
     margin-top: 20px;
@@ -123,15 +145,15 @@ p{
 }
 @import url('https://fonts.googleapis.com/css?family=Work+Sans:400,600');
 body {
-	margin: 0;
-	background: #222;
-	font-family: 'Work Sans', sans-serif;
-	font-weight: 800;
+  margin: 0;
+  background: #222;
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 800;
 }
 
 .container {
-	width: 80%;
-	margin: 0 auto;
+  width: 80%;
+  margin: 0 auto;
 }
 
 header {
@@ -202,4 +224,5 @@ nav a:hover::before {
 }
 .delete_post{
   float: right;
+  margin-top: -50px;
 }
