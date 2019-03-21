@@ -42,7 +42,7 @@ class Post(models.Model):
 
     # If true, post can be in markdown
     is_markdown = models.BooleanField(default=False)
-    published = DateTimeField(auto_now_add=True)
+    published = DateTimeField(auto_now_add=True,default=datetime.now())
 
 
     def __str__(self):
