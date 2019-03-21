@@ -234,11 +234,13 @@ height:300px;
   color: #14171a;
   text-align: left;
   margin-left: -2%;
+  margin-top: 5%;
+  font-size: 30px;
 }
 .username{
   color: #657786;
   text-align: left;
-  font-size: 20px;
+  font-size: 30px;
   margin-top: -0.5%;
   margin-left: -2%;
   padding-bottom: 5%;
