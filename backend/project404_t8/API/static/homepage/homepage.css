@@ -226,17 +226,21 @@ height:300px;
 .nocomments {
   font-size: 13px;
   color: #657786;
+  text-align: center;
+  padding-left: 4%
 }
 
 .displayname{
   color: #14171a;
   text-align: left;
   margin-left: -2%;
+  margin-top: 5%;
+  font-size: 30px;
 }
 .username{
   color: #657786;
   text-align: left;
-  font-size: 20px;
+  font-size: 30px;
   margin-top: -0.5%;
   margin-left: -2%;
   padding-bottom: 5%;
@@ -342,7 +346,7 @@ nav a:hover {
 
 .delete_post{
   float: right;
-  margin-top: -9%;
+  margin-top: -7%;
   padding: 1% 1%;
 }
 
