@@ -276,10 +276,14 @@ def homeListView(request):
     except:
         # The raw query set returns no post, so do not pass in any post to the html
         pass
-    if user:
-        pageVariables["friends"] = friend
-    if friend:
-        pageVariables["githubUrl"] = github_url
+    try:
+        if user:
+            pageVariables["friends"] = friend
+  
+        if friend:
+            pageVariables["githubUrl"] = github_url
+    except:
+        pass
 
     return render(request, 'homepage/home.html', pageVariables)
 
