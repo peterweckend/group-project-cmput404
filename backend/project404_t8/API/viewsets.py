@@ -402,6 +402,7 @@ class PostsViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
 
     # Instantiates and returns the list of permissions that this view requires.
+    # This is useful if you only want some Posts URLs to require authentication but not others
     # def get_permissions(self):
     #     if self.action == 'list':
     #         permission_classes = []
@@ -433,6 +434,7 @@ class PostsViewSet(viewsets.ModelViewSet):
             serializer_class = CommentSerializer(queryset, many=True)
             return Response(serializer_class.data)
         else: 
+            # return a permission denied error
             raise PermissionDenied
         
 
@@ -476,6 +478,8 @@ class AuthorViewSet(viewsets.ModelViewSet):
         return Response(serializer_class.data)
 
     # the API endpoint accessible at GET http://service/author/{author_id}/posts
+    # Can't name this method "posts" because there's already a "posts" method above
+    # so I had to add this @action tag stuff
     @action(methods=['get'], detail=True, url_path="posts")
     def userPosts(self, request, pk=None):
         author_id = int(self.kwargs['pk'])

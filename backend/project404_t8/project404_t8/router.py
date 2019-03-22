@@ -10,6 +10,7 @@ router.register(r'friendship', Viewsets.FriendshipViewSet)
 router.register(r'follow', Viewsets.FollowViewSet)
 router.register(r'server', Viewsets.ServerViewSet)
 
+# these are the API methods
 api_router = routers.SimpleRouter()
 api_router.register(r'posts', Viewsets.PostsViewSet)
 api_router.register(r'author', Viewsets.AuthorViewSet)
