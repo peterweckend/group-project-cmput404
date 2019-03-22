@@ -17,7 +17,7 @@ from random import uniform
 from django.urls import reverse_lazy
 from django.views.generic.edit import DeleteView, UpdateView
 import API.services as Services
-from rest_framework.exceptions import APIException, MethodNotAllowed, NotFound
+from rest_framework.exceptions import APIException, MethodNotAllowed, NotFound, PermissionDenied
 from markdownx.utils import markdownify
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
 # Django REST API Tutorial: Filtering System - https://youtu.be/s9V9F9Jtj7Q
@@ -415,6 +415,7 @@ class PostsViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
 
     # Instantiates and returns the list of permissions that this view requires.
+    # This is useful if you only want some Posts URLs to require authentication but not others
     # def get_permissions(self):
     #     if self.action == 'list':
     #         permission_classes = []
@@ -422,13 +423,13 @@ class PostsViewSet(viewsets.ModelViewSet):
     #         permission_classes = [IsAuthenticated]
     #     return [permission() for permission in permission_classes]
 
-    # http://service/posts (all posts marked as public on the server)
+    # GET http://service/posts (all posts marked as public on the server)
     def list(self, request):
         queryset = Post.objects.filter(privacy_setting="6")
         serializer_class = PostSerializer(queryset, many=True)
         return Response(serializer_class.data)
     
-    # http://service/posts/{POST_ID} access to a single post with id = {POST_ID}
+    # GET http://service/posts/{POST_ID} access to a single post with id = {POST_ID}
     def retrieve(self, request, pk=None):
         # permission_classes = (IsAuthenticated,)
         queryset = Post.objects.filter(pk=pk)
@@ -436,13 +437,21 @@ class PostsViewSet(viewsets.ModelViewSet):
         return Response(serializer_class.data)
     
     # the API endpoint accessible at GET http://service/posts/{post_id}/comments
-    # not yet completed - to do when posts info is merged
     @action(methods=['get'], detail=True, url_path="comments")
     def userPostComments(self, request, pk=None):
         post_id = pk
-        queryset = Comment.objects.filter(privacy_setting="6", post=post_id)
-        serializer_class = CommentSerializer(queryset, many=True)
-        return Response(serializer_class.data)
+        requested_post = Post.objects.get(id=post_id)
+        # we're allowed to see the post - for now just check if the posts are public
+        if requested_post.privacy_setting == "6": 
+            queryset = Comment.objects.filter(post=post_id)
+            serializer_class = CommentSerializer(queryset, many=True)
+            return Response(serializer_class.data)
+        else: 
+            # return a permission denied error
+            raise PermissionDenied
+        
+
+    
 
 class AuthorViewSet(viewsets.ModelViewSet):
     # http_method_names = ['get', 'post', 'head'] # specify which types of requests are allowed
@@ -482,6 +491,8 @@ class AuthorViewSet(viewsets.ModelViewSet):
         return Response(serializer_class.data)
 
     # the API endpoint accessible at GET http://service/author/{author_id}/posts
+    # Can't name this method "posts" because there's already a "posts" method above
+    # so I had to add this @action tag stuff
     @action(methods=['get'], detail=True, url_path="posts")
     def userPosts(self, request, pk=None):
         author_id = int(self.kwargs['pk'])
