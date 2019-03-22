@@ -1,14 +1,14 @@
 {% extends '../base.html' %}
 {% block content %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
 {% if user.is_authenticated %}
-    {{p.author_id }}
-    {{user.id}}
     {% if user.id == object.author_id %}
-        Are you sure you want to delete '{{object.title}}'?
+        <p class="confirmation">Are you sure you want to delete '{{object.title}}'?</p>
 
         <form method ="POST">
             {% csrf_token %}
-            <button type="submit" class="btn btn-danger"> Yes, I'm sure.</button>
+            <button type="submit" class="btn btn-danger delete-button"> Yes, I'm sure.</button>
         </form>
     {% else %}
         <p>You do not have access to this page.</p>
