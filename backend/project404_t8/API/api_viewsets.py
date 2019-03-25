@@ -228,6 +228,40 @@ class AuthorViewSet(viewsets.ModelViewSet):
     
         # return serialized friendship_authors
         return Response(friendship_dict)
+    @action(methods=['get'], detail=True, url_path="friends/(?P<author_id2>\d+)")
+    def friends(self, request, pk=None,author_id2=None):
+        author_id = pk
+                # since the friendship table is 2-way, request a list of users whose 
+        # IDs are in the friendship table, not including the author
+        # make sure to format this the appropriate way
+        if request.method == "GET":
+            friendship_authors = []
+            friends = Friendship.objects.filter(friend_a=author_id, friend_b=author_id2)
+            friendship_dict = {}
+            if friends:
+                for friend in friends:
+                    url = "https://" + request.get_host() + "/author/" + str(friend.friend_a.id) 
+                    url2 = "https://" + request.get_host() + "/author/" + str(friend.friend_b.id) 
+                    friendship_authors.append(url)
+                    friendship_authors.append(url2)
+                friendship_dict["friends"]= True
+            else:
+                for friend in friends:
+                    url = "https://" + request.get_host() + "/author/" + str(friend.friend_a.id) 
+                    url2 = "https://" + request.get_host() + "/author/" + str(friend.friend_b.id) 
+                    friendship_authors.append(url)
+                    friendship_authors.append(url2)
+                
+                friendship_dict["friends"]= False
+        
+            # serialize friendship_authors here
+            friendship_dict["query"] = "friends"
+            friendship_dict["authors"] = friendship_authors
+
+            return Response(friendship_dict)
+            
+        else: 
+             friends = Friendship.objects.filter(friend_a=author_id)
 
 
 
