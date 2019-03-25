@@ -42,64 +42,17 @@
   <div class="row">
     <!-- -------------------- LEFT COLUMN -------------------- -->
     <div class="leftcolumn">
-      {% if user.is_authenticated %}
-
-        <h1>Actions</h1>
-        <p class="links"><a href="/upload/">Create a post</a></p>
-        <p class="links"><a href="{% url 'editprofile' pk=user.pk %}">Edit your profile</a></p>
-        <p class ="links"><a href="/friendrequest/">Make a friend request</a></p>
-        <p class="links"><a href="{% url 'logout' %}">Logout</a></p>
-        
-        <h1 class="side-menu-item friends-menu" style= "font-size: 1em"> 
-
-      {% endif %}
+      <h1 class="side-menu-item friends-menu" style= "font-size: 1em"> 
     </div>
 
     <!-- -------------------- MAIN COLUMN -------------------- -->
     <div class="midcolumn">
-      <div class="form">
-        {% block content %}
-          <!-- Main -->
-        {% endblock %}
-      </div>
+      {% block content %}
+      {% endblock %}
     </div>
 
     <!-- -------------------- RIGHT COLUMN -------------------- -->
     <div class="rightcolumn">
-      {% if user.is_authenticated %}
-        <h1>Friends</h1>
-      
-        {% for friend in friends %}
-          {% if user.id == friend.friend_a_id %}
-              
-            <p> <a href="{% url 'profile' username=friend.friend_b %}">{{friend.friend_b}}</a></p>
-            <a href ="{% url 'delete_friend' pk=friend.pk %}"> <button type="button" class="btn btn-default">Remove Friend</button></a>
-          {% endif %}
-        {% endfor %}
-      {% endif %}
-
-      <!-- <div class="item2">
-        <style type="text/css">
-        @import url("http://www.google.com/uds/solutions/dynamicfeed/gfdynamicfeedcontrol.css");
-
-        #feedControl {
-          margin-top : 10px;
-          margin-left: auto;
-          margin-right: auto;
-          width : 440px;
-          font-size: 12px;
-          color: #9CADD0;
-        }
-        </style>
-          <script type="text/javascript">
-          function load() {
-            var feed ="http://feeds.bbci.co.uk/news/world/rss.xml";
-            new GFdynamicFeedControl(feed, "feedControl");
-          }
-          google.load("feeds", "1");
-          google.setOnLoadCallback(load);
-        </script>
-      </div> -->
     </div>
   </div>
   

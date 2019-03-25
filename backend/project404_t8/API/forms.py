@@ -18,23 +18,38 @@ privacyOptions = [
     # large scale could be done better, for now can do it more simply
 
 class uploadForm(forms.Form):
-    # Need an invisible field that sends the user ID
-    # Alternatively could just post infer it when the user posts the form in the view
     # Furthermore, a post should require at least a summary or an image
-    title = forms.CharField(label='Title', max_length=24)
-    body = forms.CharField(label='Body', max_length=250, required = False, widget=forms.Textarea(attrs={'rows':7}))
+    title = forms.CharField(label='Title', max_length=24, widget=forms.TextInput(
+        attrs={
+            'class': 'form-control',
+            'placeholder': 'Post Title...'
+        }))
+    body = forms.CharField(label='Body', max_length=250, required = False, widget=forms.Textarea(
+        attrs={
+            'rows':7,
+            'class': 'form-control',
+            'placeholder': 'Write a post...'
+        }))
     markdown = forms.BooleanField(required = False)
     imageLink = forms.ImageField(label="Image",required = False)
     privacy = forms.CharField(label='Privacy', widget=forms.Select(choices=privacyOptions))
     # If we wanted to get fancy, this could autofill from the user's friends
-    sharedAuthor = forms.CharField(label='Shared Author', required = False)
+    sharedAuthor = forms.CharField(label='Shared Author', required = False, widget=forms.TextInput(
+        attrs={
+            'class': 'form-control',
+            'placeholder': 'Shared Author?...'
+        }))
 
 class friendRequestForm(forms.Form):
     # Basically will just be a char field
     # Actually, this should just be a button that appears on a users profile
     # So to be even more honest we might not even need a form for this, but its
     # not a big deal right now
-    friendToAdd = forms.CharField(label="Username", max_length=255)
+    friendToAdd = forms.CharField(label="Author's Username", max_length=255, widget=forms.TextInput(
+        attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter a userame...'
+        }))
 
 class acceptIgnoreRequestForm(forms.Form):
     # This will simply be a button with an invisible value
@@ -42,13 +57,14 @@ class acceptIgnoreRequestForm(forms.Form):
     pass
 
 class EditProfileForm(forms.ModelForm):
-    
+    displayname = forms.CharField(label='New Display Name', max_length=24, widget=forms.TextInput(
+        attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter Display Name...'
+        }))
     class Meta:
         model = CustomUser
         fields = ['displayname']
-        labels = {
-            "displayname": "Display Name"
-        }
         
     def save(self, user=None):
         user_profile = super(EditProfileForm, self).save(commit=False)
@@ -58,6 +74,12 @@ class EditProfileForm(forms.ModelForm):
         return user_profile
         
 class commentForm(forms.ModelForm):
+    body = forms.CharField(label='New Comment', widget=forms.Textarea(
+        attrs={
+            'rows':3,
+            'class': 'form-control',
+            'placeholder': 'Enter comment...'
+        }))
     class Meta:
         model=Comment
-        fields= ('datetime','body')
+        fields= ['body']
