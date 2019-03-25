@@ -16,7 +16,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   <script>
     $(document).ready(function() {
+      $('select').formSelect();
       $(".dropdown-trigger").dropdown();
+      $('.materialboxed').materialbox();
+      $('input#title, textarea#body').characterCounter();
     });
   </script>
 </head>
@@ -76,12 +79,17 @@
         {% for friend in friends %}
           {% if user.id == friend.friend_a_id %}
             <li class="collection-item">
-              <h6><a href="{% url 'profile' username=friend.friend_b %}">{{friend.friend_b}}</a></h6>
-              <p class="delete_friend">
-                  <a href="{% url 'delete_friend' pk=friend.pk %}"><span class="glyphicon glyphicon-trash"> </a>
-                </p>
+              <div class="friends_col row">
+                <div class="col s10">
+                  <h6><a href="{% url 'profile' username=friend.friend_b %}">{{friend.friend_b}}</a></h6>
+                </div>
+                <div class="col s2">
+                  <p class="delete_friend">
+                    <a href="{% url 'delete_friend' pk=friend.pk %}"><i class="material-icons right">delete</i> </a>
+                  </p>
+                </div>
+              </div>
             </li>
-            <!-- <a href ="{% url 'delete_friend' pk=friend.pk %}"> <button type="button" class="btn btn-default">Remove Friend</button></a> -->
           {% endif %}
         {% endfor %}
       </ul>

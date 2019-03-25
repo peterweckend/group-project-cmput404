@@ -30,9 +30,14 @@ class uploadForm(forms.Form):
             'class': 'form-control',
             'placeholder': 'Write a post...'
         }))
-    markdown = forms.BooleanField(required = False)
+    markdown = forms.BooleanField(required = False, widget=forms.CheckboxInput(
+        attrs={
+            'class': 'checkbox form-control'
+        }
+    ))
     imageLink = forms.ImageField(label="Image",required = False)
-    privacy = forms.CharField(label='Privacy', widget=forms.Select(choices=privacyOptions))
+    # privacy = forms.CharField(label='Privacy', widget=forms.Select(choices=privacyOptions))
+    privacy = forms.ChoiceField(widget=forms.Select, choices=privacyOptions, label='Privacy')
     # If we wanted to get fancy, this could autofill from the user's friends
     sharedAuthor = forms.CharField(label='Shared Author', required = False, widget=forms.TextInput(
         attrs={

@@ -16,7 +16,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   <script>
     $(document).ready(function() {
+      $('select').formSelect();
       $(".dropdown-trigger").dropdown();
+      $('.materialboxed').materialbox();
+      $('input#title, textarea#body').characterCounter();
     });
   </script>
 </head>
@@ -38,7 +41,8 @@
             <!--Display some extra stuff regarding friends if the user has unignored friend requests
                 Would this just be an if/else??? -->
             {% if user.friend_requests > '0' %}
-              <li><a href="/friends/">My Friends <font color="red">({{user.friend_requests}})</font></a></li>
+              <li><a href="/friends/">My Friends <span class="new badge red">{{user.friend_requests}}</span></a></li>
+              <!-- <span class="new badge red" data-badge-caption="custom caption"></span> -->
             {% else %}
               <li><a href="/friends/">My Friends</a></li>
             {% endif %}

@@ -53,54 +53,45 @@ class ServerViewSet(viewsets.ModelViewSet):
     serializer_class = ServerSerializer
 
 def uploadView(request):
-    # if this is a POST request we need to process the form data
-    # So if we wanted to get even more fancy too, ajax could post to this itself and we
-    # wouldnt require another page, but lets just take babysteps for now
     if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = uploadForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            # process the data in form.cleaned_data as required
-            # So models could just expect a dictionary of these values
-            # How do we know what user is posting the data?
-            # something like this: request.user.id 
-            # Probably just add that to the form.cleaned_data dictionary
-            
-            newPost = form.cleaned_data
-            # print(newPost)
-            # print(request.FILES)
-            # Don't do anything if no image is uploaded
-            newPost["imageLink"] = None
-            if request.FILES != {}:
-                newPost["imageLink"] = request.FILES["imageLink"]
+        author = request.user
+        title = request.POST.get('title')
+        body = request.POST.get('body')
+        image_link = request.POST.get('imageLink')
+        privacy_setting = request.POST.get('privacy')
+        shared_author = request.POST.get('sharedAuthor')
+        is_markdown = request.POST.get('markdown')
 
-            # If shared author isn't input then convert it to None/null for now 
-            if newPost["sharedAuthor"] == "":
-                newPost["sharedAuthor"] = None
+        if shared_author == "":
+            shared_author = None
+        if image_link == "": 
+            image_link = None
+        if request.FILES != {}:
+            image_link = request.FILES["imageLink"]
+        if is_markdown == None:
+            is_markdown = False
+        elif is_markdown ==  "on":
+            is_markdown = True
 
-            newPost = Post(
-                author = request.user,
-                title = newPost["title"],
-                body = newPost["body"],
-                image_link = newPost["imageLink"],
-                privacy_setting = newPost["privacy"],
-                shared_author = newPost["sharedAuthor"],
-                is_markdown = newPost["markdown"]
-            )
+        newPost = Post(
+            author = author,
+            title = title,
+            body = body,
+            image_link = image_link,
+            privacy_setting = privacy_setting,
+            shared_author = shared_author,
+            is_markdown = is_markdown
+        )
+        newPost.save()
+        id = newPost.id
 
-            # print(newPost)
-            newPost.save()
-            id = newPost.id
-
-            # redirect to a new URL:
-            return HttpResponseRedirect('/post/%s' %id)
-
-    # if a GET (or any other method) we'll create a blank form
+        # redirect to a new URL:
+        return HttpResponseRedirect('/post/%s' %id)
     else:
-        form = uploadForm()
-
-    return render(request, 'upload/upload.html', {'form': form})
+        pass
+    
+    context = {}
+    return render(request, 'upload/upload.html', context)
 
 def postView(request, id):
 
