@@ -23,17 +23,15 @@ textarea {
 
 /* ---------- HEADER ---------- */
 header {
-  background: var(--dark-main);
-  height: 65px;
+  background: var(--dark-main) !important;
   position: sticky !important;
   top: 0;
-  z-index: 2;
-  padding: 10px;
+  z-index: 10;
 }
 .mainlogo {
-  margin-top: 5px;
-  width: 20%;
-  height: 20%;
+  margin-left: 2.5%;
+  width: 11%;
+  height: 50%;
 }
 header::after {
   content: '';
@@ -41,7 +39,8 @@ header::after {
   clear: both;
 }
 nav {
-  float: right;
+  background-color: var(--dark-main) !important;
+  padding: 0px 10px 10px 10px;
 }
 nav ul {
   margin: 0;
@@ -50,7 +49,6 @@ nav ul {
 }
 nav li {
   display: inline-block;
-  margin-left: 70px;
   padding-top: 15px;
   position: relative;
 }
@@ -61,8 +59,7 @@ nav a {
   font-size: 20px;
 }
 nav a:hover {
-  /* color: var(--dark-secondary); */
-  color: white;
+  color: var(--light-secondary);
 }
 nav a::before {
   content: '';
@@ -74,10 +71,6 @@ nav a::before {
   width: 0%;
   transition: all ease-in-out 250ms;
 }
-nav a:hover::before {
-  width: 100%;
-}
-
 /* ---------- PAGE OUTLINE ---------- */
 .leftcolumn {   
   float: left;
@@ -93,7 +86,6 @@ nav a:hover::before {
   width: 50%;
   padding-left: 30px;
   padding-right: 60px;
-
 }
 .rightcolumn {
   float: right;
@@ -138,11 +130,7 @@ nav a:hover::before {
 }
 
 /* ---------- NEXT PART HERE ---------- */
-p{
-  color:rgb(8, 8, 8);
-  margin:auto;
-  font-size: 20px;
-}
+
 .panel-heading {
 font-size: 20px;
 text-align:left;
@@ -192,7 +180,6 @@ padding-top: 10px;
 font-size: 20px;
 color:rgb(43, 43, 43);
 text-align: left;
-padding-left: 5%;
 }
 .pimage{
 width:500px;
@@ -200,36 +187,36 @@ height:300px;
 }
 .commentUser{
   float: left;
-  padding-left: 15px;
+  font-size: 11px;
+  padding-right: 10px;
 }
 .commentDate{
   font-size: 11px;
   color: #657786;
-  padding-right: 7%;
-  text-align: center;
 }
 .commentBody{
   font-family: Arial, Garamond !important; 
   /* font-weight: book; */
   font-style: italic;
-  float: left;
+  text-align: left;
   padding-left: 8px;
   font-size: 17px;
 }
-
 .comment {
   font-size: 15px;
   text-align: center;
   padding-left: 4%;
 }
-
 .nocomments {
   font-size: 13px;
   color: #657786;
   text-align: center;
   padding-left: 4%
 }
-
+.card .row {
+  padding-left: 30px;
+  margin-bottom: 0;
+}
 .displayname{
   color: #14171a;
   text-align: left;
@@ -245,111 +232,9 @@ height:300px;
   margin-left: -2%;
   padding-bottom: 5%;
 }
-.sidebar-nav {
-  margin-top: 20px;
-  padding: 0;
-  list-style: none;
-}
-#greeting{
-font-weight: bolder;
-color: var(--dark-main);
-text-align: left;
-}
-
-.item2 { grid-area: menu; }
-.item3 { 
-grid-area: main;
-z-index:2;
-}
-.item4 { grid-area: right; }
-.item5 { grid-area: footer;}
-
-.grid-container {
-display: grid;
-grid-template-areas:
-  'menu menu main main right right'
-  'footer footer footer footer footer footer';
-grid-gap: 10px;
-background-color: var(--light-main);
-padding: 10px;
-}
-
-.grid-container > div {
-background-color: var(--light-main);
-text-align: center;
-padding: 20px 0;
-font-size: 30px;
-}
-@import url('https://fonts.googleapis.com/css?family=Work+Sans:400,600');
-body {
-  margin: 0;
-  background: #222;
-  font-family: 'Work Sans', sans-serif;
-  font-weight: 800;
-}
-
-.container {
-  width: 80%;
-  margin: 0 auto;
-}
-
-header {
-  background: var(--dark-main);
-  height: 65px;
-}
-
-.mainlogo {
-  margin-top: 10px;
-}
-
-header::after {
-  content: '';
-  display: table;
-  clear: both;
-}
-
-.logo {
-  float: left;
-  font-size: 30px;
-}
-
-nav {
-  float: right;
-}
-
-nav ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-nav li {
-  display: inline-block;
-  margin-left: 70px;
-  padding-top: 23px;
-
-  position: relative;
-}
-
-nav a {
-  color: var(--light-main);
-  text-decoration: none;
-  text-transform: uppercase;
-  font-size: 14px;
-}
-
-nav a:hover {
-  /* color: var(--dark-secondary); */
-  color: white;
-}
-
-
 .delete_post{
   float: right;
   margin-top: -7%;
   padding: 1% 1%;
-}
-
-.login-objects {
-  /* margin-left: 200px; */
+  margin-right: 25px;
 }

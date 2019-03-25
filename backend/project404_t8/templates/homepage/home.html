@@ -7,21 +7,15 @@
 {% if user.is_authenticated %}
   {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
-    <h1 id="greeting">Hi {{ user.displayname }}!</h1>
+    <h1 id="greeting">Hi {{ user.displayname }}!<hr></h1>
     {% for p in post reversed %}
-      <div class="row">
-        <div class="panel panel-default">
-          {% load tz %}
-          <div class="puser"><a href="{% url 'profile' username=p.author %}">{{p.author}}</a>
-          <div class="timePub">{{p.published|timezone:"America/Edmonton"}}</div> </div>
-          {% if user.id == p.author_id %}
-          <p class="delete_post">
-                
-              <a href="{% url 'delete_post' pk=p.pk  %}"><span class="glyphicon glyphicon-trash"> </a>
-            </p>
-          {% endif %}
-          <div class="panel-body">
-              <p class="ptitle">{{p.title}} </p>
+      <div class="z-depth-2">
+        <div class="card">
+          <div class="row">
+            {% load tz %}
+            <br>
+            <div class="col s8">
+              <span class="card-title">{{p.title}}</span>
               <p class="pbody">{{p.body|safe}}</p>
               {% if p.image_link != "" %}
               {% load static %}
@@ -29,21 +23,37 @@
                   Atleast when they are being displayed on the homepage -->
               <img class= "pimage" src="{% get_media_prefix %}{{ p.image_link }}">
               {% endif %}
-
-              <div class="comment"><a href="{% url 'comment' pk=p.pk %}">Leave a comment</a></div>
-            
-              {% for comment in p.comments.all %}
-              <hr>
-              <p class="commentUser"><a href="{% url 'profile' username=comment.author %}"> {{comment.author}} </a></p>
-              <p class ="commentDate">{{comment.datetime}} </p>
+            </div>
+            <div class="col s4">
+              <div class="puser"><a href="{% url 'profile' username=p.author %}">{{p.author}}</a>
+              <div class="timePub">{{p.published|timezone:"America/Edmonton"}}</div> </div>
+            </div>
+            {% if user.id == p.author_id %}
+              <p class="delete_post">
+                <a href="{% url 'delete_post' pk=p.pk  %}"><span class="glyphicon glyphicon-trash"> </a>
+              </p>
+            {% endif %}
+          </div>
+          <div class="panel-body">
+            <a href="{% url 'comment' pk=p.pk %}" class="btn-floating halfway-fab waves-effect waves-light blue"><i class="material-icons">comment</i></a>
+            {% for comment in p.comments.all %}
+            <hr>
+            <div class=row>
               <p class="commentBody">{{comment.body}} </p>
-              
-              {% empty %}
-              <hr><br><p class="nocomments">There are currently no comments.</p><br>
-              {% endfor %}
-              
+              <div class="col s12">
+                <p class="commentUser">
+                  <a href="{% url 'profile' username=comment.author %}"> {{comment.author}}</a>
+                  <p class="commentDate">{{comment.datetime}} </p>
+                </p>
+                
+              </div>
+            </div>
+            {% empty %}
+              <p class="nocomments"><hr>There are currently no comments.</p><br>
+            {% endfor %}
           </div>
         </div>
+        <br>
       </div>
     {% endfor %}
 {% else %}
