@@ -89,19 +89,42 @@ class AuthorViewSet(viewsets.ModelViewSet):
         user = get_object_or_404(queryset, pk=pk)
 
         # build a list of friends for the response
-        friends = []
+        friends_list = []
+        friends = Friendship.objects.filter(friend_a=user.id)
+        for friend in friends:
+            friend_entry = {}
+
+            url = "https://" + request.get_host() + "/author/" + str(friend.friend_b.id) 
+            friend_object = get_object_or_404(queryset, pk=friend.friend_b.id)
+
+            friend_entry["id"] = url
+            # todo: look up the user, find what host they belong to, and return that value
+            # instead of using request.get_host() here
+            friend_entry["host"] = "https://" + request.get_host() + "/" 
+            friend_entry["displayName"] =  friend_object.displayname
+            friend_entry["url"] = url
+            friends_list.append(friend_entry)
 
         response = {}
         response["id"] = "http://" + request.get_host() + request.get_full_path()
         response["host"] = request.get_host()
         response["displayName"] = user.displayname
         response["url"] = "http://" + request.get_host() + request.get_full_path()
-        response["friends"] = friends
+        response["friends"] = friends_list
         if Services.isNotBlank(user.github_url):
             response["github"] = user.github_url
+        if Services.isNotBlank(user.first_name):
+            response["firstName"] = user.first_name
+        if Services.isNotBlank(user.last_name):
+            response["lastName"] = user.last_name
+        if Services.isNotBlank(user.email):
+            response["email"] = user.email
+        if Services.isNotBlank(user.bio):
+            response["bio"] = user.bio
 
-        serializer = UserSerializer(user)
-        return Response(serializer.data)
+        print(response)
+
+        return Response(response)
 
     # http://service/author/posts (posts that are visible to the currently authenticated user)
     @action(methods=['get'], detail=False)
