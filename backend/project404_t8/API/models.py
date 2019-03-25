@@ -32,7 +32,8 @@ class Post(models.Model):
     id = models.AutoField(primary_key=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
     title = models.CharField(max_length=250)
-    body = models.TextField()
+    description = models.TextField() # a description of what the post is about
+    body = models.TextField() # the actual content of the post
     # created_on = models.DateTimeField(auto_now=True)
     image_link = models.FileField(blank=True, null=True) # As an author, posts I create can link to images.
     privacy_setting = models.CharField(max_length=1, choices=PRIVACYCHOICE, default='1')
@@ -56,10 +57,14 @@ class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, blank=True, null=True,related_name="comments")
     datetime = models.DateTimeField(default=datetime.now, blank=True)
     body = models.TextField(default="")
+    is_markdown = models.BooleanField(default=False)
 
     def __str__(self):
             return '%s %s %s %s' % (self.id, self.author, self.post, self.datetime)
 
+class PostCategory(models.Model):
+    post_id = models.ForeignKey(Post, on_delete=models.CASCADE, blank=True, null=True,related_name="post_cat_id")
+    category = models.TextField(max_length=250)
 
 # This is when you befriend someone and they befriend you
 # (Friend another author and they accept the friend request)
@@ -90,6 +95,5 @@ class Server(models.Model):
 
     def __str__(self):
         return '%s' % (self.id)
-
 
 
