@@ -7,7 +7,7 @@ class CustomUserCreationForm(UserCreationForm):
 
     class Meta(UserCreationForm):
         model = CustomUser
-        fields = ('username', 'displayname', 'email')
+        fields = ('username', 'displayname', 'email', 'is_approved_by_admin')
         labels = {
             'displayname': 'Display name'
         }
