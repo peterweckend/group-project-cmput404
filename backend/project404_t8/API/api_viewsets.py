@@ -25,7 +25,7 @@ from markdownx.utils import markdownify
 # https://www.django-rest-framework.org/api-guide/routers/
 # https://www.django-rest-framework.org/api-guide/viewsets/#api-reference
 class PostsViewSet(viewsets.ModelViewSet):
-    http_method_names = ['get'] # only GETs allowed right now
+    http_method_names = ['get','post'] # only GETs allowed right now
     queryset = Post.objects.filter()
     serializer_class = PostSerializer
 
@@ -52,19 +52,34 @@ class PostsViewSet(viewsets.ModelViewSet):
         return Response(serializer_class.data)
     
     # the API endpoint accessible at GET http://service/posts/{post_id}/comments
-    @action(methods=['get'], detail=True, url_path="comments")
+    @action(methods=['get','post'], detail=True, url_path="comments")
     def userPostComments(self, request, pk=None):
         post_id = pk
         requested_post = Post.objects.get(id=post_id)
-        # we're allowed to see the post - for now just check if the posts are public
-        if requested_post.privacy_setting == "6": 
-            queryset = Comment.objects.filter(post=post_id)
-            serializer_class = CommentSerializer(queryset, many=True)
-            return Response(serializer_class.data)
-        else: 
-            # return a permission denied error
-            raise PermissionDenied
-        
+        if request.method =="POST":
+            # we're allowed to see the post - for now just check if the posts are public
+            if requested_post.privacy_setting == "6": 
+                queryset = Comment.objects.filter(post=post_id)
+                serializer_class = CommentSerializer(queryset, many=True)
+                return Response(serializer_class.data)
+            else:
+                # for now, raise an exception if the post we want to see isn't set to Public
+                # this will have to be changed later
+                raise PermissionDenied("Forbidden: The post you wished to access comments for is not Public")
+
+        else: # this handles "GET" methods
+
+            # we're allowed to see the post - for now just check if the posts are public
+            if requested_post.privacy_setting == "6": 
+                queryset = Comment.objects.filter(post=post_id)
+                serializer_class = CommentSerializer(queryset, many=True)
+                return Response(serializer_class.data)
+            else: 
+                # for now, raise an exception if the post we want to see isn't set to Public
+                # this will have to be changed later
+                raise PermissionDenied("Forbidden: The post you wished to access comments for is not Public")
+
+
 
     
 
@@ -74,11 +89,11 @@ class AuthorViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.filter()
     serializer_class = UserSerializer
 
-    # we don't want there to be any functionality for http://service/author -get
+    # we don't want there to be any functionality for GET http://service/author 
     def list(self, request):
         raise NotFound()
 
-    # we don't want there to be any functionality for http://service/author- post
+    # we don't want there to be any functionality for GET http://service/author
     def create(self, request):
         raise NotFound()
 
