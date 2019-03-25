@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework import generics,status,viewsets
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from .models import Post, Comment, Friendship, Follow, Server
@@ -22,6 +23,14 @@ from rest_framework.exceptions import APIException, MethodNotAllowed, NotFound, 
 from markdownx.utils import markdownify
 
 ############ API Methods
+
+class PostsPagination(PageNumberPagination):
+    page_size = 5
+    page_size_query_param = 'size'
+
+class AuthorPostsPagination(PageNumberPagination):
+    page_size = 1    
+
 # https://www.django-rest-framework.org/api-guide/routers/
 # https://www.django-rest-framework.org/api-guide/viewsets/#api-reference
 class PostsViewSet(viewsets.ModelViewSet):
@@ -87,6 +96,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
     # http_method_names = ['get', 'post', 'head'] # specify which types of requests are allowed
     permission_classes = (IsAuthenticated,)
     queryset = CustomUser.objects.filter()
+    pagination_class = AuthorPostsPagination
     serializer_class = UserSerializer
 
     # we don't want there to be any functionality for GET http://service/author 
@@ -102,6 +112,8 @@ class AuthorViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, pk=None):
         queryset = CustomUser.objects.all()
         user = get_object_or_404(queryset, pk=pk)
+        # paginator = PostsPagination()
+        # posts = paginator.paginate_queryset(queryset, request)
 
         # build a list of friends for the response
         friends_list = []
@@ -187,13 +199,16 @@ class AuthorViewSet(viewsets.ModelViewSet):
             SELECT * FROM API_post WHERE id in posts \
             AND author_id = %s', [int(uid)]*6 + [author_id])
 
-        serializer_class = PostSerializer(allowed_posts, many=True)
+        paginator = PostsPagination()
+        paginated_posts = paginator.paginate_queryset(allowed_posts, request)
+
+        serializer_class = PostSerializer(paginated_posts, many=True)
         return Response(serializer_class.data)
 
     # the API endpoint accessible at GET http://service/author/<authorid>/friends/
     # returns the author's friend list
     @action(methods=['get'], detail=True, url_path="friends")
-    def userPosts(self, request, pk=None):
+    def userFriends(self, request, pk=None):
         author_id = pk
         # since the friendship table is 2-way, request a list of users whose 
         # IDs are in the friendship table, not including the author
@@ -213,6 +228,13 @@ class AuthorViewSet(viewsets.ModelViewSet):
     
         # return serialized friendship_authors
         return Response(friendship_dict)
+
+
+
+
+
+
+
 
 
     
