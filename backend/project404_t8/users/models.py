@@ -28,6 +28,8 @@ class CustomUser(AbstractUser):
     friend_requests = models.CharField(max_length=100,default=0)
     github_id   = models.CharField(max_length=255)
     github_url  = models.CharField(max_length=255)
+    host        = models.TextField()
+    is_approved_by_admin = models.BooleanField(default=False)
 
     objects = CustomUserManager()
 

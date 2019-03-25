@@ -14,6 +14,7 @@ from .forms import uploadForm, friendRequestForm, EditProfileForm, commentForm
 from django.conf import settings
 from users.models import CustomUser
 from random import uniform
+import json
 from django.urls import reverse_lazy
 from django.views.generic.edit import DeleteView, UpdateView
 import API.services as Services
@@ -525,17 +526,28 @@ class AuthorViewSet(viewsets.ModelViewSet):
         return Response(serializer_class.data)
 
     # the API endpoint accessible at GET http://service/author/<authorid>/friends/
-    # not yet finished!
+    # returns the author's friend list
     @action(methods=['get'], detail=True, url_path="friends")
     def userPosts(self, request, pk=None):
         author_id = pk
         # since the friendship table is 2-way, request a list of users whose 
         # IDs are in the friendship table, not including the author
         # make sure to format this the appropriate way
-
-        serializer_class = PostSerializer(allowed_posts, many=True)
-        return Response(serializer_class.data)
-
+        friendship_authors = []
+        friends = Friendship.objects.filter(friend_a=author_id)
+        
+        for friend in friends:
+            url = "https://" + request.get_host() + "/author/" + str(friend.friend_b.id) 
+            friendship_authors.append(url)
+    
+        # serialize friendship_authors here
+        friendship_dict = {}
+        friendship_dict["query"] = "friends"
+        friendship_dict["author"] = pk
+        friendship_dict["authors"] = friendship_authors
+    
+        # return serialized friendship_authors
+        return Response(friendship_dict)
 
 
 
