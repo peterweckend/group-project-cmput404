@@ -87,6 +87,19 @@ class AuthorViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, pk=None):
         queryset = CustomUser.objects.all()
         user = get_object_or_404(queryset, pk=pk)
+
+        # build a list of friends for the response
+        friends = []
+
+        response = {}
+        response["id"] = "http://" + request.get_host() + request.get_full_path()
+        response["host"] = request.get_host()
+        response["displayName"] = user.displayname
+        response["url"] = "http://" + request.get_host() + request.get_full_path()
+        response["friends"] = friends
+        if Services.isNotBlank(user.github_url):
+            response["github"] = user.github_url
+
         serializer = UserSerializer(user)
         return Response(serializer.data)
 
@@ -164,4 +177,4 @@ class AuthorViewSet(viewsets.ModelViewSet):
         return Response(friendship_dict)
 
 
-
+    
