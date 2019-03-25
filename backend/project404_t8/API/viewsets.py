@@ -459,13 +459,21 @@ class AuthorViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.filter()
     serializer_class = UserSerializer
 
-    # we don't want there to be any functionality for http://service/author
+    # we don't want there to be any functionality for http://service/author -get
     def list(self, request):
         raise NotFound()
 
-    # we don't want there to be any functionality for http://service/author
+    # we don't want there to be any functionality for http://service/author- post
     def create(self, request):
         raise NotFound()
+
+    # GET http://service/author/{author_id}
+    # returns information about the author
+    def retrieve(self, request, pk=None):
+        queryset = CustomUser.objects.all()
+        user = get_object_or_404(queryset, pk=pk)
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
 
     # http://service/author/posts (posts that are visible to the currently authenticated user)
     @action(methods=['get'], detail=False)
