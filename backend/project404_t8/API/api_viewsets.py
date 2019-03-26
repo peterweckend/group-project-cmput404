@@ -84,6 +84,10 @@ def getAuthorData(request, extra=False, pk=None):
     
     return response
 
+# Get comment information
+def getCommentData(request, pk=None):
+    # TODO do me big boy
+    pass
 
 # Get post information for a single post
 def getPostData(request, pk=None):
@@ -131,16 +135,19 @@ def getPostData(request, pk=None):
     author = getAuthorData(request, extra=False, pk=authorId)
     currentPost.update({"author":author})
     
+    # Get comment info
+    # TODO peter you should be able to figure this out
+    # Use the helper function you will make
+
     return currentPost
 
-
-# Get comment information
 
 
 
 ############ API Methods
 # https://www.django-rest-framework.org/api-guide/routers/
 # https://www.django-rest-framework.org/api-guide/viewsets/#api-reference
+
 class PostsViewSet(viewsets.ModelViewSet):
     http_method_names = ['get','post'] # only GETs allowed right now
     queryset = Post.objects.filter()
@@ -163,9 +170,11 @@ class PostsViewSet(viewsets.ModelViewSet):
         # Query <all> amount of public posts from the table
         # This can be done with django pagination framework somehow
         # But that can just be done later >:)
+        # TODO Pagination shit here somehow
         queryset = Post.objects.filter(privacy_setting="6")
 
         # This serializes all the posts into an ordered dictionary
+        # Hopefully only the amount requested
         serialized_posts = PostSerializer(queryset, many=True)
         # print(serialized_posts.data)
 
@@ -175,7 +184,9 @@ class PostsViewSet(viewsets.ModelViewSet):
         # Anyways, we will create a new ordered dict
         # And make sure all the correct elements are added in order
         
+        # Response is the bigboy json response at the end
         response = OrderedDict()
+
         # First is the meta data
         # "query":"posts"
         response.update({"query":"posts"})
@@ -187,7 +198,7 @@ class PostsViewSet(viewsets.ModelViewSet):
         # size
         # This is the size of what was requested
         # Default can be 50 for now or something
-        size = 50
+        size = "TODO"
         response.update({"size":size})
 
         # next
@@ -209,44 +220,9 @@ class PostsViewSet(viewsets.ModelViewSet):
             postId = str(post["id"])            
             posts.append(getPostData(request, pk=postId))
 
-        # author
-        # id
-        # host
-        # displayName 
-        # url 
-        # github 
-
-        # categories
-        # count
-        # size 
-        # next 
-
-        # comments 
-
-        # author
-        # id
-        # host
-        # displayName 
-        # url 
-        # github  
-
-        # comment
-        # contentType
-        # published
-        # id
-
-        # published
-        # id
-        # visibility
-        # visibleTo (list of author URIs)
-        # unlisted 
 
         response.update({"posts":posts})
-        
-
-
-
-
+    
         # Finally, return this huge mfer
         return Response(response)
     
