@@ -1,5 +1,5 @@
 <!-- templates/friendrequest/friendrequest.html -->
-{% extends 'base.html' %}
+{% extends 'base_pages.html' %}
 
 {% block title %}Add new comment{% endblock %}
 
@@ -12,10 +12,11 @@
     This is for testing honestly, not final
     Will just be a JS/AJAX button instead down the road -->
 <h1>Add new comment</h1>
+<br>
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" value="Send">
+    <input type="submit" class="comment btn btn-primary" value="Comment">
 </form>
 {% else %}
 {% load static %}
