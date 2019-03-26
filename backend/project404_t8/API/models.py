@@ -89,11 +89,12 @@ class Follow(models.Model):
 
 
 class Server(models.Model):
-    id = models.AutoField(primary_key=True)
+    id = models.UUIDField(primary_key=True,editable=False, default=uuid.uuid4)
+    host = models.URLField(unique=True)
 
     # todo: store a list of hosted images?
 
     def __str__(self):
-        return '%s' % (self.id)
+        return '%s %s' % (self.id  ,self.host)
 
 
