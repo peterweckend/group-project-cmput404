@@ -58,11 +58,7 @@
   <div class="row">
     <!-- -------------------- LEFT COLUMN -------------------- -->
     <div class="leftcolumn">
-      {% if user.is_authenticated %}
-        <p>Coming Soon</p>
-        <h1 class="side-menu-item friends-menu" style= "font-size: 1em"> 
-
-      {% endif %}
+      <h1 class="side-menu-item friends-menu" style= "font-size: 1em"> 
     </div>
 
     <!-- -------------------- MAIN COLUMN -------------------- -->
@@ -73,51 +69,6 @@
 
     <!-- -------------------- RIGHT COLUMN -------------------- -->
     <div class="rightcolumn">
-      {% if user.is_authenticated %}
-        <!-- <h1>Friends</h1> -->
-        <ul class="collection with-header">
-        <li class="collection-header z-depth-4"><h4>Friends</h4></li>
-        {% for friend in friends %}
-          {% if user.id == friend.friend_a_id %}
-            <li class="collection-item">
-              <div class="friends_col row">
-                <div class="col s10">
-                  <h6><a href="{% url 'profile' username=friend.friend_b %}">{{friend.friend_b}}</a></h6>
-                </div>
-                <div class="col s2">
-                  <p class="delete_friend">
-                    <a href="{% url 'delete_friend' pk=friend.pk %}"><i class="material-icons right">delete</i> </a>
-                  </p>
-                </div>
-              </div>
-            </li>
-          {% endif %}
-        {% endfor %}
-      </ul>
-      {% endif %}
-
-      <!-- <div class="item2">
-        <style type="text/css">
-        @import url("http://www.google.com/uds/solutions/dynamicfeed/gfdynamicfeedcontrol.css");
-
-        #feedControl {
-          margin-top : 10px;
-          margin-left: auto;
-          margin-right: auto;
-          width : 440px;
-          font-size: 12px;
-          color: #9CADD0;
-        }
-        </style>
-          <script type="text/javascript">
-          function load() {
-            var feed ="http://feeds.bbci.co.uk/news/world/rss.xml";
-            new GFdynamicFeedControl(feed, "feedControl");
-          }
-          google.load("feeds", "1");
-          google.setOnLoadCallback(load);
-        </script>
-      </div> -->
     </div>
   </div>
   
