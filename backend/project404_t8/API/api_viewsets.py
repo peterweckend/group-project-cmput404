@@ -19,9 +19,10 @@ import json
 from django.urls import reverse_lazy
 from django.views.generic.edit import DeleteView, UpdateView
 import API.services as Services
-from rest_framework.exceptions import APIException, MethodNotAllowed, NotFound, PermissionDenied
+from rest_framework.exceptions import APIException, MethodNotAllowed, NotFound, PermissionDenied, ParseError
 from markdownx.utils import markdownify
 from collections import OrderedDict
+import dateutil.parser as parser
 
 ### Helper methods ###
 # To help get data, and so we don't have to reuse code all the time
@@ -41,7 +42,7 @@ from collections import OrderedDict
 def getAuthorData(request, extra=False, pk=None):
     
     # Modify the requests path
-    request.path = "/author/" + pk
+    request_path = "/author/" + str(pk)
 
     queryset = CustomUser.objects.all()
     user = get_object_or_404(queryset, pk=pk)
@@ -80,25 +81,45 @@ def getAuthorData(request, extra=False, pk=None):
             response["bio"] = user.bio
 
     
-    response["id"] = "http://" + request.get_host() + request.path
+    response["id"] = "http://" + request.get_host() + request_path
+    # todo: look up the user, find what host they belong to, and return that value
+    # instead of using request.get_host() here
     response["host"] = request.get_host()
     response["displayName"] = user.displayname
-    response["url"] = "http://" + request.get_host() + request.path
+    response["url"] = "http://" + request.get_host() + request_path
+    # do we need github link down here? ex: in the comments request
     
     return response
 
 # Get comment information
 # pk is the comment ID
 def getCommentData(request, pk=None):
-    # TODO do me big boy
-    pass
+
+    queryset = Comment.objects.filter(pk=pk)
+    comment = CommentSerializer(queryset, many=True).data[0]
+    
+    response = OrderedDict()
+
+    author_id = int(comment["author"])
+    author_response = getAuthorData(request, extra=False, pk=author_id)
+    response.update({"author":author_response})
+    response.update({"comment":comment["body"]})
+    if comment["is_markdown"]:
+        response.update({"contentType":"text/markdown"}) 
+    else:
+        response.update({"contentType":"text/plain"}) 
+    published = parser.parse(comment["datetime"]) # ISO 8601 format
+    response.update({"published":published.isoformat()})
+    response.update({"id":pk})
+
+    return response
 
 # Get post information for a single post
 # pk is the post ID
 def getPostData(request, pk=None):
 
     # Modify the request path
-    request.path = "/posts/" + pk
+    request_path = "/posts/" + str(pk)
 
     # permission_classes = (IsAuthenticated,)
     queryset = Post.objects.filter(pk=pk)
@@ -252,29 +273,37 @@ class PostsViewSet(viewsets.ModelViewSet):
     def userPostComments(self, request, pk=None):
         post_id = pk
         requested_post = Post.objects.get(id=post_id)
-        if request.method =="POST":
-            # we're allowed to see the post - for now just check if the posts are public
+        if request.method == "POST":
+            # check that we're allowed to see the post - for now just check if the posts are public
+            # for right now, just return comments from public posts
             if requested_post.privacy_setting == "6": 
                 queryset = Comment.objects.filter(post=post_id)
                 serializer_class = CommentSerializer(queryset, many=True)
                 return Response(serializer_class.data)
             else:
-                # for now, raise an exception if the post we want to see isn't set to Public
-                # this will have to be changed later
                 raise PermissionDenied("Forbidden: The post you wished to access comments for is not Public")
 
-        else: # this handles "GET" methods
-
-            # we're allowed to see the post - for now just check if the posts are public
+        elif request.method == "GET": # this handles "GET" methods
+            # check that we're allowed to see the post - for now just check if the posts are public
+            # for right now, just return comments from public posts
             if requested_post.privacy_setting == "6": 
-                queryset = Comment.objects.filter(post=post_id)
-                serializer_class = CommentSerializer(queryset, many=True)
-                return Response(serializer_class.data)
-            else: 
-                # for now, raise an exception if the post we want to see isn't set to Public
-                # this will have to be changed later
-                raise PermissionDenied("Forbidden: The post you wished to access comments for is not Public")
+                queryset = Comment.objects.filter(post=pk)
+                comments = CommentSerializer(queryset, many=True).data
+                comments_response = []
+                
+                for comment in comments:
+                    comments_response.append(getCommentData(request, pk=comment["id"]))
+                
+                response = OrderedDict()
+                response.update({"query":"comments"})
+                # todo: add count, size, next, previous and whatever pagination stuff here
+                response.update({"comments":comments_response})
 
+                return Response(response)
+            else: 
+                raise PermissionDenied("Forbidden: The post you wished to access comments for is not Public")
+        else: 
+            raise MethodNotAllowed(method=request.method)
 
 
     
