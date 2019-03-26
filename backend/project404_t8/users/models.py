@@ -22,12 +22,17 @@ class CustomUser(AbstractUser):
     username    = models.CharField(max_length=255, unique=True)
     password    = models.CharField(max_length=50)
     displayname = models.CharField(max_length=15, blank=True)
+    first_name  = models.CharField(max_length=256)
+    last_name   = models.CharField(max_length=256)
     password    = models.CharField(max_length=500)
     admin       = models.BooleanField(default=False) # superuser 
     timestamp   = models.DateTimeField(auto_now_add=True)
     friend_requests = models.CharField(max_length=100,default=0)
     github_id   = models.CharField(max_length=255)
-    github_url  = models.CharField(max_length=255)
+    github_url  = models.CharField(max_length=512)
+    host        = models.TextField()
+    bio         = models.TextField()
+    is_approved_by_admin = models.BooleanField(default=False)
 
     objects = CustomUserManager()
 

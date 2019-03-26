@@ -111,3 +111,6 @@ def updateNotifications(username):
     total = len(total)
     user.friend_requests = total
     user.save()
+
+def isNotBlank (myString):
+        return bool(myString and myString.strip())
