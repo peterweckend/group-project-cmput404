@@ -34,7 +34,9 @@ from collections import OrderedDict
 # but as long as hostname information isnt lost along the way
 # and security isn't compromised we should be good 
 
-# Get author info, optional: Friends list and extra data
+# Get author info
+# extra is a boolean that returns list of friends as well as github,bio,etc.
+# pk is the authors ID
 def getAuthorData(request, extra=False, pk=None):
     
     # Modify the requests path
@@ -85,11 +87,13 @@ def getAuthorData(request, extra=False, pk=None):
     return response
 
 # Get comment information
+# pk is the comment ID
 def getCommentData(request, pk=None):
     # TODO do me big boy
     pass
 
 # Get post information for a single post
+# pk is the post ID
 def getPostData(request, pk=None):
 
     # Modify the request path
@@ -138,6 +142,9 @@ def getPostData(request, pk=None):
     # Get comment info
     # TODO peter you should be able to figure this out
     # Use the helper function you will make
+    # This actually looks so tedious omg
+    comments = []
+    currentPost.update({"comments":comments})
 
     return currentPost
 
