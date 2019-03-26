@@ -142,14 +142,17 @@ def getPostData(request, pk=None):
     currentPost.update({"origin":origin})
 
     # description
-    # we don't really have a description yet, what would we put
-    description = "N/A"
-    currentPost.update({"description":description})
+    currentPost.update({"description":post["description"]})
 
     # contentType
     # How do we embed images
     contentType = "TODO, embedding images??"
-    currentPost.update({"contentType":contentType})
+    # for now just returning markdown or plaintext, 
+    # not sure how to do the other stuff
+    if post["is_markdown"]:
+        currentPost.update({"contentType":"text/markdown"})
+    else:
+        currentPost.update({"contentType":"text/plain"})
 
     # content
     content = post["body"]
@@ -160,13 +163,32 @@ def getPostData(request, pk=None):
     authorId = str(post["author"])
     author = getAuthorData(request, extra=False, pk=authorId)
     currentPost.update({"author":author})
+
+    # categories
+    # TODO: go into the categories table, find all entries associated with this post
+    # and put them into a list format, and add them to the response here
     
     # Get comment info
+
+    # TODO: add the total number of comments, and page size, and next, 
+    # previous, and all that other pagination stuff here
+
     # TODO peter you should be able to figure this out
     # Use the helper function you will make
     # This actually looks so tedious omg
+    # From spec:
+    # You should return ~ 5 comments per post.
+	# should be sorted newest(first) to oldest(last)
     comments = []
     currentPost.update({"comments":comments})
+
+    published = parser.parse(post["published"]) # ISO 8601 format
+    currentPost.update({"published":published.isoformat()})
+
+    currentPost.update({"id":post["id"]})
+    
+    # visibility ["PUBLIC","FOAF","FRIENDS","PRIVATE","SERVERONLY"]
+    currentPost.update({"visibility":"..."})
 
     return currentPost
 
