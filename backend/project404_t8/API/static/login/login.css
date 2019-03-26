@@ -11,12 +11,10 @@ body {
 p {
     color:var(--dark-main);
 }
-
 .confirmation {
     margin-top: 10%;
     font-weight: 300;
 }
-
 .delete-button {
     margin-left: 25%;
 }
