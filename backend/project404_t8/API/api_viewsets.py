@@ -25,12 +25,10 @@ from markdownx.utils import markdownify
 ############ API Methods
 
 class PostsPagination(PageNumberPagination):
-    page_size = 5
+    # change this to 50 later, currently at 1 for testing purposes
+    page_size = 1
     page_size_query_param = 'size'
-
-class AuthorPostsPagination(PageNumberPagination):
-    page_size = 1    
-
+  
 # https://www.django-rest-framework.org/api-guide/routers/
 # https://www.django-rest-framework.org/api-guide/viewsets/#api-reference
 class PostsViewSet(viewsets.ModelViewSet):
@@ -96,7 +94,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
     # http_method_names = ['get', 'post', 'head'] # specify which types of requests are allowed
     permission_classes = (IsAuthenticated,)
     queryset = CustomUser.objects.filter()
-    pagination_class = AuthorPostsPagination
+    pagination_class = PostsPagination
     serializer_class = UserSerializer
 
     # we don't want there to be any functionality for GET http://service/author 
@@ -201,9 +199,24 @@ class AuthorViewSet(viewsets.ModelViewSet):
 
         paginator = PostsPagination()
         paginated_posts = paginator.paginate_queryset(allowed_posts, request)
-
         serializer_class = PostSerializer(paginated_posts, many=True)
-        return Response(serializer_class.data)
+        # print(Services.get_page_size(request, paginator))
+        # is returning none for next/previous okay, or do I need to not return anything
+        response = {
+            "query": "posts",
+            "count": len(allowed_posts),
+            "size": Services.get_page_size(request, paginator),
+            "next": None,
+            "previous": None,
+            "posts" : serializer_class.data,
+        }
+
+        if paginator.get_next_link() is not None:
+            response["next"] = paginator.get_next_link()
+        if paginator.get_previous_link() is not None:
+            response["previous"] = paginator.get_previous_link()
+        # print(paginator.get_next_link())
+        return Response(response)
 
     # the API endpoint accessible at GET http://service/author/<authorid>/friends/
     # returns the author's friend list
