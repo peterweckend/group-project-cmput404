@@ -200,6 +200,7 @@ def getPostData(request, pk=None):
 class PostsPagination(PageNumberPagination):
     # change this to 50 later, currently at 1 for testing purposes
     page_size = 1
+    #  allows the client to set the page size on a per-request basis
     page_size_query_param = 'size'
   
 # https://www.django-rest-framework.org/api-guide/routers/
@@ -465,7 +466,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
             response["next"] = paginator.get_next_link()
         if paginator.get_previous_link() is not None:
             response["previous"] = paginator.get_previous_link()
-        print(paginator.get_next_link())
+        # print(paginator.get_next_link())
         return Response(response)
 
     # the API endpoint accessible at GET http://service/author/<authorid>/friends/
