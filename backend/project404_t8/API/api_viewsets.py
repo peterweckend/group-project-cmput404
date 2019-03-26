@@ -208,6 +208,7 @@ class PostsPagination(PageNumberPagination):
 class PostsViewSet(viewsets.ModelViewSet):
     http_method_names = ['get','post'] # only GETs allowed right now
     queryset = Post.objects.filter()
+    pagination_class = PostsPagination
     serializer_class = PostSerializer
 
     # Instantiates and returns the list of permissions that this view requires.
@@ -308,6 +309,8 @@ class PostsViewSet(viewsets.ModelViewSet):
         elif request.method == "GET": # this handles "GET" methods
             # check that we're allowed to see the post - for now just check if the posts are public
             # for right now, just return comments from public posts
+            paginator = PostsPagination()
+            
             if requested_post.privacy_setting == "6": 
                 queryset = Comment.objects.filter(post=pk)
                 comments = CommentSerializer(queryset, many=True).data
@@ -315,11 +318,21 @@ class PostsViewSet(viewsets.ModelViewSet):
                 
                 for comment in comments:
                     comments_response.append(getCommentData(request, pk=comment["id"]))
-                
+
+                paginated_posts = paginator.paginate_queryset(comments_response, request)
+
                 response = OrderedDict()
                 response.update({"query":"comments"})
-                # todo: add count, size, next, previous and whatever pagination stuff here
+                response.update({"count": len(queryset)})
+                response.update({"size": Services.get_page_size(request, paginator)})
+                response.update({"next": None})
+                response.update({"previous": None})
                 response.update({"comments":comments_response})
+
+                if paginator.get_next_link() is not None:
+                    response["next"] = paginator.get_next_link()
+                if paginator.get_previous_link() is not None:
+                    response["previous"] = paginator.get_previous_link()
 
                 return Response(response)
             else: 
@@ -439,21 +452,20 @@ class AuthorViewSet(viewsets.ModelViewSet):
         paginated_posts = paginator.paginate_queryset(allowed_posts, request)
         serializer_class = PostSerializer(paginated_posts, many=True)
         # print(Services.get_page_size(request, paginator))
-        # is returning none for next/previous okay, or do I need to not return anything
-        response = {
-            "query": "posts",
-            "count": len(allowed_posts),
-            "size": Services.get_page_size(request, paginator),
-            "next": None,
-            "previous": None,
-            "posts" : serializer_class.data,
-        }
+
+        response = OrderedDict()
+        response.update({"query":"comments"})
+        response.update({"count": len(allowed_posts)})
+        response.update({"size": Services.get_page_size(request, paginator)})
+        response.update({"next": None})
+        response.update({"previous": None})
+        response.update({"posts": serializer_class.data})
 
         if paginator.get_next_link() is not None:
             response["next"] = paginator.get_next_link()
         if paginator.get_previous_link() is not None:
             response["previous"] = paginator.get_previous_link()
-        # print(paginator.get_next_link())
+        print(paginator.get_next_link())
         return Response(response)
 
     # the API endpoint accessible at GET http://service/author/<authorid>/friends/
