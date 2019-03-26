@@ -121,3 +121,32 @@ def get_page_size(request, paginator):
         return int(request.GET.get('size'))
     else:
         return paginator.page_size
+
+
+# pass in a string containing the post's privacy value (ex: "3")
+# this function will return the corresponding API privacy text value (ex: "FRIENDS")
+#         ('1', 'me'),
+#         ('2', 'another author'),
+#         ('3', 'my friends'),
+#         ('4', 'friends of friends'),
+#         ('5', 'only friends on my host'),
+#         ('6', 'public'),
+#         ('7', 'unlisted')
+def get_privacy_string_for_post(post_privacy_value):
+    visibility = ["PRIVATE", "FRIENDS", "FOAF", "SERVERONLY", "PUBLIC"]
+    if post_privacy_value == "1":
+        return visibility[0]
+    elif post_privacy_value == "2":
+        return visibility[0]
+    elif post_privacy_value == "3":
+        return visibility[1]
+    elif post_privacy_value == "4":
+        return visibility[2]
+    elif post_privacy_value == "5":
+        return visibility[3]
+    elif post_privacy_value == "6":
+        return visibility[4]
+    elif post_privacy_value == "7": # TODO: see what happens to option 7
+        return "-1"
+    else:
+        return "-1"
