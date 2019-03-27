@@ -321,6 +321,15 @@ class PostsViewSet(viewsets.ModelViewSet):
                 postTime = body["published"]
                 post = Post.objects.get(pk=post_id)
 
+                if Comment.objects.get(pk=commentID):
+                    # print("comment exists")
+                    response = {
+                    'query': 'addComment',
+                        'success':False,
+                        'message':"Comment not allowed"
+                    }
+                    return Response(response, status=403)
+
                 try:
                     author = CustomUser.objects.get(pk=authorID)
                 except:
