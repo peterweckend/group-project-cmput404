@@ -489,28 +489,51 @@ class AuthorViewSet(viewsets.ModelViewSet):
 
     # the API endpoint accessible at GET http://service/author/<authorid>/friends/
     # returns the author's friend list
-    # TODO rename this function, its got a duplicate name basically
-    @action(methods=['get'], detail=True, url_path="friends")
+    # Also allows for POST
+    # returns the list with non friends removed
+    @action(methods=['get', 'post'], detail=True, url_path="friends")
     def userFriends(self, request, pk=None):
-        author_id = pk
-        # since the friendship table is 2-way, request a list of users whose 
-        # IDs are in the friendship table, not including the author
-        # make sure to format this the appropriate way
-        friendship_authors = []
-        friends = Friendship.objects.filter(friend_a=author_id)
+
+        if request.method == "POST":
+
+            # The incoming request should have a json body
+            body = json.loads(request.body)
+
+            author_id = body["author"]
+
+            # For each author provided, check to see if they are friends
+            friends = []
+            for author in body["authors"]:
+                friend = friendsHelperFunction(request, author_id, author.split("/")[-1])
+                if friend:
+                    friends.append(author)
+
+            body["authors"] = friends
+
+
+            return Response(body)
+
+        if request.method == "GET":
+            author_id = pk
+            # since the friendship table is 2-way, request a list of users whose 
+            # IDs are in the friendship table, not including the author
+            # make sure to format this the appropriate way
+            friendship_authors = []
+            friends = Friendship.objects.filter(friend_a=author_id)
+            
+            for friend in friends:
+                url = "https://" + request.get_host() + "/author/" + str(friend.friend_b.id) 
+                friendship_authors.append(url)
         
-        for friend in friends:
-            url = "https://" + request.get_host() + "/author/" + str(friend.friend_b.id) 
-            friendship_authors.append(url)
-    
-        # serialize friendship_authors here
-        friendship_dict = {}
-        friendship_dict["query"] = "friends"
-        friendship_dict["author"] = pk
-        friendship_dict["authors"] = friendship_authors
-    
-        # return serialized friendship_authors
-        return Response(friendship_dict)
+            # serialize friendship_authors here
+            friendship_dict = {}
+            friendship_dict["query"] = "friends"
+            friendship_dict["author"] = pk
+            friendship_dict["authors"] = friendship_authors
+        
+            # return serialized friendship_authors
+            return Response(friendship_dict)
+
     @action(methods=['get'], detail=True, url_path="friends/(?P<author_id2>\d+)")
     def friends(self, request, pk=None,author_id2=None):
         author_id = pk
@@ -546,11 +569,37 @@ class AuthorViewSet(viewsets.ModelViewSet):
         else: 
              friends = Friendship.objects.filter(friend_a=author_id)
 
+    # service/author/friendrequest
+    @action(methods=["POST"], detail=True, url_path="friendrequest/")
+    def friendRequest(self, request, pk=None):
+        # print(request.body)
+        return Response({})
 
+# This tells you whether 2 people are friends or not
+def friendsHelperFunction(request, pk=None, author_id2=None):
+    author_id = pk
+    friendship_authors = []
+    friends = Friendship.objects.filter(friend_a=author_id, friend_b=author_id2)
+    friendship_dict = {}
+    if friends:
+        for friend in friends:
+            url = "https://" + request.get_host() + "/author/" + str(friend.friend_a.id) 
+            url2 = "https://" + request.get_host() + "/author/" + str(friend.friend_b.id) 
+            friendship_authors.append(url)
+            friendship_authors.append(url2)
+        friendship_dict["friends"]= True
+    else:
+        for friend in friends:
+            url = "https://" + request.get_host() + "/author/" + str(friend.friend_a.id) 
+            url2 = "https://" + request.get_host() + "/author/" + str(friend.friend_b.id) 
+            friendship_authors.append(url)
+            friendship_authors.append(url2)
 
+    if friendship_authors != []:
+        # Return the url of the second ID
+        return True
 
-
-
+    return False
 
 
 
