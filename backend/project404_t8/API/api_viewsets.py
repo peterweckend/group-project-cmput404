@@ -340,7 +340,7 @@ class PostsViewSet(viewsets.ModelViewSet):
                         'success':False,
                         'message':"Comment not allowed"
                 }
-                return Response(, status=403)
+                return Response(response, status=403)
 
         elif request.method == "GET": # this handles "GET" methods
             # check that we're allowed to see the post - for now just check if the posts are public
@@ -385,24 +385,41 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
     # POST to service/friendrequest
     # This is the only functionality here
     # @action(methods=['post'], detail=True, url_path="friendrequest/")
+    # Should this allow unathenticated users??
     def create(self, request):
         # print(request.body)
         if request.method == "POST":
             # extract the author and receiver IDs
             body = json.loads(request.body.decode('utf-8'))
 
-            author = body["author"]["id"].split("/")[-1]
+            authorId = body["author"]["id"].split("/")[-1]
+            authorUsername = body["author"]["displayName"]
             friend = body["friend"]["id"].split("/")[-1]
+
+            if str(request.user.id) != str(authorId):
+                return Response("400 Access denied")
 
             # This should be done better, but right now
             # we are gonna get the username using the id
             # and then handle the friendrequest
 
-            # These will crash if the ID does not exist in the db
-            authorName = CustomUser.objects.get(pk=author)
-            friendName = CustomUser.objects.get(pk=friend)
+            # If the sender ID or the receiver ID do not exist still just 200 them
+            # If the author doesn't exist create a foregin account for them on connectify
+            try: 
+                author = CustomUser.objects.get(pk=authorId)
+            except:
+                # We should save the host they are from probably
+                newAuthor = CustomUser(id=authorId, username=authorUsername, password="thisdoesntmatter", displayname=authorUsername)
+                newAuthor.save()
+                # Make a temp/foreign author profile
 
-            Services.handle_friend_request(authorName, friendName)
+            # If the receiver doesn't exist do nothing
+            try:
+                friend = CustomUser.objects.get(pk=friend)
+            except:
+                return Response("200 OK")
+
+            Services.handle_friend_request_with_id(author, friend)
         # handleFriendRequest
         return Response("200 OK")
     
