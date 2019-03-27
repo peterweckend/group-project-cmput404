@@ -363,10 +363,10 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
     # This is the only functionality here
     # @action(methods=['post'], detail=True, url_path="friendrequest/")
     def create(self, request):
-        print(request.body)
+        # print(request.body)
         if request.method == "POST":
             # extract the author and receiver IDs
-            body = json.loads(request.body)
+            body = json.loads(request.body.decode('utf-8'))
 
             author = body["author"]["id"].split("/")[-1]
             friend = body["friend"]["id"].split("/")[-1]
@@ -376,10 +376,10 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
             # and then handle the friendrequest
 
             # These will crash if the ID does not exist in the db
-            authorName = CustomUser.object.get(pk=author)
-            friendName = CustomUser.object.get(pk=author)
+            authorName = CustomUser.objects.get(pk=author)
+            friendName = CustomUser.objects.get(pk=friend)
 
-            Services.handleFriendRequest(authorName, friendName)
+            Services.handle_friend_request(authorName, friendName)
         # handleFriendRequest
         return Response("200 OK")
     
