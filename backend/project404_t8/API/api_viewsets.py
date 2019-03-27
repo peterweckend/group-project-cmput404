@@ -406,7 +406,7 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
             friend = body["friend"]["id"].split("/")[-1]
 
             if str(request.user.id) != str(authorId):
-                return Response("400 Access denied")
+                return Response(status=400)
 
             # This should be done better, but right now
             # we are gonna get the username using the id
@@ -426,11 +426,11 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
             try:
                 friend = CustomUser.objects.get(pk=friend)
             except:
-                return Response("200 OK")
+                return Response(status=200)
 
             Services.handle_friend_request_with_id(author, friend)
         # handleFriendRequest
-        return Response("200 OK")
+        return Response(status=200)
     
 
 class AuthorViewSet(viewsets.ModelViewSet):
