@@ -21,6 +21,7 @@ import API.services as Services
 from rest_framework.exceptions import APIException, MethodNotAllowed, NotFound, PermissionDenied
 from markdownx.utils import markdownify
 from .api_viewsets import PostsViewSet, AuthorViewSet
+from .serverMethods import befriend_remote_author
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
 # Django REST API Tutorial: Filtering System - https://youtu.be/s9V9F9Jtj7Q
 
@@ -122,7 +123,7 @@ def friendRequestView(request):
             #     newUser.save()
             #     friend = Friendship(friend_a=request.user, friend_b=newUser)
             #     friend.save()
-            
+
             receiver_username = form.cleaned_data["friendToAdd"]
             receiver_username = CustomUser.objects.get(username=receiver_username)
             follower_username = request.user
@@ -133,7 +134,14 @@ def friendRequestView(request):
 
             # not yet functionality to prevent multiple requests in a row
 
-            Services.handle_friend_request(receiver_username, follower_username)
+            is_remote_author = form.cleaned_data["isRemoteAuthor"]
+            if is_remote_author:
+                print("*** IS REMOTE AUTHOR")
+                result = befriend_remote_author(receiver_username, follower_username)
+                print("RESULT OF THE BEFRIENDING:", result)
+            else:
+                print("*** IS LOCAL AUTHOR")
+                Services.handle_friend_request(receiver_username, request.user.id)
 
             # redirect to a new URL: homepage
             return HttpResponseRedirect('/')
