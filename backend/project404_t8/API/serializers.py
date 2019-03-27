@@ -6,7 +6,7 @@ from users.models import CustomUser
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'password', 'last_login']
+        fields = '__all__' #['id', 'username', 'password', 'last_login']
         # "id", "last_login", "is_superuser", "first_name", "last_name", 
         # "email", "is_staff", "is_active", "date_joined", "username", 
         # "password", "admin", "timestamp", "groups", "user_permissions"

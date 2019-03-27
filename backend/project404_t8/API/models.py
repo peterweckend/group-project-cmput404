@@ -90,9 +90,9 @@ class Follow(models.Model):
 
 class Server(models.Model):
     id = models.UUIDField(primary_key=True,editable=False, default=uuid.uuid4)
-    host = models.URLField(unique=True)
-
-    # todo: store a list of hosted images?
+    host = models.URLField(unique=True, default="")
+    username = models.TextField(max_length=255, unique=True, default="")
+    password = models.CharField(max_length=255, default="") # this should be hashed but for now its plaintext
 
     def __str__(self):
         return '%s %s' % (self.id  ,self.host)
