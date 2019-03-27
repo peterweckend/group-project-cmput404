@@ -23,7 +23,7 @@
     });
   </script>
 </head>
-<header>
+<header class="z-depth-1">
     {% if user.is_authenticated %}
     <ul id="dropdown1" class="dropdown-content">
         <li><a href="/upload/">Create a post</a></li>
@@ -122,8 +122,10 @@
     </div>
   </div>
   
-  <div class="footer navbar-fixed-bottom">
-    <p>Connectify © 2019</p>
+  <div>
+    <div class="footer navbar-fixed-bottom">
+      <p>Connectify © 2019</p>
+    </div>
   </div>
 </body>
 </html>

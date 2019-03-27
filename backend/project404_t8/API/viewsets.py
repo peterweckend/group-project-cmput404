@@ -63,17 +63,26 @@ def uploadView(request):
         privacy_setting = request.POST.get('privacy')
         shared_author = request.POST.get('sharedAuthor')
         is_markdown = request.POST.get('markdown')
+        is_unlisted = request.POST.get('unlisted')
 
+        # Check share author
         if shared_author == "":
             shared_author = None
+        # Check if there's an image
         if image_link == "": 
             image_link = None
         if request.FILES != {}:
             image_link = request.FILES["imageLink"]
+        # Check if markdown option is selected
         if is_markdown == None:
             is_markdown = False
         elif is_markdown ==  "on":
             is_markdown = True
+        # Check if unlisted option is selected
+        if is_unlisted == None:
+            is_unlisted = False
+        elif is_unlisted ==  "on":
+            is_unlisted = True
 
         newPost = Post(
             author = author,
@@ -82,7 +91,8 @@ def uploadView(request):
             image_link = image_link,
             privacy_setting = privacy_setting,
             shared_author = shared_author,
-            is_markdown = is_markdown
+            is_markdown = is_markdown,
+            is_unlisted = is_unlisted
         )
         newPost.save()
         id = newPost.id
@@ -240,7 +250,8 @@ def homeListView(request):
             (WITH friends(fid) AS (SELECT friend_b_id FROM API_friendship WHERE friend_a_id=%s) \
             SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
             AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
-            SELECT * FROM API_post WHERE id in posts', [int(uid)]*6)
+            SELECT * FROM API_post WHERE id in posts \
+            AND (is_unlisted = 0 OR (is_unlisted = 1 AND author_id = %s))', [int(uid)]*7)
     except:
         post = Post.objects.all()
     #     # Do not display an image if the image does not exist

@@ -26,7 +26,6 @@ class Post(models.Model):
         ('4', 'friends of friends'),
         ('5', 'only friends on my host'),
         ('6', 'public'),
-        ('7', 'unlisted')
     )
 
     id = models.AutoField(primary_key=True)
@@ -43,12 +42,13 @@ class Post(models.Model):
 
     # If true, post can be in markdown
     is_markdown = models.BooleanField(default=False)
+    is_unlisted = models.BooleanField(default=False)
     published = DateTimeField(auto_now_add=True)
 
 
     def __str__(self):
-        return '%s %s %s %s %s %s %s' % (self.id, self.title, self.body, self.image_link, 
-            self.privacy_setting, self.shared_author, self.is_markdown)
+        return '%s %s %s %s %s %s %s %s' % (self.id, self.title, self.body, self.image_link, 
+            self.privacy_setting, self.shared_author, self.is_markdown, self.is_unlisted)
 
 
 class Comment(models.Model):
