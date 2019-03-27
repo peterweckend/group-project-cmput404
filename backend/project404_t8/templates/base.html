@@ -27,7 +27,7 @@
     {% if user.is_authenticated %}
     <ul id="dropdown1" class="dropdown-content">
         <li><a href="/upload/">Create a post</a></li>
-        <li><a href="{% url 'editprofile' pk=user.pk %}">Edit your profile</a></li>
+        
         <li><a href="/addFriend/">Friend request</a></li>
         <li><a href="{% url 'logout' %}">Logout</a></li>
     </ul>
