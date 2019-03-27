@@ -362,7 +362,7 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
     # POST to service/friendrequest
     # This is the only functionality here
     # @action(methods=['post'], detail=True, url_path="friendrequest/")
-    def list(self, request):
+    def create(self, request):
         print(request.body)
         if request.method == "POST":
             # extract the author and receiver IDs
