@@ -313,11 +313,34 @@ class PostsViewSet(viewsets.ModelViewSet):
             # check that we're allowed to see the post - for now just check if the posts are public
             # for right now, just return comments from public posts
             if requested_post.privacy_setting == "6": 
-                queryset = Comment.objects.filter(post=post_id)
-                serializer_class = CommentSerializer(queryset, many=True)
-                return Response(serializer_class.data)
+                body = json.loads(request.body)
+                authorID = body["author"]["id"].split("/")[-1]
+                authorUsername = body["author"]["displayName"]
+                commentID = body["id"]
+                comment = body["comment"]
+                postTime = body["published"]
+                post = Post.objects.get(pk=post_id)
+
+                try:
+                    author = CustomUser.objects.get(pk=authorID)
+                except:
+                    author = CustomUser(id=authorID, username=authorUsername, password="fixme", displayName = authorUsername)
+                    
+                newComment = Comment(id=commentID, author=author, post=post, datetime=postTime, body=comment)
+                newComment.save()
+                response = {
+                    'query': 'addComment',
+                        'success':True,
+                        'message':"Comment Added"
+                }
+                return Response(response, status=200)
             else:
-                raise PermissionDenied("Forbidden: The post you wished to access comments for is not Public")
+                response = {
+                    'query': 'addComment',
+                        'success':False,
+                        'message':"Comment not allowed"
+                }
+                return Response(, status=403)
 
         elif request.method == "GET": # this handles "GET" methods
             # check that we're allowed to see the post - for now just check if the posts are public
