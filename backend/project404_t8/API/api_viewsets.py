@@ -200,10 +200,10 @@ def getPostData(request, pk=None):
     currentPost.update({"visibility":Services.get_privacy_string_for_post(post["privacy_setting"])})
 
      # todo: waiting on the ability for multiple private authors
-    currentPost.update({"visibleTo":"..."})
+    currentPost.update({"visibleTo":"[]"})
 
      # todo: waiting until the post as an isUnlisted boolean attribute
-    currentPost.update({"unlisted":"..."})
+    currentPost.update({"unlisted":False})
     
 
     return currentPost
