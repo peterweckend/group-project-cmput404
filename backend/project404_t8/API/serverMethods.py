@@ -132,13 +132,13 @@ def get_remote_posts_for_feed(current_user_id):
                 # if it is, continue to next post. If it isn't, save it?
 
                 # todo: grab the author from the post and create/save a new author object
-                post_author = None
+                post_author =  CustomUser(id=post["author"]["id"], host=remote_server.host, \
+                            displayname=post["author"]["displayname"], github=post["author"]["github_url"], username = post["author"]["displayname"], \
+                            password= "12345", )
                 post_author.save()
 
                 # there are a bunch of fields here that still need to be filled out
-                post_object = Post(id=post.id, author=post_author, \
-                    title=post.title, description=post.description, body=post.content \ 
-                    privacy_setting='6', published=post.published, original_host=remote_server.host)
+                post_object = Post(id=post.id, author=post_author, title=post.title, description=post.description, body=post.content, privacy_setting='6', published=post.published, original_host=remote_server.host)
                 post_object.save()
 
                 remote_posts.append(post_object)
@@ -150,8 +150,44 @@ def get_remote_posts_for_feed(current_user_id):
 
 
 
-def get_remote_post_by_id(remote_post_id):
-    return None
+def get_remote_post_by_id(remote_post_id,current_user_id):
+    
+
+    # current strategy: get all posts from all connected servers
+    # go through the posts and filter out ones that the current user
+    # should not be able to see
+    remote_posts = []
+    try:
+        queryset = Server.objects.all()
+        for remote_server in queryset:
+            request_url = remote_server.host + "/posts/%s" % remote_post_id
+            header = get_custom_header_for_user(current_user_id)
+            r = requests.get(request_url, auth=(remote_server.username, remote_server.password), headers=header)
+
+            if r.status_code != 200:
+                print("An error occured")
+                continue
+            
+            posts = r.text.posts # hopefully this is the correct syntax for getting data from the response
+
+            for post in posts:
+                # check if the post is already saved in our db from a previous request
+                # if it is, continue to next post. If it isn't, save it?
+
+                # todo: grab the author from the post and create/save a new author object
+                post_author =  CustomUser(id=post["author"]["id"], host=remote_server.host,  displayname=post["author"]["displayname"], github=post["author"]["github_url"], username = post["author"]["displayname"], password= "12345", )
+                post_author.save()
+
+                # there are a bunch of fields here that still need to be filled out
+                post_object = Post(id=post.id, author=post_author, title=post.title, description=post.description, body=post.content, privacy_setting='6', published=post.published, original_host=remote_server.host)
+                post_object.save()
+
+                remote_posts.append(post_object)
+            
+    except:
+        # No external servers or posts found
+        print("No posts or servers were found")
+    return remote_posts
 
 
 

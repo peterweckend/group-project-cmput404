@@ -21,7 +21,8 @@ import API.services as Services
 from rest_framework.exceptions import APIException, MethodNotAllowed, NotFound, PermissionDenied
 from markdownx.utils import markdownify
 from .api_viewsets import PostsViewSet, AuthorViewSet
-from .serverMethods import befriend_remote_author
+from .serverMethods import befriend_remote_author, get_remote_posts_for_feed
+
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
 # Django REST API Tutorial: Filtering System - https://youtu.be/s9V9F9Jtj7Q
 
@@ -219,6 +220,8 @@ def homeListView(request):
             SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
             AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
             SELECT * FROM API_post WHERE id in posts', [int(uid)]*6)
+        postRemote = get_remote_posts_for_feed(request.user)
+        print("Got to this point,line 224")
     except:
         post = Post.objects.all()
     #     # Do not display an image if the image does not exist
@@ -232,7 +235,7 @@ def homeListView(request):
 
     try:
         user = CustomUser.objects.get(username=request.user)        
-        print(user.github_id,1)
+        # print(user.github_id,1)
         if user.github_id != 1:
             user.github_url = "https://api.github.com/users/%s/events/public".format(user.github_id)
             github_url= user.github_url
@@ -257,6 +260,7 @@ def homeListView(request):
                 p.body = markdownify(p.body)
 
         pageVariables["post"] = post
+        pageVariables["postRemote"]=postRemote
     except:
         # The raw query set returns no post, so do not pass in any post to the html
         pass
