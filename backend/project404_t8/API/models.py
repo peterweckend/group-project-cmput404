@@ -28,7 +28,7 @@ class Post(models.Model):
         ('6', 'public'),
     )
 
-    id = models.AutoField(primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
     title = models.CharField(max_length=250)
     description = models.TextField(blank=True, null=True) # a description of what the post is about
@@ -55,7 +55,7 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
-    id = models.AutoField(primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
     post = models.ForeignKey(Post, on_delete=models.CASCADE, blank=True, null=True,related_name="comments")
     datetime = models.DateTimeField(default=datetime.now, blank=True)

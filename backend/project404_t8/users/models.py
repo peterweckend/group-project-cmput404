@@ -1,6 +1,7 @@
 from django.db import models
 from django import forms
 from django.contrib.auth.models import AbstractUser, UserManager
+import uuid
 
 # https://youtu.be/HshbjK1vDtY
 class CustomUserManager(UserManager):
@@ -19,6 +20,7 @@ class CustomUserManager(UserManager):
 
 
 class CustomUser(AbstractUser):
+    id          = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     username    = models.CharField(max_length=255, unique=True)
     password    = models.CharField(max_length=255)
     displayname = models.CharField(max_length=255, blank=True)
