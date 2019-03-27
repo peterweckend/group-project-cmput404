@@ -580,6 +580,23 @@ class AuthorViewSet(viewsets.ModelViewSet):
     @action(methods=["POST"], detail=True, url_path="friendrequest/")
     def friendRequest(self, request, pk=None):
         # print(request.body)
+
+        # Ok, considering I don't know how to get this url rn we are just gonna
+        # code by hand and hope for the best LOL
+
+        body = json.loads(request.body)
+
+        author = body["author"]["id"]
+        friend = body["friend"]["id"]
+
+        # From services
+        # handleFriendRequest
+        # currently uses usernames, should actually use ID's
+
+        # Make sure these two arent already friends or aren't already following
+        # Could also just not do anything and then send the 200 anyway
+        # Reuse code from the other friend req here? or services
+
         return Response({})
 
 # This tells you whether 2 people are friends or not
