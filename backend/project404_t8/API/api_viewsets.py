@@ -482,7 +482,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
             SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
             AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
             SELECT * FROM API_post WHERE id in posts \
-            ORDER BY published DESC' , [int(uid)]*6)
+            ORDER BY published DESC' , [str(uid)]*6)
 
         serializer_class = PostSerializer(allowed_posts, many=True)
         return Response(serializer_class.data)
@@ -509,7 +509,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
             AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
             SELECT * FROM API_post WHERE id in posts \
             AND author_id = %s \
-            ORDER BY published DESC', [int(uid)]*6 + [author_id])
+            ORDER BY published DESC', [str(uid)]*6 + [author_id])
 
         paginator = PostsPagination()
         paginated_posts = paginator.paginate_queryset(allowed_posts, request)
