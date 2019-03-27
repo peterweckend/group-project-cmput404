@@ -132,13 +132,14 @@ def getPostData(request, pk=None):
     title = post["title"]
     currentPost.update({"title":title})
 
+    # get source and origin
     # source
-    source = "TODO, what should this be?"
+    source = request.scheme + "://" + str(request.META["HTTP_HOST"]) + "/posts/" + str(post["id"])
     currentPost.update({"source":source})
 
-    # origin
+    # origin, same as source right now
     # just the path of the post
-    origin = "TODO, this should be the post url"
+    origin = request.scheme + "://" + str(request.META["HTTP_HOST"]) + "/posts/" + str(post["id"])
     currentPost.update({"origin":origin})
 
     # description
@@ -189,6 +190,7 @@ def getPostData(request, pk=None):
     
     # visibility ["PUBLIC","FOAF","FRIENDS","PRIVATE","SERVERONLY"]
     currentPost.update({"visibility":"..."})
+    
 
     return currentPost
 
@@ -231,10 +233,12 @@ class PostsViewSet(viewsets.ModelViewSet):
         # But that can just be done later >:)
         # TODO Pagination shit here somehow
         queryset = Post.objects.filter(privacy_setting="6")
-
+        paginator = PostsPagination()
+        public_posts = paginator.paginate_queryset(queryset, request)
+            
         # This serializes all the posts into an ordered dictionary
         # Hopefully only the amount requested
-        serialized_posts = PostSerializer(queryset, many=True)
+        serialized_posts = PostSerializer(public_posts, many=True)
         # print(serialized_posts.data)
 
         # We don't want to use this one, the order is all messed up and shit
@@ -257,16 +261,19 @@ class PostsViewSet(viewsets.ModelViewSet):
         # size
         # This is the size of what was requested
         # Default can be 50 for now or something
-        size = "TODO"
-        response.update({"size":size})
-
+        response.update({"size":Services.get_page_size(request, paginator)})
+        
         # next
-        next = "TODO"
-        response.update({"next":next})
+        if paginator.get_next_link() is not None:
+            response.update({"next":paginator.get_next_link()})
+        else: 
+            response.update({"next":None})
 
         # previous
-        previous = "TODO"
-        response.update({"previous":previous})
+        if paginator.get_previous_link() is not None:
+            response.update({"previous":paginator.get_previous_link()})
+        else: 
+            response.update({"previous":None})
 
         # posts
         # loop through the retrieved posts (currently all of them)
@@ -279,7 +286,7 @@ class PostsViewSet(viewsets.ModelViewSet):
             postId = str(post["id"])            
             posts.append(getPostData(request, pk=postId))
 
-
+        # response.update({"posts":serialized_posts.data})
         response.update({"posts":posts})
     
         # Finally, return this huge mfer
@@ -451,16 +458,27 @@ class AuthorViewSet(viewsets.ModelViewSet):
 
         paginator = PostsPagination()
         paginated_posts = paginator.paginate_queryset(allowed_posts, request)
-        serializer_class = PostSerializer(paginated_posts, many=True)
+        serialized_posts = PostSerializer(paginated_posts, many=True)
         # print(Services.get_page_size(request, paginator))
 
         response = OrderedDict()
-        response.update({"query":"comments"})
+        response.update({"query":"posts"})
         response.update({"count": len(allowed_posts)})
         response.update({"size": Services.get_page_size(request, paginator)})
         response.update({"next": None})
         response.update({"previous": None})
-        response.update({"posts": serializer_class.data})
+        # response.update({"posts": serialized_posts.data})
+
+        posts = []
+        
+        for post in serialized_posts.data:
+            # Get single post information
+            # print(post)
+            postId = str(post["id"])            
+            posts.append(getPostData(request, pk=postId))
+
+        # response.update({"posts":serialized_posts.data})
+        response.update({"posts":posts})
 
         if paginator.get_next_link() is not None:
             response["next"] = paginator.get_next_link()
