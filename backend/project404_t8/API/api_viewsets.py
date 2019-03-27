@@ -95,7 +95,7 @@ def getAuthorData(request, extra=False, pk=None):
 # pk is the comment ID
 def getCommentData(request, pk=None):
 
-    queryset = Comment.objects.filter(pk=pk)
+    queryset = Comment.objects.filter(pk=pk)#.order_by('-datetime')
     comment = CommentSerializer(queryset, many=True).data[0]
     
     response = OrderedDict()
@@ -122,7 +122,7 @@ def getPostData(request, pk=None):
     request_path = "/posts/" + str(pk)
 
     # permission_classes = (IsAuthenticated,)
-    queryset = Post.objects.filter(pk=pk)
+    queryset = Post.objects.filter(pk=pk)#.order_by('-published')
     post = PostSerializer(queryset, many=True).data[0]
     
     # Init the returned dictionary
@@ -180,8 +180,13 @@ def getPostData(request, pk=None):
     # From spec:
     # You should return ~ 5 comments per post.
 	# should be sorted newest(first) to oldest(last)
-    comments = []
-    currentPost.update({"comments":comments})
+    comments_response = []
+    queryset = Comment.objects.filter(post=pk).order_by('-datetime')
+    comments = CommentSerializer(queryset, many=True).data
+    
+    for comment in comments:
+        comments_response.append(getCommentData(request, pk=comment["id"]))
+    currentPost.update({"comments":comments_response})
 
     published = parser.parse(post["published"]) # ISO 8601 format
     currentPost.update({"published":published.isoformat()})
@@ -232,7 +237,7 @@ class PostsViewSet(viewsets.ModelViewSet):
         # This can be done with django pagination framework somehow
         # But that can just be done later >:)
         # TODO Pagination shit here somehow
-        queryset = Post.objects.filter(privacy_setting="6")
+        queryset = Post.objects.filter(privacy_setting="6").order_by('-published')
         paginator = PostsPagination()
         public_posts = paginator.paginate_queryset(queryset, request)
             
@@ -320,7 +325,7 @@ class PostsViewSet(viewsets.ModelViewSet):
             paginator = PostsPagination()
             
             if requested_post.privacy_setting == "6": 
-                queryset = Comment.objects.filter(post=pk)
+                queryset = Comment.objects.filter(post=pk).order_by('-datetime')
                 comments = CommentSerializer(queryset, many=True).data
                 comments_response = []
                 
@@ -428,7 +433,8 @@ class AuthorViewSet(viewsets.ModelViewSet):
             (WITH friends(fid) AS (SELECT friend_b_id FROM API_friendship WHERE friend_a_id=%s) \
             SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
             AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
-            SELECT * FROM API_post WHERE id in posts', [int(uid)]*6)
+            SELECT * FROM API_post WHERE id in posts \
+            ORDER BY published DESC' , [int(uid)]*6)
 
         serializer_class = PostSerializer(allowed_posts, many=True)
         return Response(serializer_class.data)
@@ -454,7 +460,8 @@ class AuthorViewSet(viewsets.ModelViewSet):
             SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
             AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
             SELECT * FROM API_post WHERE id in posts \
-            AND author_id = %s', [int(uid)]*6 + [author_id])
+            AND author_id = %s \
+            ORDER BY published DESC', [int(uid)]*6 + [author_id])
 
         paginator = PostsPagination()
         paginated_posts = paginator.paginate_queryset(allowed_posts, request)
