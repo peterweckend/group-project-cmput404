@@ -17,3 +17,8 @@ body {
 .upload .create-post {
   padding-bottom: 100px !important;
 }
+
+.myCheckbox {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}

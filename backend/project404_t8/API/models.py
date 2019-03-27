@@ -45,6 +45,9 @@ class Post(models.Model):
     is_unlisted = models.BooleanField(default=False)
     published = DateTimeField(auto_now_add=True)
 
+    # if this post came from another server, store the original host here
+    original_host = models.TextField()
+
 
     def __str__(self):
         return '%s %s %s %s %s %s %s %s' % (self.id, self.title, self.body, self.image_link, 
@@ -89,11 +92,12 @@ class Follow(models.Model):
 
 
 class Server(models.Model):
-    id = models.AutoField(primary_key=True)
-
-    # todo: store a list of hosted images?
+    id = models.UUIDField(primary_key=True,editable=False, default=uuid.uuid4)
+    host = models.URLField(unique=True, default="")
+    username = models.TextField(max_length=255, unique=True, default="")
+    password = models.CharField(max_length=255, default="") # this should be hashed but for now its plaintext
 
     def __str__(self):
-        return '%s' % (self.id)
+        return '%s %s' % (self.id  ,self.host)
 
 

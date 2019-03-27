@@ -50,11 +50,16 @@ class friendRequestForm(forms.Form):
     # Actually, this should just be a button that appears on a users profile
     # So to be even more honest we might not even need a form for this, but its
     # not a big deal right now
-    friendToAdd = forms.CharField(label="Author's Username", max_length=255, widget=forms.TextInput(
+    friendToAdd = forms.CharField(label="Local Author's Username or Remote Author's ID", max_length=255, widget=forms.TextInput(
         attrs={
             'class': 'form-control',
-            'placeholder': 'Enter a userame...'
+            'placeholder': 'Enter a username or user ID...'
         }))
+    isRemoteAuthor = forms.BooleanField(label="Add a remote author", required = False, widget=forms.CheckboxInput(
+        attrs={
+            'class': 'myCheckbox'
+        }
+    ))
 
 class acceptIgnoreRequestForm(forms.Form):
     # This will simply be a button with an invisible value

@@ -15,7 +15,8 @@
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" class="send-request btn btn-primary" value="Send Request">
+        <input type="submit" class="send-request btn btn-primary" value="Send Request to Local Friend">
+    </form>
     </form>
   {% else %}
     {% load static %}
