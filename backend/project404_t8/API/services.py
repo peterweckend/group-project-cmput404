@@ -103,6 +103,52 @@ def handle_friend_request(receiver_username, follower_username):
     updateNotifications(receiver_username)
     updateNotifications(follower_username)
 
+# This takes two custom user objects and adds them to the friend or follow table
+def handle_friend_request_with_id(receiver, follower):
+    # Do nothing if a friendship between the two users exists
+    receiver_id = receiver.id
+    follower_id = follower.id
+
+    check1 = Friendship.objects.filter(friend_a=receiver_id, friend_b=follower_id)
+    check2 = Friendship.objects.filter(friend_b=receiver_id, friend_a=follower_id)
+
+    if check1.exists() or check2.exists():
+        # Friendship already exists, so do nothing
+        return
+  
+    # Do nothing if the follow relationship already exists
+    check1 = Follow.objects.filter(receiver=receiver_id, follower=follower_id)
+    if check1.exists():
+        # Follow / friend request already exists, do nothing
+        return
+
+    # If the inverse relationship exists, remove it,
+    # Then add the relationship to friends instead
+    # So first, query for the relationship
+    if Follow.objects.filter(follower=receiver_id, receiver=follower_id).exists():
+        # Delete this entry, then create a friend relationship instead
+        follow = Follow.objects.get(follower=receiver_id, receiver=follower_id)
+        follow.delete()
+        friend = Friendship(friend_a=follower, friend_b=receiver)
+        friend.save()
+
+        # Addition by TOLU
+        # we have to add this because we need the relationship going both ways
+        # for the database SQL queries of friend of friends
+        friend = Friendship(friend_a=receiver, friend_b=follower)
+        friend.save()
+        
+
+    # maybe make sure the user cant send a new friend request after already
+    # being friends
+    else:
+        # Create the entry in follow, essentially sending the friend request
+        follow = Follow(follower=follower, receiver=receiver)
+        follow.save()
+
+    updateNotificationsById(receiver_id)
+    updateNotificationsById(follower_id)
+
 
 def updateNotifications(username):
     # This will update the number of friend requests the user
@@ -112,11 +158,48 @@ def updateNotifications(username):
     user.friend_requests = total
     user.save()
 
+def updateNotificationsById(id):
+    user = CustomUser.objects.get(id=id)
+    total = Follow.objects.filter(receiver=user.id, ignored=0)
+    total = len(total)
+    user.friend_requests = total
+    user.save()
+
 def isNotBlank (myString):
         return bool(myString and myString.strip())
 
+# returns the size of results the query wants to display, &size=
 def get_page_size(request, paginator):
     if (request.GET.get('size')):
         return int(request.GET.get('size'))
     else:
         return paginator.page_size
+
+
+# pass in a string containing the post's privacy value (ex: "3")
+# this function will return the corresponding API privacy text value (ex: "FRIENDS")
+#         ('1', 'me'),
+#         ('2', 'another author'),
+#         ('3', 'my friends'),
+#         ('4', 'friends of friends'),
+#         ('5', 'only friends on my host'),
+#         ('6', 'public'),
+#         ('7', 'unlisted')
+def get_privacy_string_for_post(post_privacy_value):
+    visibility = ["PRIVATE", "FRIENDS", "FOAF", "SERVERONLY", "PUBLIC"]
+    if post_privacy_value == "1":
+        return visibility[0]
+    elif post_privacy_value == "2":
+        return visibility[0]
+    elif post_privacy_value == "3":
+        return visibility[1]
+    elif post_privacy_value == "4":
+        return visibility[2]
+    elif post_privacy_value == "5":
+        return visibility[3]
+    elif post_privacy_value == "6":
+        return visibility[4]
+    elif post_privacy_value == "7": # TODO: see what happens to option 7
+        return "-1"
+    else:
+        return "-1"

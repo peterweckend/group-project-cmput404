@@ -20,39 +20,9 @@ from django.views.generic.edit import DeleteView, UpdateView
 import API.services as Services
 from rest_framework.exceptions import APIException, MethodNotAllowed, NotFound, PermissionDenied
 from markdownx.utils import markdownify
-from .api_viewsets import PostsViewSet, AuthorViewSet
+from .api_viewsets import PostsViewSet, AuthorViewSet, FriendRequestViewSet
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
 # Django REST API Tutorial: Filtering System - https://youtu.be/s9V9F9Jtj7Q
-
-class UserViewSet(viewsets.ModelViewSet):
-        queryset = CustomUser.objects.all()
-        serializer_class = UserSerializer
-
-        @action(methods=['get'], detail=False)
-        def newest(self, request):
-            newest = self.get_queryset().order_by('id').last()
-            serializer = self.get_serializer_class()(newest)
-            return Response(serializer.data)
-
-class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
-
-class CommentViewSet(viewsets.ModelViewSet):
-    queryset = Comment.objects.all()
-    serializer_class = CommentSerializer
-
-class FriendshipViewSet(viewsets.ModelViewSet):
-    queryset = Friendship.objects.all()
-    serializer_class = FriendshipSerializer
-
-class FollowViewSet(viewsets.ModelViewSet):
-    queryset = Follow.objects.all()
-    serializer_class = FollowSerializer
-
-class ServerViewSet(viewsets.ModelViewSet):
-    queryset = Server.objects.all()
-    serializer_class = ServerSerializer
 
 def uploadView(request):
     if request.method == 'POST':
