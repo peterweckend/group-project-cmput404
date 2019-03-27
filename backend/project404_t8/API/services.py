@@ -114,3 +114,9 @@ def updateNotifications(username):
 
 def isNotBlank (myString):
         return bool(myString and myString.strip())
+
+def get_page_size(request, paginator):
+    if (request.GET.get('size')):
+        return int(request.GET.get('size'))
+    else:
+        return paginator.page_size
