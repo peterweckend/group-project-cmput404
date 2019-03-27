@@ -29,7 +29,7 @@
                 <a href="{% url 'delete_post' pk=p.pk  %}"><span class="glyphicon glyphicon-trash"> </a>
               </p>
             {% endif %}
-            {% if p.image_link != "" %}
+            {% if p.image_link != "" and p.image_link != NONE %}
               <div class="col s4">
                 {% load static %}
                 <br>

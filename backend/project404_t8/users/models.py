@@ -20,8 +20,8 @@ class CustomUserManager(UserManager):
 
 class CustomUser(AbstractUser):
     username    = models.CharField(max_length=255, unique=True)
-    password    = models.CharField(max_length=50)
-    displayname = models.CharField(max_length=15, blank=True)
+    password    = models.CharField(max_length=255)
+    displayname = models.CharField(max_length=255, blank=True)
     first_name  = models.CharField(max_length=256)
     last_name   = models.CharField(max_length=256)
     password    = models.CharField(max_length=500)
