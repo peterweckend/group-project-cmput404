@@ -21,10 +21,10 @@ class Post(models.Model):
 
     PRIVACYCHOICE = (
         ('1', 'me'),
-        ('2', 'another author'),
+        ('2', 'specific users'),            # PRIVATE OPTION
         ('3', 'my friends'),
         ('4', 'friends of friends'),
-        ('5', 'only friends on my host'),
+        ('5', 'only friends on my host'),   # SERVER ONLY OPTION
         ('6', 'public'),
     )
 
