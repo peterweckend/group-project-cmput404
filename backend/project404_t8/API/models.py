@@ -45,6 +45,9 @@ class Post(models.Model):
     is_markdown = models.BooleanField(default=False)
     published = DateTimeField(auto_now_add=True)
 
+    # if this post came from another server, store the original host here
+    original_host = models.TextField()
+
 
     def __str__(self):
         return '%s %s %s %s %s %s %s' % (self.id, self.title, self.body, self.image_link, 
