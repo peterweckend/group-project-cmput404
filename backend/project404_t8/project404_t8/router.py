@@ -5,4 +5,5 @@ import API.viewsets as Viewsets
 api_router = routers.SimpleRouter()
 api_router.register(r'posts', Viewsets.PostsViewSet)
 api_router.register(r'author', Viewsets.AuthorViewSet)
+api_router.register(r'friendrequest', Viewsets.FriendRequestViewSet)
 

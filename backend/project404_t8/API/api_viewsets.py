@@ -353,7 +353,35 @@ class PostsViewSet(viewsets.ModelViewSet):
         else: 
             raise MethodNotAllowed(method=request.method)
 
+class FriendRequestViewSet(viewsets.ModelViewSet):
+    http_method_names = ['post']
+    permission_classes = (IsAuthenticated,)
+    queryset = CustomUser.objects.filter()
+    serializer_class = UserSerializer
 
+    # POST to service/friendrequest
+    # This is the only functionality here
+    # @action(methods=['post'], detail=True, url_path="friendrequest/")
+    def list(self, request):
+        print(request.body)
+        if request.method == "POST":
+            # extract the author and receiver IDs
+            body = json.loads(request.body)
+
+            author = body["author"]["id"].split("/")[-1]
+            friend = body["friend"]["id"].split("/")[-1]
+
+            # This should be done better, but right now
+            # we are gonna get the username using the id
+            # and then handle the friendrequest
+
+            # These will crash if the ID does not exist in the db
+            authorName = CustomUser.object.get(pk=author)
+            friendName = CustomUser.object.get(pk=author)
+
+            Services.handleFriendRequest(authorName, friendName)
+        # handleFriendRequest
+        return Response("200 OK")
     
 
 class AuthorViewSet(viewsets.ModelViewSet):
@@ -575,29 +603,6 @@ class AuthorViewSet(viewsets.ModelViewSet):
             
         else: 
              friends = Friendship.objects.filter(friend_a=author_id)
-
-    # service/author/friendrequest
-    @action(methods=["POST"], detail=True, url_path="friendrequest/")
-    def friendRequest(self, request, pk=None):
-        # print(request.body)
-
-        # Ok, considering I don't know how to get this url rn we are just gonna
-        # code by hand and hope for the best LOL
-
-        body = json.loads(request.body)
-
-        author = body["author"]["id"]
-        friend = body["friend"]["id"]
-
-        # From services
-        # handleFriendRequest
-        # currently uses usernames, should actually use ID's
-
-        # Make sure these two arent already friends or aren't already following
-        # Could also just not do anything and then send the 200 anyway
-        # Reuse code from the other friend req here? or services
-
-        return Response({})
 
 # This tells you whether 2 people are friends or not
 def friendsHelperFunction(request, pk=None, author_id2=None):

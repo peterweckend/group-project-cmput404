@@ -20,7 +20,7 @@ from django.views.generic.edit import DeleteView, UpdateView
 import API.services as Services
 from rest_framework.exceptions import APIException, MethodNotAllowed, NotFound, PermissionDenied
 from markdownx.utils import markdownify
-from .api_viewsets import PostsViewSet, AuthorViewSet
+from .api_viewsets import PostsViewSet, AuthorViewSet, FriendRequestViewSet
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
 # Django REST API Tutorial: Filtering System - https://youtu.be/s9V9F9Jtj7Q
 
