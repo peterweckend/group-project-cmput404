@@ -15,5 +15,5 @@ urlpatterns =[
     # path("profile/", profileView, name="profile"),
     url(r'^profile/(?P<username>[a-zA-Z0-9]+)$', profileView, name='profile'),
     url(r'^editprofile/(?P<pk>\d+)/$', editProfile.as_view(), name='editprofile'),
-    path("friendrequest/", friendRequestView, name="Friend Request"),
+    path("friendrequest2/", friendRequestView, name="Friend Request"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

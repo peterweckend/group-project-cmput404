@@ -95,7 +95,7 @@ def getAuthorData(request, extra=False, pk=None):
 # pk is the comment ID
 def getCommentData(request, pk=None):
 
-    queryset = Comment.objects.filter(pk=pk)
+    queryset = Comment.objects.filter(pk=pk)#.order_by('-datetime')
     comment = CommentSerializer(queryset, many=True).data[0]
     
     response = OrderedDict()
@@ -122,7 +122,7 @@ def getPostData(request, pk=None):
     request_path = "/posts/" + str(pk)
 
     # permission_classes = (IsAuthenticated,)
-    queryset = Post.objects.filter(pk=pk)
+    queryset = Post.objects.filter(pk=pk)#.order_by('-published')
     post = PostSerializer(queryset, many=True).data[0]
     
     # Init the returned dictionary
@@ -132,13 +132,14 @@ def getPostData(request, pk=None):
     title = post["title"]
     currentPost.update({"title":title})
 
+    # get source and origin
     # source
-    source = "TODO, what should this be?"
+    source = request.scheme + "://" + str(request.META["HTTP_HOST"]) + "/posts/" + str(post["id"])
     currentPost.update({"source":source})
 
-    # origin
+    # origin, same as source right now
     # just the path of the post
-    origin = "TODO, this should be the post url"
+    origin = request.scheme + "://" + str(request.META["HTTP_HOST"]) + "/posts/" + str(post["id"])
     currentPost.update({"origin":origin})
 
     # description
@@ -179,8 +180,13 @@ def getPostData(request, pk=None):
     # From spec:
     # You should return ~ 5 comments per post.
 	# should be sorted newest(first) to oldest(last)
-    comments = []
-    currentPost.update({"comments":comments})
+    comments_response = []
+    queryset = Comment.objects.filter(post=pk).order_by('-datetime')
+    comments = CommentSerializer(queryset, many=True).data
+    
+    for comment in comments:
+        comments_response.append(getCommentData(request, pk=comment["id"]))
+    currentPost.update({"comments":comments_response})
 
     published = parser.parse(post["published"]) # ISO 8601 format
     currentPost.update({"published":published.isoformat()})
@@ -189,6 +195,7 @@ def getPostData(request, pk=None):
     
     # visibility ["PUBLIC","FOAF","FRIENDS","PRIVATE","SERVERONLY"]
     currentPost.update({"visibility":"..."})
+    
 
     return currentPost
 
@@ -200,6 +207,7 @@ def getPostData(request, pk=None):
 class PostsPagination(PageNumberPagination):
     # change this to 50 later, currently at 1 for testing purposes
     page_size = 1
+    #  allows the client to set the page size on a per-request basis
     page_size_query_param = 'size'
   
 # https://www.django-rest-framework.org/api-guide/routers/
@@ -208,6 +216,7 @@ class PostsPagination(PageNumberPagination):
 class PostsViewSet(viewsets.ModelViewSet):
     http_method_names = ['get','post'] # only GETs allowed right now
     queryset = Post.objects.filter()
+    pagination_class = PostsPagination
     serializer_class = PostSerializer
 
     # Instantiates and returns the list of permissions that this view requires.
@@ -228,11 +237,13 @@ class PostsViewSet(viewsets.ModelViewSet):
         # This can be done with django pagination framework somehow
         # But that can just be done later >:)
         # TODO Pagination shit here somehow
-        queryset = Post.objects.filter(privacy_setting="6")
-
+        queryset = Post.objects.filter(privacy_setting="6").order_by('-published')
+        paginator = PostsPagination()
+        public_posts = paginator.paginate_queryset(queryset, request)
+            
         # This serializes all the posts into an ordered dictionary
         # Hopefully only the amount requested
-        serialized_posts = PostSerializer(queryset, many=True)
+        serialized_posts = PostSerializer(public_posts, many=True)
         # print(serialized_posts.data)
 
         # We don't want to use this one, the order is all messed up and shit
@@ -255,16 +266,19 @@ class PostsViewSet(viewsets.ModelViewSet):
         # size
         # This is the size of what was requested
         # Default can be 50 for now or something
-        size = "TODO"
-        response.update({"size":size})
-
+        response.update({"size":Services.get_page_size(request, paginator)})
+        
         # next
-        next = "TODO"
-        response.update({"next":next})
+        if paginator.get_next_link() is not None:
+            response.update({"next":paginator.get_next_link()})
+        else: 
+            response.update({"next":None})
 
         # previous
-        previous = "TODO"
-        response.update({"previous":previous})
+        if paginator.get_previous_link() is not None:
+            response.update({"previous":paginator.get_previous_link()})
+        else: 
+            response.update({"previous":None})
 
         # posts
         # loop through the retrieved posts (currently all of them)
@@ -277,7 +291,7 @@ class PostsViewSet(viewsets.ModelViewSet):
             postId = str(post["id"])            
             posts.append(getPostData(request, pk=postId))
 
-
+        # response.update({"posts":serialized_posts.data})
         response.update({"posts":posts})
     
         # Finally, return this huge mfer
@@ -299,27 +313,62 @@ class PostsViewSet(viewsets.ModelViewSet):
             # check that we're allowed to see the post - for now just check if the posts are public
             # for right now, just return comments from public posts
             if requested_post.privacy_setting == "6": 
-                queryset = Comment.objects.filter(post=post_id)
-                serializer_class = CommentSerializer(queryset, many=True)
-                return Response(serializer_class.data)
+                body = json.loads(request.body)
+                authorID = body["author"]["id"].split("/")[-1]
+                authorUsername = body["author"]["displayName"]
+                commentID = body["id"]
+                comment = body["comment"]
+                postTime = body["published"]
+                post = Post.objects.get(pk=post_id)
+
+                try:
+                    author = CustomUser.objects.get(pk=authorID)
+                except:
+                    author = CustomUser(id=authorID, username=authorUsername, password="fixme", displayName = authorUsername)
+                    
+                newComment = Comment(id=commentID, author=author, post=post, datetime=postTime, body=comment)
+                newComment.save()
+                response = {
+                    'query': 'addComment',
+                        'success':True,
+                        'message':"Comment Added"
+                }
+                return Response(response, status=200)
             else:
-                raise PermissionDenied("Forbidden: The post you wished to access comments for is not Public")
+                response = {
+                    'query': 'addComment',
+                        'success':False,
+                        'message':"Comment not allowed"
+                }
+                return Response(response, status=403)
 
         elif request.method == "GET": # this handles "GET" methods
             # check that we're allowed to see the post - for now just check if the posts are public
             # for right now, just return comments from public posts
+            paginator = PostsPagination()
+            
             if requested_post.privacy_setting == "6": 
-                queryset = Comment.objects.filter(post=pk)
+                queryset = Comment.objects.filter(post=pk).order_by('-datetime')
                 comments = CommentSerializer(queryset, many=True).data
                 comments_response = []
                 
                 for comment in comments:
                     comments_response.append(getCommentData(request, pk=comment["id"]))
-                
+
+                paginated_comments = paginator.paginate_queryset(comments_response, request)
+
                 response = OrderedDict()
                 response.update({"query":"comments"})
-                # todo: add count, size, next, previous and whatever pagination stuff here
-                response.update({"comments":comments_response})
+                response.update({"count": len(queryset)})
+                response.update({"size": Services.get_page_size(request, paginator)})
+                response.update({"next": None})
+                response.update({"previous": None})
+                response.update({"comments":paginated_comments})
+
+                if paginator.get_next_link() is not None:
+                    response["next"] = paginator.get_next_link()
+                if paginator.get_previous_link() is not None:
+                    response["previous"] = paginator.get_previous_link()
 
                 return Response(response)
             else: 
@@ -327,7 +376,52 @@ class PostsViewSet(viewsets.ModelViewSet):
         else: 
             raise MethodNotAllowed(method=request.method)
 
+class FriendRequestViewSet(viewsets.ModelViewSet):
+    http_method_names = ['post']
+    permission_classes = (IsAuthenticated,)
+    queryset = CustomUser.objects.filter()
+    serializer_class = UserSerializer
 
+    # POST to service/friendrequest
+    # This is the only functionality here
+    # @action(methods=['post'], detail=True, url_path="friendrequest/")
+    # Should this allow unathenticated users??
+    def create(self, request):
+        # print(request.body)
+        if request.method == "POST":
+            # extract the author and receiver IDs
+            body = json.loads(request.body.decode('utf-8'))
+
+            authorId = body["author"]["id"].split("/")[-1]
+            authorUsername = body["author"]["displayName"]
+            friend = body["friend"]["id"].split("/")[-1]
+
+            if str(request.user.id) != str(authorId):
+                return Response("400 Access denied")
+
+            # This should be done better, but right now
+            # we are gonna get the username using the id
+            # and then handle the friendrequest
+
+            # If the sender ID or the receiver ID do not exist still just 200 them
+            # If the author doesn't exist create a foregin account for them on connectify
+            try: 
+                author = CustomUser.objects.get(pk=authorId)
+            except:
+                # We should save the host they are from probably
+                newAuthor = CustomUser(id=authorId, username=authorUsername, password="thisdoesntmatter", displayname=authorUsername)
+                newAuthor.save()
+                # Make a temp/foreign author profile
+
+            # If the receiver doesn't exist do nothing
+            try:
+                friend = CustomUser.objects.get(pk=friend)
+            except:
+                return Response("200 OK")
+
+            Services.handle_friend_request_with_id(author, friend)
+        # handleFriendRequest
+        return Response("200 OK")
     
 
 class AuthorViewSet(viewsets.ModelViewSet):
@@ -407,7 +501,8 @@ class AuthorViewSet(viewsets.ModelViewSet):
             (WITH friends(fid) AS (SELECT friend_b_id FROM API_friendship WHERE friend_a_id=%s) \
             SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
             AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
-            SELECT * FROM API_post WHERE id in posts', [int(uid)]*6)
+            SELECT * FROM API_post WHERE id in posts \
+            ORDER BY published DESC' , [int(uid)]*6)
 
         serializer_class = PostSerializer(allowed_posts, many=True)
         return Response(serializer_class.data)
@@ -433,21 +528,32 @@ class AuthorViewSet(viewsets.ModelViewSet):
             SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
             AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
             SELECT * FROM API_post WHERE id in posts \
-            AND author_id = %s', [int(uid)]*6 + [author_id])
+            AND author_id = %s \
+            ORDER BY published DESC', [int(uid)]*6 + [author_id])
 
         paginator = PostsPagination()
         paginated_posts = paginator.paginate_queryset(allowed_posts, request)
-        serializer_class = PostSerializer(paginated_posts, many=True)
+        serialized_posts = PostSerializer(paginated_posts, many=True)
         # print(Services.get_page_size(request, paginator))
-        # is returning none for next/previous okay, or do I need to not return anything
-        response = {
-            "query": "posts",
-            "count": len(allowed_posts),
-            "size": Services.get_page_size(request, paginator),
-            "next": None,
-            "previous": None,
-            "posts" : serializer_class.data,
-        }
+
+        response = OrderedDict()
+        response.update({"query":"posts"})
+        response.update({"count": len(allowed_posts)})
+        response.update({"size": Services.get_page_size(request, paginator)})
+        response.update({"next": None})
+        response.update({"previous": None})
+        # response.update({"posts": serialized_posts.data})
+
+        posts = []
+        
+        for post in serialized_posts.data:
+            # Get single post information
+            # print(post)
+            postId = str(post["id"])            
+            posts.append(getPostData(request, pk=postId))
+
+        # response.update({"posts":serialized_posts.data})
+        response.update({"posts":posts})
 
         if paginator.get_next_link() is not None:
             response["next"] = paginator.get_next_link()
@@ -458,28 +564,51 @@ class AuthorViewSet(viewsets.ModelViewSet):
 
     # the API endpoint accessible at GET http://service/author/<authorid>/friends/
     # returns the author's friend list
-    # TODO rename this function, its got a duplicate name basically
-    @action(methods=['get'], detail=True, url_path="friends")
+    # Also allows for POST
+    # returns the list with non friends removed
+    @action(methods=['get', 'post'], detail=True, url_path="friends")
     def userFriends(self, request, pk=None):
-        author_id = pk
-        # since the friendship table is 2-way, request a list of users whose 
-        # IDs are in the friendship table, not including the author
-        # make sure to format this the appropriate way
-        friendship_authors = []
-        friends = Friendship.objects.filter(friend_a=author_id)
+
+        if request.method == "POST":
+
+            # The incoming request should have a json body
+            body = json.loads(request.body)
+
+            author_id = body["author"]
+
+            # For each author provided, check to see if they are friends
+            friends = []
+            for author in body["authors"]:
+                friend = friendsHelperFunction(request, author_id, author.split("/")[-1])
+                if friend:
+                    friends.append(author)
+
+            body["authors"] = friends
+
+
+            return Response(body)
+
+        if request.method == "GET":
+            author_id = pk
+            # since the friendship table is 2-way, request a list of users whose 
+            # IDs are in the friendship table, not including the author
+            # make sure to format this the appropriate way
+            friendship_authors = []
+            friends = Friendship.objects.filter(friend_a=author_id)
+            
+            for friend in friends:
+                url = "https://" + request.get_host() + "/author/" + str(friend.friend_b.id) 
+                friendship_authors.append(url)
         
-        for friend in friends:
-            url = "https://" + request.get_host() + "/author/" + str(friend.friend_b.id) 
-            friendship_authors.append(url)
-    
-        # serialize friendship_authors here
-        friendship_dict = {}
-        friendship_dict["query"] = "friends"
-        friendship_dict["author"] = pk
-        friendship_dict["authors"] = friendship_authors
-    
-        # return serialized friendship_authors
-        return Response(friendship_dict)
+            # serialize friendship_authors here
+            friendship_dict = {}
+            friendship_dict["query"] = "friends"
+            friendship_dict["author"] = pk
+            friendship_dict["authors"] = friendship_authors
+        
+            # return serialized friendship_authors
+            return Response(friendship_dict)
+
     @action(methods=['get'], detail=True, url_path="friends/(?P<author_id2>\d+)")
     def friends(self, request, pk=None,author_id2=None):
         author_id = pk
@@ -515,11 +644,31 @@ class AuthorViewSet(viewsets.ModelViewSet):
         else: 
              friends = Friendship.objects.filter(friend_a=author_id)
 
+# This tells you whether 2 people are friends or not
+def friendsHelperFunction(request, pk=None, author_id2=None):
+    author_id = pk
+    friendship_authors = []
+    friends = Friendship.objects.filter(friend_a=author_id, friend_b=author_id2)
+    friendship_dict = {}
+    if friends:
+        for friend in friends:
+            url = "https://" + request.get_host() + "/author/" + str(friend.friend_a.id) 
+            url2 = "https://" + request.get_host() + "/author/" + str(friend.friend_b.id) 
+            friendship_authors.append(url)
+            friendship_authors.append(url2)
+        friendship_dict["friends"]= True
+    else:
+        for friend in friends:
+            url = "https://" + request.get_host() + "/author/" + str(friend.friend_a.id) 
+            url2 = "https://" + request.get_host() + "/author/" + str(friend.friend_b.id) 
+            friendship_authors.append(url)
+            friendship_authors.append(url2)
 
+    if friendship_authors != []:
+        # Return the url of the second ID
+        return True
 
-
-
-
+    return False
 
 
 

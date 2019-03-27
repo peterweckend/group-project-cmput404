@@ -20,7 +20,7 @@ from django.views.generic.edit import DeleteView, UpdateView
 import API.services as Services
 from rest_framework.exceptions import APIException, MethodNotAllowed, NotFound, PermissionDenied
 from markdownx.utils import markdownify
-from .api_viewsets import PostsViewSet, AuthorViewSet
+from .api_viewsets import PostsViewSet, AuthorViewSet, FriendRequestViewSet
 from .serverMethods import befriend_remote_author, get_remote_posts_for_feed
 
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
