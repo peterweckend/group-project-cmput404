@@ -387,7 +387,7 @@ class PostsViewSet(viewsets.ModelViewSet):
 
 class FriendRequestViewSet(viewsets.ModelViewSet):
     http_method_names = ['post']
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
     queryset = CustomUser.objects.filter()
     serializer_class = UserSerializer
 
@@ -435,7 +435,7 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
 
 class AuthorViewSet(viewsets.ModelViewSet):
     # http_method_names = ['get', 'post', 'head'] # specify which types of requests are allowed
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
     queryset = CustomUser.objects.filter()
     pagination_class = PostsPagination
     serializer_class = UserSerializer
