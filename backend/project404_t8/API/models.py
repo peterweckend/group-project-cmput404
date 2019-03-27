@@ -32,7 +32,7 @@ class Post(models.Model):
     id = models.AutoField(primary_key=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
     title = models.CharField(max_length=250)
-    description = models.TextField() # a description of what the post is about
+    description = models.TextField(blank=True, null=True) # a description of what the post is about
     body = models.TextField() # the actual content of the post
     # created_on = models.DateTimeField(auto_now=True)
     image_link = models.FileField(blank=True, null=True) # As an author, posts I create can link to images.
