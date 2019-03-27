@@ -21,18 +21,17 @@ class Post(models.Model):
 
     PRIVACYCHOICE = (
         ('1', 'me'),
-        ('2', 'another author'),
+        ('2', 'specific users'),            # PRIVATE OPTION
         ('3', 'my friends'),
         ('4', 'friends of friends'),
-        ('5', 'only friends on my host'),
+        ('5', 'only friends on my host'),   # SERVER ONLY OPTION
         ('6', 'public'),
-        ('7', 'unlisted')
     )
 
     id = models.AutoField(primary_key=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
     title = models.CharField(max_length=250)
-    description = models.TextField() # a description of what the post is about
+    description = models.TextField(blank=True, null=True) # a description of what the post is about
     body = models.TextField() # the actual content of the post
     # created_on = models.DateTimeField(auto_now=True)
     image_link = models.FileField(blank=True, null=True) # As an author, posts I create can link to images.
@@ -43,12 +42,13 @@ class Post(models.Model):
 
     # If true, post can be in markdown
     is_markdown = models.BooleanField(default=False)
+    is_unlisted = models.BooleanField(default=False)
     published = DateTimeField(auto_now_add=True)
 
 
     def __str__(self):
-        return '%s %s %s %s %s %s %s' % (self.id, self.title, self.body, self.image_link, 
-            self.privacy_setting, self.shared_author, self.is_markdown)
+        return '%s %s %s %s %s %s %s %s' % (self.id, self.title, self.body, self.image_link, 
+            self.privacy_setting, self.shared_author, self.is_markdown, self.is_unlisted)
 
 
 class Comment(models.Model):

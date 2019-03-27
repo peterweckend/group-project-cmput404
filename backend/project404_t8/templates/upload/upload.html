@@ -32,7 +32,6 @@
               <div class="row">
                 <div class="file-field input-field">
                   <div class="btn waves-effect waves-light">
-                    <!-- <i class="large material-icons">insert_photo</i> -->
                     <span>Attach Image</span>
                     <input type="file" name="imageLink">
                   </div>
@@ -45,12 +44,11 @@
                 <div class="input-field col s6">
                   <select name="privacy">
                     <option value="1" selected>Just Me</option>
-                    <option value="2">One other person</option>
-                    <option value="3">Friends</option>
-                    <option value="4">Friends of Friends</option>
                     <option value="5">Only Friends on Connectify</option>
+                    <option value="3">All Friends</option>
+                    <option value="4">Friends of Friends</option>
+                    <option value="2">Specific User(s)</option>
                     <option value="6">Public</option>
-                    <option value="7">Unlisted</option>
                   </select>
                   <label>Privacy</label>
                 </div>
@@ -59,7 +57,7 @@
                 </div>
               </div>
               <div class="row">
-                <div class="input-field col s6">
+                <div class="input-field col s4">
                   <p>
                     <label>
                       <input type="checkbox" name="markdown"/>
@@ -67,7 +65,15 @@
                     </label>
                   </p>
                 </div>
-                <div class="input-field col s6 right-align">
+                <div class="input-field col s4">
+                  <p>
+                    <label>
+                      <input type="checkbox" name="unlisted"/>
+                      <span>Unlisted</span>
+                    </label>
+                  </p>
+                </div>
+                <div class="input-field col s4 right-align">
                   <!-- <input type="submit" class="create-post btn" value="Create Post"> -->
                   <button class="btn waves-effect waves-light" type="submit" name="action">Create Post
                     <i class="material-icons right">send</i>
