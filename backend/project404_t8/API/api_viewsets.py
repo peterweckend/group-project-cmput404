@@ -39,7 +39,8 @@ import dateutil.parser as parser
 # Get author info
 # extra is a boolean that returns list of friends as well as github,bio,etc.
 # pk is the authors ID
-def getAuthorData(request, extra=False, pk=None):
+# in theory, githubRequired shouldn't be true if extra is true
+def getAuthorData(request, extra=False, pk=None, githubRequired=False):
     
     # Modify the requests path
     request_path = "/author/" + str(pk)
@@ -47,6 +48,15 @@ def getAuthorData(request, extra=False, pk=None):
     queryset = CustomUser.objects.all()
     user = get_object_or_404(queryset, pk=pk)
     response = {}
+
+    response["id"] = "http://" + request.get_host() + request_path
+    # todo: look up the user, find what host they belong to, and return that value
+    # instead of using request.get_host() here
+    response["host"] = request.get_host()
+    response["displayName"] = user.displayname
+    response["url"] = "http://" + request.get_host() + request_path
+    if githubRequired:
+        response["github"] = user.github_url
 
     # build a list of friends for the response
     # This will be optional
@@ -79,15 +89,6 @@ def getAuthorData(request, extra=False, pk=None):
             response["email"] = user.email
         if Services.isNotBlank(user.bio):
             response["bio"] = user.bio
-
-    
-    response["id"] = "http://" + request.get_host() + request_path
-    # todo: look up the user, find what host they belong to, and return that value
-    # instead of using request.get_host() here
-    response["host"] = request.get_host()
-    response["displayName"] = user.displayname
-    response["url"] = "http://" + request.get_host() + request_path
-    # do we need github link down here? ex: in the comments request
     
     return response
 
@@ -101,7 +102,7 @@ def getCommentData(request, pk=None):
     response = OrderedDict()
 
     author_id = int(comment["author"])
-    author_response = getAuthorData(request, extra=False, pk=author_id)
+    author_response = getAuthorData(request, extra=False, pk=author_id, githubRequired=True)
     response.update({"author":author_response})
     response.update({"comment":comment["body"]})
     if comment["is_markdown"]:
@@ -162,12 +163,14 @@ def getPostData(request, pk=None):
     # Get author information
     # Then add author to the dic
     authorId = str(post["author"])
-    author = getAuthorData(request, extra=False, pk=authorId)
+    author = getAuthorData(request, extra=False, pk=authorId, githubRequired=True)
     currentPost.update({"author":author})
 
     # categories
     # TODO: go into the categories table, find all entries associated with this post
     # and put them into a list format, and add them to the response here
+    post_categories = ["dont", "exist", "yet"]
+    currentPost.update({"categories":post_categories})
     
     # Get comment info
 
@@ -194,7 +197,13 @@ def getPostData(request, pk=None):
     currentPost.update({"id":post["id"]})
     
     # visibility ["PUBLIC","FOAF","FRIENDS","PRIVATE","SERVERONLY"]
-    currentPost.update({"visibility":"..."})
+    currentPost.update({"visibility":Services.get_privacy_string_for_post(post["privacy_setting"])})
+
+     # todo: waiting on the ability for multiple private authors
+    currentPost.update({"visibleTo":"..."})
+
+     # todo: waiting until the post as an isUnlisted boolean attribute
+    currentPost.update({"unlisted":"..."})
     
 
     return currentPost
@@ -451,46 +460,8 @@ class AuthorViewSet(viewsets.ModelViewSet):
     # GET http://service/author/{author_id}
     # returns information about the author
     def retrieve(self, request, pk=None):
-        queryset = CustomUser.objects.all()
-        user = get_object_or_404(queryset, pk=pk)
-        # paginator = PostsPagination()
-        # posts = paginator.paginate_queryset(queryset, request)
-
-        # build a list of friends for the response
-        friends_list = []
-        friends = Friendship.objects.filter(friend_a=user.id)
-        for friend in friends:
-            friend_entry = {}
-
-            url = "https://" + request.get_host() + "/author/" + str(friend.friend_b.id) 
-            friend_object = get_object_or_404(queryset, pk=friend.friend_b.id)
-
-            friend_entry["id"] = url
-            # todo: look up the user, find what host they belong to, and return that value
-            # instead of using request.get_host() here
-            friend_entry["host"] = "https://" + request.get_host() + "/" 
-            friend_entry["displayName"] =  friend_object.displayname
-            friend_entry["url"] = url
-            friends_list.append(friend_entry)
-
-        response = {}
-        response["id"] = "http://" + request.get_host() + request.get_full_path()
-        response["host"] = request.get_host()
-        response["displayName"] = user.displayname
-        response["url"] = "http://" + request.get_host() + request.get_full_path()
-        response["friends"] = friends_list
-        if Services.isNotBlank(user.github_url):
-            response["github"] = user.github_url
-        if Services.isNotBlank(user.first_name):
-            response["firstName"] = user.first_name
-        if Services.isNotBlank(user.last_name):
-            response["lastName"] = user.last_name
-        if Services.isNotBlank(user.email):
-            response["email"] = user.email
-        if Services.isNotBlank(user.bio):
-            response["bio"] = user.bio
-
-        return Response(response)
+        return Response(getAuthorData(request, extra=True, pk=pk, githubRequired=False))
+    
 
     # http://service/author/posts (posts that are visible to the currently authenticated user)
     @action(methods=['get'], detail=False)
