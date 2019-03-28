@@ -231,7 +231,6 @@ def homeListView(request):
             AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
             SELECT * FROM API_post WHERE id in posts \
             AND (is_unlisted = 0 OR (is_unlisted = 1 AND author_id = %s))', [uid]*7)
-        print("hey")
         postRemote = get_remote_posts_for_feed(request.user)
     except:
         # post = Post.objects.all()
