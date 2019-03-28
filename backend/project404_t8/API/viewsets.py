@@ -233,7 +233,7 @@ def homeListView(request):
             SELECT * FROM API_post WHERE id in posts \
             AND (is_unlisted = 0 OR (is_unlisted = 1 AND author_id = %s))', [uid]*7)
         print("about to call postRemote")
-        postRemote = get_remote_posts_for_feed(request.user)
+        # postRemote = get_remote_posts_for_feed(request.user)
         print("returned from postRemote")
     except:
         print("in except")
