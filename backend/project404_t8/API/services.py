@@ -21,7 +21,7 @@ def has_permission_to_see_post(requesting_user_id, post):
 
     # ('3', 'my friends'),
     # So first get the IDs of all the author's friends
-    if post.privacy_setting == '3':
+    if post.privacy_setting == '3' or post.privacy_setting == '4':
         # Get a list of all the rows in friends where friend_a/b == requesting_user_id
         friends1 = Friendship.objects.filter(friend_a=post.author.id)
         friends2 = Friendship.objects.filter(friend_b=post.author.id)
@@ -29,10 +29,13 @@ def has_permission_to_see_post(requesting_user_id, post):
         # alright this feels really messy but it should work I think
         # If the models change things could get cringed but I actually think its fine
         # Iterate through each queryset, and append the ids of each element to the list
+        friendObj = []
         for row in friends1:
             friends.add(row.friend_b.id)
+            friendObj.append(row)
         for row in friends2:
             friends.add(row.friend_a.id)
+            friendObj.append(row)
 
         # Friends are the authors friends
         # If the requester is in the friends list they can view
@@ -40,16 +43,31 @@ def has_permission_to_see_post(requesting_user_id, post):
             # print(requesting_user_id, friends)
             hasPermission = True
 
-    # ('4', 'friends of friends'),
-    # This is brutal enough to do in SQLite, how tf do we do it in Django???
-    # Can just bruteforce it I guess lol, for each user in authorsfriends
-    # query all their friends then add to another set
-    # TODO
+        # ('4', 'friends of friends'),
+        # This is brutal enough to do in SQLite, how tf do we do it in Django???
+        # Can just bruteforce it I guess lol, for each user in authorsfriends
+        # query all their friends then add to another set
+        if post.privacy == '4':
+            for friend in friendObj:
+                friends1 = Friendship.objects.filter(friend_a=friend.author.id)
+                friends2 = Friendship.objects.filter(friend_b=friend.author.id)
+
+                for row in friends1:
+                    friends.add(row.friend_b.id)
+                for row in friends2:
+                    friends.add(row.friend_a.id)
+
+            if requesting_user_id in friends:
+            # print(requesting_user_id, friends)
+            hasPermission = True
+
+
 
     # ('5', 'only friends on my host'),
     # Not sure how to implement this one, how do we know where the user's hosted on?
     # This is a problem for the next deadline lel
     # TODO
+    # basically same as friends above, but make sure they are from the connectify host
 
     # ('6', 'public')
     # ('7', 'unlisted')
