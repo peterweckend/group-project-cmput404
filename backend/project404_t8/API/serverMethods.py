@@ -146,14 +146,14 @@ def get_remote_posts_for_feed(current_user_id):
     # should not be able to see
     
     #######################3 will probably have to change it right now its hardcoded as garys lol
-    current_user_id="e204d9bb-73aa-41d7-aceb-b9fce475d65f"
+    # current_user_id="e204d9bb-73aa-41d7-aceb-b9fce475d65f"
     ####################################
     remote_posts = []
     try:
         queryset = Server.objects.all()
         for remote_server in queryset:
             request_url = remote_server.host + "author/posts"
-            # print("here,150")
+            print("here,150")
             try:
                 header = get_custom_header_for_user(current_user_id)
             except Exception as e:
@@ -185,12 +185,12 @@ def get_remote_posts_for_feed(current_user_id):
                 # check if the post is already saved in our db from a previous request
                 # if it is, continue to next post. If it isn't, save it?
 
-                # todo: grab the author from the post and create/save a new author object
+                # todo: grab the author from the post and create/save a new author objects
             
                 # print(post["author"],1999)
                 try:
-                    post_author =  CustomUser(timestamp= timezone.now(), id=post["author"]["id"].split("author/")[1], host=remote_server.host, displayname=post["author"]["displayName"], github_url=post["author"]["github"], username = post["author"]["displayName"], password= "12345" )
-                # post_author.save()
+                    post_author =  CustomUser(timestamp= timezone.now(), id=post["author"]["id"].split("author/")[1], host=remote_server.host, displayname=post["author"]["displayName"], github_url=post["author"]["github"], username = "str"+str(count), password= "12345" )
+                    post_author.save()
                 # print(187)
                 # there are a bunch of fields here that still need to be filled out
                 
