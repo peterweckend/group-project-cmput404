@@ -219,7 +219,7 @@ def homeListView(request):
         uid = str(uid).replace('-','')
         # todo: properly escape this using https://docs.djangoproject.com/en/1.9/topics/db/sql/#passing-parameters-into-raw
         post = Post.objects.raw(''' \
-        SELECT id from "API_post";''')
+        SELECT id from API_post;''')
         # post = Post.objects.raw(' \
         # WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
         # (SELECT f2.friend_a_id AS fofid \
