@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Post, Comment, Friendship, Follow, Server
+from .models import Post, Comment, Friendship, Follow, Server, PostCategory, PostAuthorizedAuthor
 # REST API Serializer JSON https://www.youtube.com/watch?v=V4NjlXiu5WI
 from users.models import CustomUser
 
@@ -12,13 +12,6 @@ class UserSerializer(serializers.ModelSerializer):
         # "password", "admin", "timestamp", "groups", "user_permissions"
         
 class PostSerializer(serializers.ModelSerializer):
-    # id = serializers.ReadOnlyField()
-    # title = serializers.CharField()
-    # body = serializers.CharField()
-    # image_link = serializers.CharField(required=False, allow_blank=True)
-    # privacy_setting = serializers.CharField()
-    # shared_author = serializers...
-    # is_markdown = serializers.BooleanField()
     class Meta:
         model = Post
         fields = '__all__' 
@@ -29,6 +22,15 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = '__all__' 
 
+class PostCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PostCategory
+        fields = '__all__' 
+
+class PostAuthorizedAuthorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PostAuthorizedAuthor
+        fields = '__all__' 
 
 class FriendshipSerializer(serializers.ModelSerializer):
     class Meta:

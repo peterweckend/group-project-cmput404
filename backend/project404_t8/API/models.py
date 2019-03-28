@@ -31,7 +31,7 @@ class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
     title = models.CharField(max_length=250)
-    description = models.TextField(blank=True, null=True) # a description of what the post is about
+    description = models.TextField(default="") # a description of what the post is about
     body = models.TextField() # the actual content of the post
     # created_on = models.DateTimeField(auto_now=True)
     image_link = models.FileField(blank=True, null=True) # As an author, posts I create can link to images.
@@ -68,6 +68,10 @@ class Comment(models.Model):
 class PostCategory(models.Model):
     post_id = models.ForeignKey(Post, on_delete=models.CASCADE, blank=True, null=True,related_name="post_cat_id")
     category = models.TextField(max_length=250)
+
+class PostAuthorizedAuthor(models.Model):
+    post_id = models.ForeignKey(Post, on_delete=models.CASCADE, blank=True, null=True,related_name="post_auth_author_id")
+    authorized_author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True, related_name='post_viewable_author') 
 
 # This is when you befriend someone and they befriend you
 # (Friend another author and they accept the friend request)

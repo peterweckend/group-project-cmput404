@@ -3,11 +3,11 @@ from rest_framework import generics,status,viewsets
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from .models import Post, Comment, Friendship, Follow, Server
+from .models import Post, Comment, Friendship, Follow, Server, PostCategory, PostAuthorizedAuthor
 from users.models import CustomUser
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from .serializers import UserSerializer, PostSerializer, CommentSerializer, FriendshipSerializer, FollowSerializer, ServerSerializer
+from .serializers import UserSerializer, PostSerializer, CommentSerializer, FriendshipSerializer, FollowSerializer, ServerSerializer, PostCategorySerializer, PostAuthorizedAuthorSerializer
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
@@ -52,7 +52,7 @@ def getAuthorData(request, extra=False, pk=None, githubRequired=False):
     response["id"] = "http://" + request.get_host() + request_path
     # todo: look up the user, find what host they belong to, and return that value
     # instead of using request.get_host() here
-    response["host"] = request.get_host()
+    response["host"] = "http://" + request.get_host() + "/"
     response["displayName"] = user.displayname
     response["url"] = "http://" + request.get_host() + request_path
     if githubRequired:
@@ -101,7 +101,7 @@ def getCommentData(request, pk=None):
     
     response = OrderedDict()
 
-    author_id = int(comment["author"])
+    author_id = comment["author"]
     author_response = getAuthorData(request, extra=False, pk=author_id, githubRequired=True)
     response.update({"author":author_response})
     response.update({"comment":comment["body"]})
@@ -138,17 +138,15 @@ def getPostData(request, pk=None):
     source = request.scheme + "://" + str(request.META["HTTP_HOST"]) + "/posts/" + str(post["id"])
     currentPost.update({"source":source})
 
-    # origin, same as source right now
+    # origin
     # just the path of the post
-    origin = request.scheme + "://" + str(request.META["HTTP_HOST"]) + "/posts/" + str(post["id"])
+    origin = str(post["original_host"]) + "/posts/" + str(post["id"])
     currentPost.update({"origin":origin})
 
     # description
     currentPost.update({"description":post["description"]})
 
     # contentType
-    # How do we embed images
-    contentType = "TODO, embedding images??"
     # for now just returning markdown or plaintext, 
     # not sure how to do the other stuff
     if post["is_markdown"]:
@@ -167,9 +165,11 @@ def getPostData(request, pk=None):
     currentPost.update({"author":author})
 
     # categories
-    # TODO: go into the categories table, find all entries associated with this post
-    # and put them into a list format, and add them to the response here
-    post_categories = ["dont", "exist", "yet"]
+    post_categories = []
+    queryset = PostCategory.objects.filter(post_id=post["id"])
+    for category in queryset:
+        post_categories.append(category.category)
+    
     currentPost.update({"categories":post_categories})
     
     # Get comment info
@@ -199,13 +199,14 @@ def getPostData(request, pk=None):
     # visibility ["PUBLIC","FOAF","FRIENDS","PRIVATE","SERVERONLY"]
     currentPost.update({"visibility":Services.get_privacy_string_for_post(post["privacy_setting"])})
 
-     # todo: waiting on the ability for multiple private authors
-    currentPost.update({"visibleTo":"[]"})
+    authorized_authors = []
+    queryset = PostAuthorizedAuthor.objects.filter(post_id=post["id"])
+    for author_post_object in queryset:
+        authorized_authors.append(author_post_object.authorized_author.get_url_to_author())    
+    currentPost.update({"visibleTo":authorized_authors})
 
-     # todo: waiting until the post as an isUnlisted boolean attribute
-    currentPost.update({"unlisted":False})
+    currentPost.update({"unlisted":post["is_unlisted"]})
     
-
     return currentPost
 
 
@@ -443,7 +444,6 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
     
 
 class AuthorViewSet(viewsets.ModelViewSet):
-    # http_method_names = ['get', 'post', 'head'] # specify which types of requests are allowed
     # permission_classes = (IsAuthenticated,)
     queryset = CustomUser.objects.filter()
     pagination_class = PostsPagination
@@ -492,7 +492,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
     # so I had to add this @action tag stuff
     @action(methods=['get'], detail=True, url_path="posts")
     def userPosts(self, request, pk=None):
-        author_id = int(self.kwargs['pk'])
+        author_id = self.kwargs['pk']
         uname = request.user
         uid = uname.id
         allowed_posts = Post.objects.raw(' \

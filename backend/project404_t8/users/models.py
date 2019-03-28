@@ -2,6 +2,7 @@ from django.db import models
 from django import forms
 from django.contrib.auth.models import AbstractUser, UserManager
 import uuid
+from API.models import Server
 
 # https://youtu.be/HshbjK1vDtY
 class CustomUserManager(UserManager):
@@ -44,5 +45,17 @@ class CustomUser(AbstractUser):
     @property
     def is_admin(self):
         return self.admin
+
+    def get_url_to_author(self):
+        author_host = self.host
+        if not author_host:
+            queryset = Server.objects.all()
+            for server in queryset:
+                if server.username == "local":
+                    author_host = server.host
+                    break
+            
+        return author_host + "author/" + str(self.id)
+
 
         
