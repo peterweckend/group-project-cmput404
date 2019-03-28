@@ -7,8 +7,8 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.db.models import DateTimeField, BooleanField
 import random
-import factory  
-import factory.django
+# import factory  
+# import factory.django
 from users.models import CustomUser
 from datetime import datetime
 
@@ -59,19 +59,19 @@ class Post(models.Model):
 
 
 # Added by @tiakindele for posts generation
-class PostFactory(factory.django.DjangoModelFactory):  
-    class Meta:
-        model = Post
-    random.seed(datetime.now())
-    author = CustomUser(1)
-    title = factory.Faker('sentence', nb_words=4)
-    description = ""
-    body = factory.Faker('text')
-    image_link = "pic"+str(random.randint(1,20))+".jpg"
-    privacy_setting = random.choice([1,2,3,4,5,6])
-    is_markdown = random.randint(0,1)
-    is_unlisted = random.randint(0,1)
-    original_host = ""
+# class PostFactory(factory.django.DjangoModelFactory):  
+#     class Meta:
+#         model = Post
+#     random.seed(datetime.now())
+#     author = CustomUser(1)
+#     title = factory.Faker('sentence', nb_words=4)
+#     description = ""
+#     body = factory.Faker('text')
+#     image_link = "pic"+str(random.randint(1,20))+".jpg"
+#     privacy_setting = random.choice([1,2,3,4,5,6])
+#     is_markdown = random.randint(0,1)
+#     is_unlisted = random.randint(0,1)
+#     original_host = ""
 
 class Comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -101,11 +101,11 @@ class Friendship(models.Model):
 
     def __str__(self):
         return '%s %s' % (self.friend_a, self.friend_b)
-class FriendshipFactory(factory.django.DjangoModelFactory):  
-    class Meta:
-        model = Friendship
-    friend_a = CustomUser(1)
-    friend_b = CustomUser(1)
+# class FriendshipFactory(factory.django.DjangoModelFactory):  
+#     class Meta:
+#         model = Friendship
+#     friend_a = CustomUser(1)
+#     friend_b = CustomUser(1)
 
 # This is when you befriend someone
 # (Friend another author without an accepted friend request)
