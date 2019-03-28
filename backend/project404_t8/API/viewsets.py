@@ -21,7 +21,7 @@ import API.services as Services
 from rest_framework.exceptions import APIException, MethodNotAllowed, NotFound, PermissionDenied
 from markdownx.utils import markdownify
 from .api_viewsets import PostsViewSet, AuthorViewSet, FriendRequestViewSet
-from .serverMethods import befriend_remote_author, get_remote_posts_for_feed
+from .serverMethods import befriend_remote_author, get_remote_posts_for_feed,get_user
 
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
 # Django REST API Tutorial: Filtering System - https://youtu.be/s9V9F9Jtj7Q
@@ -231,7 +231,8 @@ def homeListView(request):
             AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
             SELECT * FROM API_post WHERE id in posts \
             AND (is_unlisted = 0 OR (is_unlisted = 1 AND author_id = %s))', [uid]*7)
-        postRemote = get_remote_posts_for_feed(request.user)
+        # print(request.user.id,234)
+        postRemote = get_remote_posts_for_feed(request.user.id)
     except:
         # post = Post.objects.all()
         pass

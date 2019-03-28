@@ -3,7 +3,8 @@ from users.models import CustomUser
 import requests
 import API.services as Services
 from .serializers import UserSerializer, PostSerializer, CommentSerializer, FriendshipSerializer, FollowSerializer, ServerSerializer
-
+from django.utils import timezone
+import json
 
 # returns a header object of the format:
 # X-User: http://service/author/:uuid
@@ -13,11 +14,14 @@ LOCAL_USERNAME = 'local'
 def get_custom_header_for_user(user_id):
     try:
         queryset = Server.objects.filter(username=LOCAL_USERNAME)
+        # print(17 )
+        # print(queryset)
         server = ServerSerializer(queryset, many=True).data[0]
-        header = {'X-User': server.host + "/author/" + str(user_id)}
+        # print(18)
+        header = {'X-User': server["host"] + "/author/" + str(user_id)}
         return header
-    except:
-        print("An error occurred generating the custom header.")
+    except Exception as e:
+        print("An error occurred generating the custom header:",e)
         return None
 
 def get_server_info(remote_server_host):
@@ -40,16 +44,29 @@ def get_our_server():
     except:
         return None
 
-
 def get_remote_author(remote_server, remote_author_id):
-    request_url = remote_server.host + "/author/" + str(remote_author_id)
-    r = requests.get(request_url, auth=(remote_server.username, remote_server.password))
+    request_url = remote_server.host + "author/" + str(remote_author_id)
+    # print("here",65)
+
+    r = requests.get(request_url)
+    # print("r",39)
     if r.status_code == 200:
-        response = r.text
-        remote_author = CustomUser(id=remote_author_id, host=remote_server.host, \
-            displayname=response.displayName, github=response.github, username = remote_author_id, \
-            password= "12345", bio=response.bio)
-        remote_author.save()
+        # print("hi")
+        response = r.content.decode("utf-8")
+        # print(response,43)
+        # print(type(response))
+        # print(222222222222)
+        author_data= json.loads(response)
+        # print(11111111111111111)
+        # print(author_data["id"].split("author/")[1],22)
+        try:
+            remote_author = CustomUser(timestamp=timezone.now(), id=author_data["id"].split("author/")[1], host=remote_server.host, displayname=author_data["displayName"], github_url=author_data["github"], username = "gart", password= "12345", bio=author_data["bio"])
+        
+            # print("here",65)
+        
+            remote_author.save()
+        except Exception as e:
+            print(e,52)
         return remote_author
     else:
         return None
@@ -57,6 +74,7 @@ def get_remote_author(remote_server, remote_author_id):
 # returns a second parameter stating if the author is local
 def get_user(remote_author_id):
     # search for any local authors with the username
+    remote_author_id ="e204d9bb-73aa-41d7-aceb-b9fce475d65f"
     try:
         queryset = CustomUser.objects.filter(pk=remote_author_id)
         author = UserSerializer(queryset, many=True).data[0]
@@ -74,6 +92,7 @@ def get_user(remote_author_id):
                 author_is_local = False
                 return author, author_is_local
     return None
+
 
 
 # we send friend request to a remote server
@@ -125,34 +144,63 @@ def get_remote_posts_for_feed(current_user_id):
     # current strategy: get all posts from all connected servers
     # go through the posts and filter out ones that the current user
     # should not be able to see
+    
+    #######################3 will probably have to change it right now its hardcoded as garys lol
+    current_user_id="e204d9bb-73aa-41d7-aceb-b9fce475d65f"
+    ####################################
     remote_posts = []
     try:
         queryset = Server.objects.all()
         for remote_server in queryset:
-            request_url = remote_server.host + "/author/posts"
-            header = get_custom_header_for_user(current_user_id)
-            r = requests.get(request_url, auth=(remote_server.username, remote_server.password), headers=header)
+            request_url = remote_server.host + "author/posts"
+            # print("here,150")
+            try:
+                header = get_custom_header_for_user(current_user_id)
+            except Exception as e:
+                print(e,52)
+            # print(158)
+            r = requests.get(request_url, headers=header)
+            # print(159)
 
             if r.status_code != 200:
                 print("An error occured")
                 continue
             
-            posts = r.text.posts # hopefully this is the correct syntax for getting data from the response
-
-            for post in posts:
+            # print("hi")
+            response = r.content.decode("utf-8")
+            # print(response,43)
+            # print(type(response))
+            # print(222222222222)
+            posts= json.loads(response)
+            # print(172)
+            # print(posts,11111111111111111)
+            # print(posts["id"].split("author/")[1],22) # hopefully this is the correct syntax for getting data from the response
+            count = 0
+            # print(posts["posts"])
+            for post in posts["posts"]:
+                # print("in foor loop")
+                # print(post)
+                count +=1
+                # print(count)
                 # check if the post is already saved in our db from a previous request
                 # if it is, continue to next post. If it isn't, save it?
 
                 # todo: grab the author from the post and create/save a new author object
-                post_author =  CustomUser(id=post["author"]["id"], host=remote_server.host, \
-                            displayname=post["author"]["displayname"], github=post["author"]["github_url"], username = post["author"]["displayname"], \
-                            password= "12345", )
-                post_author.save()
-
+            
+                # print(post["author"],1999)
+                try:
+                    post_author =  CustomUser(timestamp= timezone.now(), id=post["author"]["id"].split("author/")[1], host=remote_server.host, displayname=post["author"]["displayName"], github_url=post["author"]["github"], username = post["author"]["displayName"], password= "12345" )
+                # post_author.save()
+                # print(187)
                 # there are a bunch of fields here that still need to be filled out
-                post_object = Post(id=post.id, author=post_author, title=post.title, description=post.description, body=post.content, privacy_setting='6', published=post.published, original_host=remote_server.host)
-                post_object.save()
-
+                
+                    # print(post["content"],189)
+                    # print((post["content"]),189)
+                    post_object = Post(id=post["id"], author=post_author, title=post["title"], description=post["description"], body=post["content"], privacy_setting='6', published=post["published"], original_host=remote_server.host)
+                    # print(192)
+                    post_object.save()
+                except Exception as e:
+                    print(e,189)   
                 remote_posts.append(post_object)
             
     except:
