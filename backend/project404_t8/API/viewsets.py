@@ -211,11 +211,11 @@ class editProfile(UpdateView):
         return reverse_lazy("home")
   
 def homeListView(request):
-
     # this try and except is to render posts into homepage
     try:
         uname = request.user
-        uid = (uname.id).strip("-")
+        uid = uname.id
+        uid = str(uid).replace('-','')
         # todo: properly escape this using https://docs.djangoproject.com/en/1.9/topics/db/sql/#passing-parameters-into-raw
         post = Post.objects.raw(' \
         WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
