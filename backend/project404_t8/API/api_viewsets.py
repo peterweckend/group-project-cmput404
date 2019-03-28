@@ -215,8 +215,7 @@ def getPostData(request, pk=None):
 ############ API Methods
 
 class PostsPagination(PageNumberPagination):
-    # change this to 50 later, currently at 1 for testing purposes
-    page_size = 1
+    page_size = 50
     #  allows the client to set the page size on a per-request basis
     page_size_query_param = 'size'
   
