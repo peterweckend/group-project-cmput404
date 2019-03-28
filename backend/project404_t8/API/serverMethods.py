@@ -1,4 +1,4 @@
-from .models import Server, Post
+from .models import Server, Post, Comment
 from users.models import CustomUser
 import requests
 import API.services as Services
@@ -251,5 +251,64 @@ def get_remote_post_by_id(remote_post_id,current_user_id):
 
 
 
-def get_remote_comments_by_post_id(remote_post_id):
-    return None
+def get_remote_comments_by_post_id(remote_post_id,current_user_id):
+    # This takes a post id (remote or not honestly shouldn't matter)
+    # Then it returns the list of comment objects for that post, possibly ordered
+    # Ill try to copy the way you guys are doing it
+
+    # Do we have to determine if we have permission to see the post?
+    try:
+        # Create a list of the connected servers
+        queryset = Server.objects.all()
+        for remote_server in queryset:
+
+            # We will continue to hammer their API using the next tag
+            # until we have retreived all the comments
+            allComments = []
+            while True:
+                # consider increasing the amount to grab per page with comments?size=
+                request_url = remote_server.host + "/posts/%s/comments" % remote_post_id
+                header = get_custom_header_for_user(current_user_id)
+                r = requests.get(request_url, auth=(remote_server.username, remote_server.password), headers=header)
+
+                if r.status_code != 200:
+                    print("An error occured, the post most likely doesn't exist on the server")
+                    continue
+                
+                # comments should be json for the comments
+                # add them to the big list
+                # I think you might be able to use the + operator but oh well
+                comments = r.text.comments
+                for comment in comments:
+                    allComments.append(comment)
+                
+                # Find the URL to the next page
+                # Obviously if the tag doesn't exist then break
+                try:
+                    # Cheap trick to see if this is a url and not null or ""
+                    if len(r.text.next) > 10:
+                        request_url = r.text.next
+                    # If the url is none or null or "" or not long enogh to be a url
+                    else:
+                        break
+                except:
+                    break
+
+            # For each comment in allComments, create a new comment object 
+            # Then do we save it to the new post object that is saved in our database?
+            # Probably
+            for comment in allComments:
+                print(comment)
+                newComment = Comment()
+                newComment.body = comment.body
+                newComment.post = comment.post 
+                # Does this need to be a custom user object?
+                # newComment.author = CustomUser.objects.get(pk=current_user_id)
+                newComment.author = current_user_id
+                newComment.save()
+
+    except:
+        # No comments found
+        print("No comments or servers found")
+
+    return comments 
