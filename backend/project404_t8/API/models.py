@@ -6,7 +6,11 @@ import uuid
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.db.models import DateTimeField, BooleanField
-
+import random
+# import factory  
+# import factory.django
+from users.models import CustomUser
+from datetime import datetime
 
 # @receiver(post_save, sender=User)
 # def create_author_profile(sender, instance, created, **kwargs):
@@ -54,6 +58,21 @@ class Post(models.Model):
             self.privacy_setting, self.shared_author, self.is_markdown, self.is_unlisted)
 
 
+# Added by @tiakindele for posts generation
+# class PostFactory(factory.django.DjangoModelFactory):  
+#     class Meta:
+#         model = Post
+#     random.seed(datetime.now())
+#     author = CustomUser(1)
+#     title = factory.Faker('sentence', nb_words=4)
+#     description = ""
+#     body = factory.Faker('text')
+#     image_link = "pic"+str(random.randint(1,20))+".jpg"
+#     privacy_setting = random.choice([1,2,3,4,5,6])
+#     is_markdown = random.randint(0,1)
+#     is_unlisted = random.randint(0,1)
+#     original_host = ""
+
 class Comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
@@ -74,7 +93,7 @@ class PostAuthorizedAuthor(models.Model):
     authorized_author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True, related_name='post_viewable_author') 
 
 # This is when you befriend someone and they befriend you
-# (Friend another author and they accept the friend request)
+# (Friend another author and they accept the friend request)``
 # When the friend request is accepted, the corresponding Follow model is deleted
 class Friendship(models.Model):
     friend_a = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="friend_a_set", on_delete=models.CASCADE,blank=True, null=True)
@@ -82,7 +101,11 @@ class Friendship(models.Model):
 
     def __str__(self):
         return '%s %s' % (self.friend_a, self.friend_b)
-
+# class FriendshipFactory(factory.django.DjangoModelFactory):  
+#     class Meta:
+#         model = Friendship
+#     friend_a = CustomUser(1)
+#     friend_b = CustomUser(1)
 
 # This is when you befriend someone
 # (Friend another author without an accepted friend request)
