@@ -493,8 +493,12 @@ class AuthorViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=True, url_path="posts")
     def userPosts(self, request, pk=None):
         author_id = self.kwargs['pk']
+        author_id = str(author_id).replace('-','')
         uname = request.user
         uid = uname.id
+        uid = str(uid).replace('-','')
+        # print("hello" + str(author_id))
+        print(uid)
         allowed_posts = Post.objects.raw(' \
         WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
         (SELECT f2.friend_a_id AS fofid \
@@ -510,7 +514,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
             SELECT * FROM API_post WHERE id in posts \
             AND author_id = %s \
             ORDER BY published DESC', [str(uid)]*6 + [author_id])
-
+        print(len(allowed_posts))
         paginator = PostsPagination()
         paginated_posts = paginator.paginate_queryset(allowed_posts, request)
         serialized_posts = PostSerializer(paginated_posts, many=True)
