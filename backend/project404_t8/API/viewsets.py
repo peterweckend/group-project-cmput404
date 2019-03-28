@@ -213,6 +213,7 @@ class editProfile(UpdateView):
 def homeListView(request):
     # this try and except is to render posts into homepage
     try:
+        print("in homelistview")
         uname = request.user
         uid = uname.id
         uid = str(uid).replace('-','')
@@ -231,8 +232,11 @@ def homeListView(request):
             AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
             SELECT * FROM API_post WHERE id in posts \
             AND (is_unlisted = 0 OR (is_unlisted = 1 AND author_id = %s))', [uid]*7)
+        print("about to call postRemote")
         postRemote = get_remote_posts_for_feed(request.user)
+        print("returned from postRemote")
     except:
+        print("in except")
         # post = Post.objects.all()
         pass
     #     # Do not display an image if the image does not exist
@@ -260,6 +264,7 @@ def homeListView(request):
     
     # Check to see if any posts exist
     try:
+        print("below")
         # This will index the first result of the query
         # will crash if there are no results, taking us to except
         post[0]
@@ -267,6 +272,7 @@ def homeListView(request):
         # Now that we are here, loop through each element
         # And markdownify the body if it is_markdown
         for p in post:
+            print("looping through post")
             if p.is_markdown:
                 p.body = markdownify(p.body)
 
@@ -283,7 +289,7 @@ def homeListView(request):
             pageVariables["githubUrl"] = github_url
     except:
         pass
-
+    print("about to render")
     return render(request, 'homepage/home.html', pageVariables)
 
 
