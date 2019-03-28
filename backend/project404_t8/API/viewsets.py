@@ -211,11 +211,11 @@ class editProfile(UpdateView):
         return reverse_lazy("home")
   
 def homeListView(request):
-
     # this try and except is to render posts into homepage
     try:
         uname = request.user
         uid = uname.id
+        uid = str(uid).replace('-','')
         # todo: properly escape this using https://docs.djangoproject.com/en/1.9/topics/db/sql/#passing-parameters-into-raw
         post = Post.objects.raw(' \
         WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
@@ -230,10 +230,11 @@ def homeListView(request):
             SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
             AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
             SELECT * FROM API_post WHERE id in posts \
-            AND (is_unlisted = 0 OR (is_unlisted = 1 AND author_id = %s))', [int(uid)]*7)
+            AND (is_unlisted = 0 OR (is_unlisted = 1 AND author_id = %s))', [uid]*7)
         postRemote = get_remote_posts_for_feed(request.user)
     except:
-        post = Post.objects.all()
+        # post = Post.objects.all()
+        pass
     #     # Do not display an image if the image does not exist
     # imageExists = False
     # if post.image_link != "":
