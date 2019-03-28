@@ -9,7 +9,7 @@ from .serializers import UserSerializer, PostSerializer, CommentSerializer, Frie
 # X-User: http://service/author/:uuid
 # this should be included in the headers of 
 # any requests that involve checking permissions
-LOCAL_USERNAME = 'heroku'
+LOCAL_USERNAME = 'local'
 def get_custom_header_for_user(user_id):
     try:
         queryset = Server.objects.filter(username=LOCAL_USERNAME)
@@ -25,6 +25,16 @@ def get_server_info(remote_server_host):
         queryset = Server.objects.all()
         for server in queryset:
             if server.host == remote_server_host:
+                return server
+        return None
+    except:
+        return None
+
+def get_our_server(): 
+    try:
+        queryset = Server.objects.all()
+        for server in queryset:
+            if server.username == LOCAL_USERNAME:
                 return server
         return None
     except:
@@ -95,7 +105,7 @@ def befriend_remote_author(remote_author_id, local_author_id):
     data["query"] = "friendrequest"
     data["author"] = author
     data["friend"] = friend
-
+    # todo send to all servers?
     request_url = remote_server.host + "/author/" + str(remote_author_id)
     r = requests.post(request_url, auth=(remote_server.username, remote_server.password))
     response = r.text

@@ -33,8 +33,8 @@ urlpatterns = [
     url(r'^', include(api_router.urls)),
     url(r'^',include('API.urls')), 
     url(r'^',include('users.urls')),
-    url(r'^deletePost/(?P<pk>\d+)/$', PostDelete.as_view(), name="delete_post"),
-    url(r'^deleteFriend/(?P<pk>\d+)/$', FriendDelete.as_view(), name="delete_friend"),
+    url(r'^deletePost/(?P<id>[0-9A-Fa-f-]+)/$', PostDelete.as_view(), name="delete_post"),
+    url(r'^deleteFriend/(?P<id>[0-9A-Fa-f-]+)/$', FriendDelete.as_view(), name="delete_friend"), #?P<id>[0-9A-Fa-f-]+)/$
     url(r'^post/(?P<pk>\d+)/commentPost/', comment_thread, name="comment"),
     url(r'^markdownx/', include('markdownx.urls'))
 ]
