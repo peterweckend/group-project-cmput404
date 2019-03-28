@@ -21,7 +21,7 @@ import API.services as Services
 from rest_framework.exceptions import APIException, MethodNotAllowed, NotFound, PermissionDenied
 from markdownx.utils import markdownify
 from .api_viewsets import PostsViewSet, AuthorViewSet, FriendRequestViewSet
-from .serverMethods import befriend_remote_author, get_remote_posts_for_feed
+from .serverMethods import befriend_remote_author, get_remote_posts_for_feed,get_user
 
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
 # Django REST API Tutorial: Filtering System - https://youtu.be/s9V9F9Jtj7Q
@@ -216,6 +216,7 @@ def homeListView(request):
         uname = request.user
         uid = uname.id
         uid = str(uid).replace('-','')
+        postRemote = get_remote_posts_for_feed(request.user.id)
         # todo: properly escape this using https://docs.djangoproject.com/en/1.9/topics/db/sql/#passing-parameters-into-raw
         post = Post.objects.raw(' \
         WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
@@ -231,8 +232,10 @@ def homeListView(request):
             AND (privacy_setting = 3 OR privacy_setting = 4 OR (privacy_setting = 5 AND original_host = \
             (select host from users_customuser where id = %s)))) OR author_id = %s OR  privacy_setting = 6) \
             SELECT * FROM API_post WHERE id in posts \
-            AND (is_unlisted = 0 OR (is_unlisted = 1 AND author_id = %s))', [uid]*8)
-        postRemote = get_remote_posts_for_feed(request.user)
+            AND (is_unlisted = 0 OR (is_unlisted = 1 AND author_id = %s)) \
+            ORDER BY published ASC', [uid]*8)
+        # print(request.user.id,234)
+        
     except:
         # post = Post.objects.all()
         pass
