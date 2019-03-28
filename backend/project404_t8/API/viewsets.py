@@ -229,10 +229,11 @@ def homeListView(request):
             SELECT id FROM API_post WHERE (author_id in  \
             (WITH friends(fid) AS (SELECT friend_b_id FROM API_friendship WHERE friend_a_id=%s) \
             SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
-            AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
+            AND (privacy_setting = 3 OR privacy_setting = 4 OR (privacy_setting = 5 AND original_host = \
+            (select host from users_customuser where id = %s)))) OR author_id = %s OR  privacy_setting = 6) \
             SELECT * FROM API_post WHERE id in posts \
             AND (is_unlisted = 0 OR (is_unlisted = 1 AND author_id = %s)) \
-            ORDER BY published ASC', [uid]*7)
+            ORDER BY published ASC', [uid]*8)
         # print(request.user.id,234)
         
     except:
