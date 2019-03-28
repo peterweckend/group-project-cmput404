@@ -311,6 +311,13 @@ class PostsViewSet(viewsets.ModelViewSet):
         # permission_classes = (IsAuthenticated,)
         queryset = Post.objects.filter(pk=pk)
         serializer_class = PostSerializer(queryset, many=True)
+
+        # response = OrderedDict()
+        # response.update({"query":"getPost"})
+        # response.update({"postID":})
+        # response.update({"url": })
+        # response.update({"previous": None})
+
         return Response(serializer_class.data)
     
     # the API endpoint accessible at GET http://service/posts/{post_id}/comments
@@ -467,6 +474,8 @@ class AuthorViewSet(viewsets.ModelViewSet):
     def posts(self, request, pk=None):
         uname = request.user
         uid = uname.id
+        uid = str(uid).replace('-','')
+        
         # todo: properly escape this using https://docs.djangoproject.com/en/1.9/topics/db/sql/#passing-parameters-into-raw
         allowed_posts = Post.objects.raw(' \
         WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
@@ -483,8 +492,31 @@ class AuthorViewSet(viewsets.ModelViewSet):
             SELECT * FROM API_post WHERE id in posts \
             ORDER BY published DESC' , [str(uid)]*6)
 
-        serializer_class = PostSerializer(allowed_posts, many=True)
-        return Response(serializer_class.data)
+        paginator = PostsPagination()
+        paginated_posts = paginator.paginate_queryset(allowed_posts, request)
+        serialized_posts = PostSerializer(paginated_posts, many=True)
+
+        response = OrderedDict()
+        response.update({"query":"posts"})
+        response.update({"count": len(allowed_posts)})
+        response.update({"size": Services.get_page_size(request, paginator)})
+        response.update({"next": None})
+        response.update({"previous": None})
+
+        posts = []
+        
+        for post in serialized_posts.data:
+            # Get single post information
+            postId = str(post["id"])            
+            posts.append(getPostData(request, pk=postId))
+
+        response.update({"posts":posts})
+
+        if paginator.get_next_link() is not None:
+            response["next"] = paginator.get_next_link()
+        if paginator.get_previous_link() is not None:
+            response["previous"] = paginator.get_previous_link()
+        return Response(response)    
 
     # the API endpoint accessible at GET http://service/author/{author_id}/posts
     # Can't name this method "posts" because there's already a "posts" method above
@@ -496,8 +528,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
         uname = request.user
         uid = uname.id
         uid = str(uid).replace('-','')
-        # print("hello" + str(author_id))
-        print(uid)
+
         allowed_posts = Post.objects.raw(' \
         WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
         (SELECT f2.friend_a_id AS fofid \
@@ -513,7 +544,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
             SELECT * FROM API_post WHERE id in posts \
             AND author_id = %s \
             ORDER BY published DESC', [str(uid)]*6 + [author_id])
-        print(len(allowed_posts))
+
         paginator = PostsPagination()
         paginated_posts = paginator.paginate_queryset(allowed_posts, request)
         serialized_posts = PostSerializer(paginated_posts, many=True)
