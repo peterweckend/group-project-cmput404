@@ -311,4 +311,4 @@ def get_remote_comments_by_post_id(remote_post_id,current_user_id):
         # No comments found
         print("No comments or servers found")
 
-    return comments 
+    return allComments
