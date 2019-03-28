@@ -324,10 +324,21 @@ class PostsViewSet(viewsets.ModelViewSet):
     @action(methods=['get','post'], detail=True, url_path="comments")
     def userPostComments(self, request, pk=None):
         post_id = pk
-        requested_post = Post.objects.get(id=post_id)
+        
+        # does the post exist?
+        try:
+            requested_post = Post.objects.get(id=post_id)
+        except:
+            response = {
+                'query': 'addComment',
+                    'success':False,
+                    'message':"Comment not allowed"
+            }
+            return Response(response, status=403)
         if request.method == "POST":
             # check that we're allowed to see the post - for now just check if the posts are public
             # for right now, just return comments from public posts
+            # should we check if post visibility is serveronly/private?
             if requested_post.privacy_setting == "6": 
                 body = json.loads(request.body)
                 authorID = body["author"]["id"].split("/")[-1]
@@ -337,14 +348,15 @@ class PostsViewSet(viewsets.ModelViewSet):
                 postTime = body["published"]
                 post = Post.objects.get(pk=post_id)
 
-                if Comment.objects.get(pk=commentID):
-                    # print("comment exists")
-                    response = {
-                    'query': 'addComment',
-                        'success':False,
-                        'message':"Comment not allowed"
-                    }
-                    return Response(response, status=403)
+                # swapped to UUID so this shouldn't be an issue 
+                # if Comment.objects.get(pk=commentID):
+                #     # print("comment exists")
+                #     response = {
+                #     'query': 'addComment',
+                #         'success':False,
+                #         'message':"Comment not allowed"
+                #     }
+                #     return Response(response, status=403)
 
                 try:
                     author = CustomUser.objects.get(pk=authorID)
@@ -371,7 +383,6 @@ class PostsViewSet(viewsets.ModelViewSet):
             # check that we're allowed to see the post - for now just check if the posts are public
             # for right now, just return comments from public posts
             paginator = PostsPagination()
-            
             if requested_post.privacy_setting == "6": 
                 queryset = Comment.objects.filter(post=pk).order_by('-datetime')
                 comments = CommentSerializer(queryset, many=True).data
