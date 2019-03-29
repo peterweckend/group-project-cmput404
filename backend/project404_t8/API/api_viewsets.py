@@ -316,7 +316,7 @@ class PostsViewSet(viewsets.ModelViewSet):
         post = getPostData(request, pk=pk)
         response = OrderedDict()
         response.update({"query":"getPost"})
-        response.update({"post":post})
+        response.update({"posts":post})
         
 
         # return Response(serializer_class.data)
