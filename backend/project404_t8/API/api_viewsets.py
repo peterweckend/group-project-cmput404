@@ -368,7 +368,7 @@ class PostsViewSet(viewsets.ModelViewSet):
             # for right now, just return comments from public posts
             # should we check if post visibility is serveronly/private?
             request_user_id = getAuthorIdForApiRequest(request)
-            if request_user_id = None:
+            if request_user_id == None:
                 raise ParseError("No correct X-User header or authentication were provided.")
 
             if Services.has_permission_to_see_post(request_user_id, requested_post): 
@@ -417,9 +417,9 @@ class PostsViewSet(viewsets.ModelViewSet):
             paginator = PostsPagination()
             # if requested_post.privacy_setting == "6": 
             request_user_id = getAuthorIdForApiRequest(request)
-            if request_user_id = None:
+            if request_user_id == None:
                 raise ParseError("No correct X-User header or authentication were provided.")
-                
+
             if Services.has_permission_to_see_post(request_user_id, requested_post): 
                 queryset = Comment.objects.filter(post=pk).order_by('-datetime')
                 comments = CommentSerializer(queryset, many=True).data
@@ -520,7 +520,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
         # uname = request.user
         # uid = uname.id
         uid = getAuthorIdForApiRequest(request)
-        if uid = None:
+        if uid == None:
             raise ParseError("No correct X-User header or authentication were provided.")
         uid = str(uid).replace('-','')
         
@@ -543,7 +543,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
         allPosts = Post.objects.filter().order_by('-published') # I think this returns them all
 
         request_user_id = getAuthorIdForApiRequest(request)
-        if request_user_id = None:
+        if request_user_id == None:
             raise ParseError("No correct X-User header or authentication were provided.")
 
         for post in allPosts:
@@ -586,7 +586,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
         # uname = request.user
         # uid = uname.id
         uid = getAuthorIdForApiRequest(request)
-        if uid = None:
+        if uid == None:
             raise ParseError("No correct X-User header or authentication were provided.")
         uid = str(uid)
         
