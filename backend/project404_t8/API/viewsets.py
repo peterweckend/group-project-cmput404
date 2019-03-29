@@ -21,7 +21,7 @@ import API.services as Services
 from rest_framework.exceptions import APIException, MethodNotAllowed, NotFound, PermissionDenied
 from markdownx.utils import markdownify
 from .api_viewsets import PostsViewSet, AuthorViewSet, FriendRequestViewSet
-from .serverMethods import befriend_remote_author_by_id, get_remote_posts_for_feed, get_user
+from .serverMethods import befriend_remote_author_by_id, get_remote_posts_for_feed, get_user, get_remote_comments_by_post_id
 
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
 # Django REST API Tutorial: Filtering System - https://youtu.be/s9V9F9Jtj7Q
@@ -95,7 +95,7 @@ def postView(request, id):
     # Perform privacy calculations
     # Has permission will be passed in
     # If its False we could either display a 404 or a "you do not have permission"
-    hasPermission = Services.has_permission_to_see_post(request.user, post)
+    hasPermission = Services.has_permission_to_see_post(request.user.id, post)
 
     if post.is_markdown:
         post.body = markdownify(post.body)
@@ -177,7 +177,7 @@ def profileView(request, username):
         profile_posts = []
         for post in profile_posts_all:
             print("in post for loop")
-            if Services.has_permission_to_see_post(request.user, post):
+            if Services.has_permission_to_see_post(request.user.id, post):
                 print("has permission")
                 profile_posts.append(post)
     
@@ -217,7 +217,13 @@ def homeListView(request):
         uname = request.user
         uid = uname.id
         # uid = str(uid).replace('-','')
-        get_remote_posts_for_feed(request.user.id)
+        foreignPosts = get_remote_posts_for_feed(request.user.id)
+        # For each post in the feed, get the comments
+        # for postt in foreignPosts:
+        #     print(postt.id)
+        #     print(len(foreignPosts))
+        #     get_remote_comments_by_post_id(postt.id, request.id)
+
         # todo: properly escape this using https://docs.djangoproject.com/en/1.9/topics/db/sql/#passing-parameters-into-raw
         # post = Post.objects.raw(' \
         # WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
@@ -239,7 +245,7 @@ def homeListView(request):
         viewable_posts = []
         all_posts = Post.objects.filter().order_by('published')
         for post in all_posts:
-            if Services.has_permission_to_see_post(uname, post):
+            if Services.has_permission_to_see_post(uid, post):
                 viewable_posts.append(post)
         
     except:

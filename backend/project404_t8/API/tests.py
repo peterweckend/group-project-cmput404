@@ -30,35 +30,35 @@ class PrivacyTestCase(TestCase):
         author = UserModels.CustomUser.objects.get(id="8c4f71d9-fcc5-48b0-8092-9b775969bc9c")
         myPost = Post.objects.get(id="9c4f71d9-fcc5-48b0-8092-9b775969bc9c")
 
-        hasPermission = Services.has_permission_to_see_post(author, myPost)
+        hasPermission = Services.has_permission_to_see_post(author.id, myPost)
         self.assertEqual(True, hasPermission)
 
     def test_user_can_see_another_author_posts_when_allowed(self):
         """Authorized users can see the post when the post privacy is set to Another Author"""
         someUser = UserModels.CustomUser.objects.get(id="8c4f71d9-fcc5-48b0-8092-9b775969bc9d")
         myPost = Post.objects.get(id="9c4f71d9-fcc5-48b0-8092-9b775969bc9d")
-        hasPermission = Services.has_permission_to_see_post(someUser, myPost)
+        hasPermission = Services.has_permission_to_see_post(someUser.id, myPost)
         self.assertEqual(True, hasPermission)
 
     def test_user_cannot_see_another_author_posts_when_not_allowed(self):
         """Users cannot see Another Author posts if they aren't authorized"""
         strangerUser = UserModels.CustomUser.objects.get(id="8c4f71d9-fcc5-48b0-8092-9b775969bc9e")
         myPost = Post.objects.get(id="9c4f71d9-fcc5-48b0-8092-9b775969bc9d")
-        hasPermission = Services.has_permission_to_see_post(strangerUser, myPost)
+        hasPermission = Services.has_permission_to_see_post(strangerUser.id, myPost)
         self.assertEqual(False, hasPermission)
 
     def test_user_can_see_their_friends_posts_when_allowed(self):
         """Users can see their friends' posts when the posts are set to My Friends"""
         someUser = UserModels.CustomUser.objects.get(id="8c4f71d9-fcc5-48b0-8092-9b775969bc9d")
         myPost = Post.objects.get(id="9c4f71d9-fcc5-48b0-8092-9b775969bc9e")
-        hasPermission = Services.has_permission_to_see_post(someUser, myPost)
+        hasPermission = Services.has_permission_to_see_post(someUser.id, myPost)
         self.assertEqual(True, hasPermission)
 
     def test_user_cannot_see_friends_posts_of_non_friends(self):
         """Users can't see My Friends posts when they aren't friends"""
         strangerUser = UserModels.CustomUser.objects.get(id="8c4f71d9-fcc5-48b0-8092-9b775969bc9e")
         myPost = Post.objects.get(id="9c4f71d9-fcc5-48b0-8092-9b775969bc9e")
-        hasPermission = Services.has_permission_to_see_post(strangerUser, myPost)
+        hasPermission = Services.has_permission_to_see_post(strangerUser.id, myPost)
         self.assertEqual(False, hasPermission)
 
     # # friends of friends isn't implemented
@@ -69,7 +69,7 @@ class PrivacyTestCase(TestCase):
         """Users can see public posts"""
         strangerUser = UserModels.CustomUser.objects.get(id="8c4f71d9-fcc5-48b0-8092-9b775969bc9e")
         myPost = Post.objects.get(id="9c4f71d9-fcc5-48b0-8092-9b775969bc9f")
-        hasPermission = Services.has_permission_to_see_post(strangerUser, myPost)
+        hasPermission = Services.has_permission_to_see_post(strangerUser.id, myPost)
         self.assertEqual(True, hasPermission)
 
 class FriendFollowerTestCase(TestCase):

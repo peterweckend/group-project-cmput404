@@ -1,14 +1,24 @@
 from .models import Post, Comment, Friendship, Follow, Server
 from users.models import CustomUser
+import uuid
 
 # Exists between the data layers and the UI.
 # Holds the logic of the views.
 # This allows multiple views to access the same functions
 # and logic easily and allows us to change the logic all in one place.
 
-def has_permission_to_see_post(requesting_user, post):
+def has_permission_to_see_post(requesting_user_id, post):
     hasPermission = False
-    requesting_user_id = requesting_user.id
+
+    # convert to UUID object
+    if not isinstance(requesting_user_id, uuid.UUID):
+        try:
+            requesting_user_id = uuid.UUID(requesting_user_id)
+        except:
+            print("An error occurred.")
+            return False
+
+    # do we need to replace the '-'s in requesting_user_id? probably not but maybe?
 
     # ('1', 'me'),
     # This one will always apply, so it does not need an if conditional
@@ -17,7 +27,7 @@ def has_permission_to_see_post(requesting_user, post):
 
     # ('2', 'another author'),
     if post.privacy_setting == '2':
-        if requesting_user_id == post.author or requesting_user_id == post.shared_author.id:
+        if requesting_user_id == post.author.id or requesting_user_id == post.shared_author.id:
             hasPermission = True
 
     # ('3', 'my friends'),
@@ -41,7 +51,6 @@ def has_permission_to_see_post(requesting_user, post):
         # Friends are the authors friends
         # If the requester is in the friends list they can view
         if requesting_user_id in friends:
-            # print(requesting_user_id, friends)
             hasPermission = True
 
         # ('4', 'friends of friends'),
@@ -50,8 +59,8 @@ def has_permission_to_see_post(requesting_user, post):
         # query all their friends then add to another set
         if post.privacy_setting == '4':
             for friend in friendObj:
-                friends1 = Friendship.objects.filter(friend_a=friend.author.id)
-                friends2 = Friendship.objects.filter(friend_b=friend.author.id)
+                friends1 = Friendship.objects.filter(friend_a=post.author.id)
+                friends2 = Friendship.objects.filter(friend_b=post.author.id)
 
                 for row in friends1:
                     friends.add(row.friend_b.id)
@@ -59,7 +68,6 @@ def has_permission_to_see_post(requesting_user, post):
                     friends.add(row.friend_a.id)
 
             if requesting_user_id in friends:
-                # print(requesting_user_id, friends)
                 hasPermission = True
 
 

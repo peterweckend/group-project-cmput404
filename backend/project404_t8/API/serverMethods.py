@@ -155,16 +155,14 @@ def get_remote_posts_for_feed(current_user_id):
             if remote_server.username == LOCAL_USERNAME:
                 continue
 
-            print("inside remote")
             request_url = remote_server.host + "/author/posts"
-            print("here,150")
             try:
                 header = get_custom_header_for_user(current_user_id)
             except Exception as e:
                 print(e,52)
-            # print(158)
             r = requests.get(request_url, headers=header)
-            # print(159)
+
+            print("\nRequesting:", request_url,"Status code:", r.status_code,"\n")
 
             if r.status_code != 200:
                 print("An error occured")
@@ -210,6 +208,12 @@ def get_remote_posts_for_feed(current_user_id):
     except:
         # No external servers or posts found
         print("No posts or no servers were found")
+
+    # Lets just try to get all the comments in here instead
+    # What could go wrong?
+    for post in remote_posts:
+        get_remote_comments_by_post_id(post.id, current_user_id)
+
     return remote_posts
 
 
@@ -276,8 +280,8 @@ def get_remote_comments_by_post_id(remote_post_id,current_user_id):
                 r = requests.get(request_url, auth=(remote_server.username, remote_server.password), headers=header)
 
                 if r.status_code != 200:
-                    print("An error occured, the post most likely doesn't exist on the server")
-                    continue
+                    print("Requesting:", request_url, "Status:", r.status_code)
+                    break
                 
                 # comments should be json for the comments
                 # add them to the big list
