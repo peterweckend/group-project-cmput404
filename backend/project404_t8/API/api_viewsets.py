@@ -49,12 +49,12 @@ def getAuthorData(request, extra=False, pk=None, githubRequired=False):
     user = get_object_or_404(queryset, pk=pk)
     response = {}
 
-    response["id"] = "http://" + request.get_host() + request_path
+    response["id"] = "https://" + request.get_host() + request_path
     # todo: look up the user, find what host they belong to, and return that value
     # instead of using request.get_host() here
-    response["host"] = "http://" + request.get_host() + "/"
+    response["host"] = "https://" + request.get_host() + "/"
     response["displayName"] = user.displayname
-    response["url"] = "http://" + request.get_host() + request_path
+    response["url"] = "https://" + request.get_host() + request_path
     if githubRequired:
         response["github"] = user.github_url
 
