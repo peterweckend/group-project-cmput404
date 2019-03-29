@@ -48,7 +48,7 @@ def get_remote_author(remote_server, remote_author_id):
     request_url = remote_server.host + "/author/" + str(remote_author_id)
     # print("here",65)
 
-    r = requests.get(request_url)
+    r = requests.get(request_url, auth=(remote_server.username, remote_server.password))
     # print("r",39)
     if r.status_code == 200:
         # print("hi")
@@ -155,12 +155,12 @@ def get_remote_posts_for_feed(current_user_id):
             if remote_server.username == LOCAL_USERNAME:
                 continue
 
-            request_url = remote_server.host + "/author/posts"
+            request_url = remote_server.host + "/author/posts?size=25"
             try:
                 header = get_custom_header_for_user(current_user_id)
             except Exception as e:
                 print(e,52)
-            r = requests.get(request_url, headers=header)
+            r = requests.get(request_url, auth=(remote_server.username, remote_server.password), headers=header)
 
             print("\nRequesting:", request_url,"Status code:", r.status_code,"\n")
 
@@ -204,6 +204,30 @@ def get_remote_posts_for_feed(current_user_id):
                 except Exception as e:
                     print(e,189)   
                 remote_posts.append(post_object)
+
+                # add each comment on the post to the post
+                for comment in post["comments"]:
+                    if comment != []:
+                        try:
+                            comment_author =  CustomUser(timestamp= timezone.now(), id=comment["author"]["id"].split("author/")[1], host=remote_server.host, displayname=comment["author"]["displayName"], github_url=comment["author"]["github"], username = comment["author"]["id"].split("author/")[1], password= "12345" )
+                            comment_author.save()
+                        except Exception as e:
+                            print("author already exists")
+                            pass
+                        try:
+                            newComment = Comment()
+                            newComment.body = comment["comment"]
+                            newComment.post = post_object
+                            # Does this need to be a custom user object?
+                            # newComment.author = CustomUser.objects.get(pk=current_user_id)
+                            newComment.author = comment_author
+                            newComment.id = comment["id"]
+                            newComment.datetime = comment["published"]
+                            newComment.save()
+                            print("NEW COMMENT:" , newComment)
+                        except Exception as e:
+                            print(e)
+                            print("comment not being made properly")
             
     except:
         # No external servers or posts found
