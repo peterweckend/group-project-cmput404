@@ -417,7 +417,7 @@ class PostsViewSet(viewsets.ModelViewSet):
 
                 return Response(response)
             else: 
-                raise PermissionDenied("Forbidden: The post you wished to access comments for is not Public")
+                raise PermissionDenied("Forbidden: You don't have permission to access comments for this post or you provided an invalid user.")
         else: 
             raise MethodNotAllowed(method=request.method)
 
