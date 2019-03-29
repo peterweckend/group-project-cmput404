@@ -186,6 +186,8 @@ def getPostData(request, pk=None):
     comments_response = []
     queryset = Comment.objects.filter(post=pk).order_by('-datetime')
     comments = CommentSerializer(queryset, many=True).data
+    # get only 5 most recent comments
+    comments = comments[:5]
     
     for comment in comments:
         comments_response.append(getCommentData(request, pk=comment["id"]))
@@ -311,17 +313,35 @@ class PostsViewSet(viewsets.ModelViewSet):
         # permission_classes = (IsAuthenticated,)
         queryset = Post.objects.filter(pk=pk)
         serializer_class = PostSerializer(queryset, many=True)
+
+        # response = OrderedDict()
+        # response.update({"query":"getPost"})
+        # response.update({"postID":})
+        # response.update({"url": })
+        # response.update({"previous": None})
+
         return Response(serializer_class.data)
     
     # the API endpoint accessible at GET http://service/posts/{post_id}/comments
     @action(methods=['get','post'], detail=True, url_path="comments")
     def userPostComments(self, request, pk=None):
         post_id = pk
-        requested_post = Post.objects.get(id=post_id)
+        
+        # does the post exist?
+        try:
+            requested_post = Post.objects.get(id=post_id)
+        except:
+            response = {
+                'query': 'addComment',
+                    'success':False,
+                    'message':"Comment not allowed"
+            }
+            return Response(response, status=403)
         if request.method == "POST":
             # check that we're allowed to see the post - for now just check if the posts are public
             # for right now, just return comments from public posts
-            if requested_post.privacy_setting == "6": 
+            # should we check if post visibility is serveronly/private?
+            if Services.has_permission_to_see_post(request.user, requested_post): 
                 body = json.loads(request.body)
                 authorID = body["author"]["id"].split("/")[-1]
                 authorUsername = body["author"]["displayName"]
@@ -330,14 +350,15 @@ class PostsViewSet(viewsets.ModelViewSet):
                 postTime = body["published"]
                 post = Post.objects.get(pk=post_id)
 
-                if Comment.objects.get(pk=commentID):
-                    # print("comment exists")
-                    response = {
-                    'query': 'addComment',
-                        'success':False,
-                        'message':"Comment not allowed"
-                    }
-                    return Response(response, status=403)
+                # swapped to UUID so this shouldn't be an issue 
+                # if Comment.objects.get(pk=commentID):
+                #     # print("comment exists")
+                #     response = {
+                #     'query': 'addComment',
+                #         'success':False,
+                #         'message':"Comment not allowed"
+                #     }
+                #     return Response(response, status=403)
 
                 try:
                     author = CustomUser.objects.get(pk=authorID)
@@ -364,8 +385,8 @@ class PostsViewSet(viewsets.ModelViewSet):
             # check that we're allowed to see the post - for now just check if the posts are public
             # for right now, just return comments from public posts
             paginator = PostsPagination()
-            
-            if requested_post.privacy_setting == "6": 
+            # if requested_post.privacy_setting == "6": 
+            if Services.has_permission_to_see_post(request.user, requested_post): 
                 queryset = Comment.objects.filter(post=pk).order_by('-datetime')
                 comments = CommentSerializer(queryset, many=True).data
                 comments_response = []
@@ -411,11 +432,8 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
             body = json.loads(request.body.decode('utf-8'))
 
             authorId = body["author"]["id"].split("/")[-1]
-            authorUsername = body["author"]["displayName"]
+            authorDisplayName = body["author"]["displayName"]
             friend = body["friend"]["id"].split("/")[-1]
-
-            if str(request.user.id) != str(authorId):
-                return Response(status=400)
 
             # This should be done better, but right now
             # we are gonna get the username using the id
@@ -427,7 +445,7 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
                 author = CustomUser.objects.get(pk=authorId)
             except:
                 # We should save the host they are from probably
-                newAuthor = CustomUser(id=authorId, username=authorUsername, password="thisdoesntmatter", displayname=authorUsername)
+                newAuthor = CustomUser(id=authorId, username=authorDisplayName, password="thisdoesntmatter", displayname=authorDisplayName)
                 newAuthor.save()
                 # Make a temp/foreign author profile
 
@@ -437,7 +455,7 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
             except:
                 return Response(status=200)
 
-            Services.handle_friend_request_with_id(author, friend)
+            Services.handle_friend_request(friend, author)
         # handleFriendRequest
         return Response(status=200)
     
@@ -467,24 +485,54 @@ class AuthorViewSet(viewsets.ModelViewSet):
     def posts(self, request, pk=None):
         uname = request.user
         uid = uname.id
+        uid = str(uid).replace('-','')
+        
         # todo: properly escape this using https://docs.djangoproject.com/en/1.9/topics/db/sql/#passing-parameters-into-raw
-        allowed_posts = Post.objects.raw(' \
-        WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
-        (SELECT f2.friend_a_id AS fofid \
-            FROM API_friendship f \
-            JOIN API_friendship f2 ON f.friend_a_id = f2.friend_b_id \
-            WHERE fofid NOT IN (SELECT friend_a_ID FROM API_friendship  \
-            WHERE friend_b_id = %s) AND f.friend_b_id = %s AND fofid != %s) AND privacy_setting = 4 \
-        UNION \
-            SELECT id FROM API_post WHERE (author_id in  \
-            (WITH friends(fid) AS (SELECT friend_b_id FROM API_friendship WHERE friend_a_id=%s) \
-            SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
-            AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
-            SELECT * FROM API_post WHERE id in posts \
-            ORDER BY published DESC' , [str(uid)]*6)
+        # allowed_posts = Post.objects.raw(' \
+        # WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
+        # (SELECT f2.friend_a_id AS fofid \
+        #     FROM API_friendship f \
+        #     JOIN API_friendship f2 ON f.friend_a_id = f2.friend_b_id \
+        #     WHERE fofid NOT IN (SELECT friend_a_ID FROM API_friendship  \
+        #     WHERE friend_b_id = %s) AND f.friend_b_id = %s AND fofid != %s) AND privacy_setting = 4 \
+        # UNION \
+        #     SELECT id FROM API_post WHERE (author_id in  \
+        #     (WITH friends(fid) AS (SELECT friend_b_id FROM API_friendship WHERE friend_a_id=%s) \
+        #     SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
+        #     AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
+        #     SELECT * FROM API_post WHERE id in posts \
+        #     ORDER BY published DESC' , [str(uid)]*6)
+        allowed_posts = []
+        allPosts = Post.objects.filter().order_by('-published') # I think this returns them all
+        for post in allPosts:
+            if Services.has_permission_to_see_post(request.user, post):
+                allowed_posts.append(post)
 
-        serializer_class = PostSerializer(allowed_posts, many=True)
-        return Response(serializer_class.data)
+        paginator = PostsPagination()
+        paginated_posts = paginator.paginate_queryset(allowed_posts, request)
+        serialized_posts = PostSerializer(paginated_posts, many=True)
+
+        response = OrderedDict()
+        response.update({"query":"posts"})
+        response.update({"count": len(allowed_posts)})
+        response.update({"size": Services.get_page_size(request, paginator)})
+        response.update({"next": None})
+        response.update({"previous": None})
+
+        posts = []
+        
+        for post in serialized_posts.data:
+            # Get single post information
+            postId = str(post["id"])            
+            posts.append(getPostData(request, pk=postId))
+
+        response.update({"posts":posts})
+
+        if paginator.get_next_link() is not None:
+            response["next"] = paginator.get_next_link()
+        if paginator.get_previous_link() is not None:
+            response["previous"] = paginator.get_previous_link()
+        return Response(response)    
 
     # the API endpoint accessible at GET http://service/author/{author_id}/posts
     # Can't name this method "posts" because there's already a "posts" method above
@@ -492,28 +540,37 @@ class AuthorViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=True, url_path="posts")
     def userPosts(self, request, pk=None):
         author_id = self.kwargs['pk']
-        author_id = str(author_id).replace('-','')
+        author_id = str(author_id)
         uname = request.user
         uid = uname.id
-        uid = str(uid).replace('-','')
-        # print("hello" + str(author_id))
-        print(uid)
-        allowed_posts = Post.objects.raw(' \
-        WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
-        (SELECT f2.friend_a_id AS fofid \
-            FROM API_friendship f \
-            JOIN API_friendship f2 ON f.friend_a_id = f2.friend_b_id \
-            WHERE fofid NOT IN (SELECT friend_a_ID FROM API_friendship  \
-            WHERE friend_b_id = %s) AND f.friend_b_id = %s AND fofid != %s) AND privacy_setting = 4 \
-        UNION \
-            SELECT id FROM API_post WHERE (author_id in  \
-            (WITH friends(fid) AS (SELECT friend_b_id FROM API_friendship WHERE friend_a_id=%s) \
-            SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
-            AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
-            SELECT * FROM API_post WHERE id in posts \
-            AND author_id = %s \
-            ORDER BY published DESC', [str(uid)]*6 + [author_id])
-        print(len(allowed_posts))
+        uid = str(uid)
+        requester = request.user
+        
+        # allowed_posts = Post.objects.raw(' \
+        # WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
+        # (SELECT f2.friend_a_id AS fofid \
+        #     FROM API_friendship f \
+        #     JOIN API_friendship f2 ON f.friend_a_id = f2.friend_b_id \
+        #     WHERE fofid NOT IN (SELECT friend_a_ID FROM API_friendship  \
+        #     WHERE friend_b_id = %s) AND f.friend_b_id = %s AND fofid != %s) AND privacy_setting = 4 \
+        # UNION \
+        #     SELECT id FROM API_post WHERE (author_id in  \
+        #     (WITH friends(fid) AS (SELECT friend_b_id FROM API_friendship WHERE friend_a_id=%s) \
+        #     SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
+        #     AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
+        #     SELECT * FROM API_post WHERE id in posts \
+        #     AND author_id = %s \
+        #     ORDER BY published DESC', [str(uid)]*6 + [author_id])
+
+        # Instead of this big boy query, just query for all our posts
+        # Then for each post, check to see if the user has permission
+        allowed_posts = []
+        allPosts = Post.objects.filter(author=author_id).order_by('-published') # I think this returns them all
+        for post in allPosts:
+            if Services.has_permission_to_see_post(requester, post):
+                allowed_posts.append(post)
+
+
         paginator = PostsPagination()
         paginated_posts = paginator.paginate_queryset(allowed_posts, request)
         serialized_posts = PostSerializer(paginated_posts, many=True)
@@ -652,7 +709,3 @@ def friendsHelperFunction(request, pk=None, author_id2=None):
         return True
 
     return False
-
-
-
-    
