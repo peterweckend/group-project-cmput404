@@ -95,8 +95,7 @@ def postView(request, id):
     # Perform privacy calculations
     # Has permission will be passed in
     # If its False we could either display a 404 or a "you do not have permission"
-    requesting_user_id = request.user.id
-    hasPermission = Services.has_permission_to_see_post(requesting_user_id, post)
+    hasPermission = Services.has_permission_to_see_post(request.user, post)
 
     if post.is_markdown:
         post.body = markdownify(post.body)
@@ -176,7 +175,7 @@ def profileView(request, username):
         profile_posts = []
         for post in profile_posts_all:
             print("in post for loop")
-            if Services.has_permission_to_see_post(request.user.id, post):
+            if Services.has_permission_to_see_post(request.user, post):
                 print("has permission")
                 profile_posts.append(post)
     
@@ -215,26 +214,31 @@ def homeListView(request):
     try:
         uname = request.user
         uid = uname.id
-        uid = str(uid).replace('-','')
+        # uid = str(uid).replace('-','')
         postRemote = get_remote_posts_for_feed(request.user.id)
         # todo: properly escape this using https://docs.djangoproject.com/en/1.9/topics/db/sql/#passing-parameters-into-raw
-        post = Post.objects.raw(' \
-        WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
-        (SELECT f2.friend_a_id AS fofid \
-            FROM API_friendship f \
-            JOIN API_friendship f2 ON f.friend_a_id = f2.friend_b_id \
-            WHERE fofid NOT IN (SELECT friend_a_ID FROM API_friendship  \
-            WHERE friend_b_id = %s) AND f.friend_b_id = %s AND fofid != %s) AND privacy_setting = 4 \
-        UNION \
-            SELECT id FROM API_post WHERE (author_id in  \
-            (WITH friends(fid) AS (SELECT friend_b_id FROM API_friendship WHERE friend_a_id=%s) \
-            SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
-            AND (privacy_setting = 3 OR privacy_setting = 4 OR (privacy_setting = 5 AND original_host = \
-            (select host from users_customuser where id = %s)))) OR author_id = %s OR  privacy_setting = 6) \
-            SELECT * FROM API_post WHERE id in posts \
-            AND (is_unlisted = 0 OR (is_unlisted = 1 AND author_id = %s)) \
-            ORDER BY published ASC', [uid]*8)
+        # post = Post.objects.raw(' \
+        # WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
+        # (SELECT f2.friend_a_id AS fofid \
+        #     FROM API_friendship f \
+        #     JOIN API_friendship f2 ON f.friend_a_id = f2.friend_b_id \
+        #     WHERE fofid NOT IN (SELECT friend_a_ID FROM API_friendship  \
+        #     WHERE friend_b_id = %s) AND f.friend_b_id = %s AND fofid != %s) AND privacy_setting = 4 \
+        # UNION \
+        #     SELECT id FROM API_post WHERE (author_id in  \
+        #     (WITH friends(fid) AS (SELECT friend_b_id FROM API_friendship WHERE friend_a_id=%s) \
+        #     SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
+        #     AND (privacy_setting = 3 OR privacy_setting = 4 OR (privacy_setting = 5 AND original_host = \
+        #     (select host from users_customuser where id = %s)))) OR author_id = %s OR  privacy_setting = 6) \
+        #     SELECT * FROM API_post WHERE id in posts \
+        #     AND (is_unlisted = 0 OR (is_unlisted = 1 AND author_id = %s)) \
+        #     ORDER BY published ASC', [uid]*8)
         # print(request.user.id,234)
+        viewable_posts = []
+        all_posts = Post.objects.filter().order_by('published')
+        for post in all_posts:
+            if Services.has_permission_to_see_post(uname, post):
+                viewable_posts.append(post)
         
     except:
         # post = Post.objects.all()
@@ -266,15 +270,15 @@ def homeListView(request):
     try:
         # This will index the first result of the query
         # will crash if there are no results, taking us to except
-        post[0]
+        viewable_posts[0]
 
         # Now that we are here, loop through each element
         # And markdownify the body if it is_markdown
-        for p in post:
+        for p in viewable_posts:
             if p.is_markdown:
                 p.body = markdownify(p.body)
 
-        pageVariables["post"] = post
+        pageVariables["post"] = viewable_posts
         pageVariables["postRemote"]=postRemote
     except:
         # The raw query set returns no post, so do not pass in any post to the html

@@ -6,8 +6,9 @@ from users.models import CustomUser
 # This allows multiple views to access the same functions
 # and logic easily and allows us to change the logic all in one place.
 
-def has_permission_to_see_post(requesting_user_id, post):
+def has_permission_to_see_post(requesting_user, post):
     hasPermission = False
+    requesting_user_id = requesting_user.id
 
     # ('1', 'me'),
     # This one will always apply, so it does not need an if conditional
@@ -58,8 +59,8 @@ def has_permission_to_see_post(requesting_user_id, post):
                     friends.add(row.friend_a.id)
 
             if requesting_user_id in friends:
-            # print(requesting_user_id, friends)
-            hasPermission = True
+                # print(requesting_user_id, friends)
+                hasPermission = True
 
 
 

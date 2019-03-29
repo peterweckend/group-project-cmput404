@@ -186,6 +186,8 @@ def getPostData(request, pk=None):
     comments_response = []
     queryset = Comment.objects.filter(post=pk).order_by('-datetime')
     comments = CommentSerializer(queryset, many=True).data
+    # get only 5 most recent comments
+    comments = comments[:5]
     
     for comment in comments:
         comments_response.append(getCommentData(request, pk=comment["id"]))
@@ -339,7 +341,7 @@ class PostsViewSet(viewsets.ModelViewSet):
             # check that we're allowed to see the post - for now just check if the posts are public
             # for right now, just return comments from public posts
             # should we check if post visibility is serveronly/private?
-            if requested_post.privacy_setting == "6": 
+            if Services.has_permission_to_see_post(request.user, requested_post): 
                 body = json.loads(request.body)
                 authorID = body["author"]["id"].split("/")[-1]
                 authorUsername = body["author"]["displayName"]
@@ -488,20 +490,25 @@ class AuthorViewSet(viewsets.ModelViewSet):
         uid = str(uid).replace('-','')
         
         # todo: properly escape this using https://docs.djangoproject.com/en/1.9/topics/db/sql/#passing-parameters-into-raw
-        allowed_posts = Post.objects.raw(' \
-        WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
-        (SELECT f2.friend_a_id AS fofid \
-            FROM API_friendship f \
-            JOIN API_friendship f2 ON f.friend_a_id = f2.friend_b_id \
-            WHERE fofid NOT IN (SELECT friend_a_ID FROM API_friendship  \
-            WHERE friend_b_id = %s) AND f.friend_b_id = %s AND fofid != %s) AND privacy_setting = 4 \
-        UNION \
-            SELECT id FROM API_post WHERE (author_id in  \
-            (WITH friends(fid) AS (SELECT friend_b_id FROM API_friendship WHERE friend_a_id=%s) \
-            SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
-            AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
-            SELECT * FROM API_post WHERE id in posts \
-            ORDER BY published DESC' , [str(uid)]*6)
+        # allowed_posts = Post.objects.raw(' \
+        # WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
+        # (SELECT f2.friend_a_id AS fofid \
+        #     FROM API_friendship f \
+        #     JOIN API_friendship f2 ON f.friend_a_id = f2.friend_b_id \
+        #     WHERE fofid NOT IN (SELECT friend_a_ID FROM API_friendship  \
+        #     WHERE friend_b_id = %s) AND f.friend_b_id = %s AND fofid != %s) AND privacy_setting = 4 \
+        # UNION \
+        #     SELECT id FROM API_post WHERE (author_id in  \
+        #     (WITH friends(fid) AS (SELECT friend_b_id FROM API_friendship WHERE friend_a_id=%s) \
+        #     SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
+        #     AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
+        #     SELECT * FROM API_post WHERE id in posts \
+        #     ORDER BY published DESC' , [str(uid)]*6)
+        allowed_posts = []
+        allPosts = Post.objects.filter().order_by('-published') # I think this returns them all
+        for post in allPosts:
+            if Services.has_permission_to_see_post(request.user, post):
+                allowed_posts.append(post)
 
         paginator = PostsPagination()
         paginated_posts = paginator.paginate_queryset(allowed_posts, request)
@@ -535,26 +542,36 @@ class AuthorViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=True, url_path="posts")
     def userPosts(self, request, pk=None):
         author_id = self.kwargs['pk']
-        author_id = str(author_id).replace('-','')
+        author_id = str(author_id)
         uname = request.user
         uid = uname.id
-        uid = str(uid).replace('-','')
+        uid = str(uid)
+        requester = request.user
+        
+        # allowed_posts = Post.objects.raw(' \
+        # WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
+        # (SELECT f2.friend_a_id AS fofid \
+        #     FROM API_friendship f \
+        #     JOIN API_friendship f2 ON f.friend_a_id = f2.friend_b_id \
+        #     WHERE fofid NOT IN (SELECT friend_a_ID FROM API_friendship  \
+        #     WHERE friend_b_id = %s) AND f.friend_b_id = %s AND fofid != %s) AND privacy_setting = 4 \
+        # UNION \
+        #     SELECT id FROM API_post WHERE (author_id in  \
+        #     (WITH friends(fid) AS (SELECT friend_b_id FROM API_friendship WHERE friend_a_id=%s) \
+        #     SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
+        #     AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
+        #     SELECT * FROM API_post WHERE id in posts \
+        #     AND author_id = %s \
+        #     ORDER BY published DESC', [str(uid)]*6 + [author_id])
 
-        allowed_posts = Post.objects.raw(' \
-        WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
-        (SELECT f2.friend_a_id AS fofid \
-            FROM API_friendship f \
-            JOIN API_friendship f2 ON f.friend_a_id = f2.friend_b_id \
-            WHERE fofid NOT IN (SELECT friend_a_ID FROM API_friendship  \
-            WHERE friend_b_id = %s) AND f.friend_b_id = %s AND fofid != %s) AND privacy_setting = 4 \
-        UNION \
-            SELECT id FROM API_post WHERE (author_id in  \
-            (WITH friends(fid) AS (SELECT friend_b_id FROM API_friendship WHERE friend_a_id=%s) \
-            SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
-            AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
-            SELECT * FROM API_post WHERE id in posts \
-            AND author_id = %s \
-            ORDER BY published DESC', [str(uid)]*6 + [author_id])
+        # Instead of this big boy query, just query for all our posts
+        # Then for each post, check to see if the user has permission
+        allowed_posts = []
+        allPosts = Post.objects.filter(author=author_id).order_by('-published') # I think this returns them all
+        for post in allPosts:
+            if Services.has_permission_to_see_post(requester, post):
+                allowed_posts.append(post)
+
 
         paginator = PostsPagination()
         paginated_posts = paginator.paginate_queryset(allowed_posts, request)
@@ -694,7 +711,3 @@ def friendsHelperFunction(request, pk=None, author_id2=None):
         return True
 
     return False
-
-
-
-    
