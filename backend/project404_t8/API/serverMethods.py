@@ -10,7 +10,7 @@ import json
 # X-User: http://service/author/:uuid
 # this should be included in the headers of 
 # any requests that involve checking permissions
-LOCAL_USERNAME = 'local'
+LOCAL_USERNAME = 'local' #todo: put this in its own constants file
 def get_custom_header_for_user(user_id):
     try:
         queryset = Server.objects.filter(username=LOCAL_USERNAME)
@@ -45,7 +45,7 @@ def get_our_server():
         return None
 
 def get_remote_author(remote_server, remote_author_id):
-    request_url = remote_server.host + "author/" + str(remote_author_id)
+    request_url = remote_server.host + "/author/" + str(remote_author_id)
     # print("here",65)
 
     r = requests.get(request_url)
@@ -152,7 +152,11 @@ def get_remote_posts_for_feed(current_user_id):
     try:
         queryset = Server.objects.all()
         for remote_server in queryset:
-            request_url = remote_server.host + "author/posts"
+            if remote_server.username == LOCAL_USERNAME:
+                continue
+
+            print("inside remote")
+            request_url = remote_server.host + "/author/posts"
             print("here,150")
             try:
                 header = get_custom_header_for_user(current_user_id)
@@ -205,7 +209,7 @@ def get_remote_posts_for_feed(current_user_id):
             
     except:
         # No external servers or posts found
-        print("No posts or servers were found")
+        print("No posts or no servers were found")
     return remote_posts
 
 

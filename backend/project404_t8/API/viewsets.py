@@ -217,7 +217,7 @@ def homeListView(request):
         uname = request.user
         uid = uname.id
         # uid = str(uid).replace('-','')
-        postRemote = get_remote_posts_for_feed(request.user.id)
+        get_remote_posts_for_feed(request.user.id)
         # todo: properly escape this using https://docs.djangoproject.com/en/1.9/topics/db/sql/#passing-parameters-into-raw
         # post = Post.objects.raw(' \
         # WITH posts AS (SELECT id FROM API_post WHERE author_id in  \

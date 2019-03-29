@@ -40,6 +40,7 @@ import dateutil.parser as parser
 # extra is a boolean that returns list of friends as well as github,bio,etc.
 # pk is the authors ID
 # in theory, githubRequired shouldn't be true if extra is true
+LOCAL_USERNAME = 'local' #todo: put this in its own constants file
 def getAuthorData(request, extra=False, pk=None, githubRequired=False):
     
     # Modify the requests path
@@ -49,12 +50,12 @@ def getAuthorData(request, extra=False, pk=None, githubRequired=False):
     user = get_object_or_404(queryset, pk=pk)
     response = {}
 
-    response["id"] = "http://" + request.get_host() + request_path
+    response["id"] = "https://" + request.get_host() + request_path
     # todo: look up the user, find what host they belong to, and return that value
     # instead of using request.get_host() here
-    response["host"] = "http://" + request.get_host() + "/"
+    response["host"] = "https://" + request.get_host() + "/"
     response["displayName"] = user.displayname
-    response["url"] = "http://" + request.get_host() + request_path
+    response["url"] = "https://" + request.get_host() + request_path
     if githubRequired:
         response["github"] = user.github_url
 
@@ -140,7 +141,12 @@ def getPostData(request, pk=None):
 
     # origin
     # just the path of the post
-    origin = str(post["original_host"]) + "/posts/" + str(post["id"])
+    if Services.isNotBlank(post["original_host"]):
+        origin = str(post["original_host"]) + "/posts/" + str(post["id"])
+    else:
+        queryset = Server.objects.filter(username=LOCAL_USERNAME)
+        server = ServerSerializer(queryset, many=True).data[0]
+        origin = server["host"] + "/posts/" + str(post["id"])
     currentPost.update({"origin":origin})
 
     # description
