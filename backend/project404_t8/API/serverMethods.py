@@ -48,7 +48,7 @@ def get_remote_author(remote_server, remote_author_id):
     request_url = remote_server.host + "/author/" + str(remote_author_id)
     # print("here",65)
 
-    r = requests.get(request_url)
+    r = requests.get(request_url, auth=(remote_server.username, remote_server.password))
     # print("r",39)
     if r.status_code == 200:
         # print("hi")
