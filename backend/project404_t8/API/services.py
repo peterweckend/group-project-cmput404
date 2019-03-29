@@ -48,7 +48,7 @@ def has_permission_to_see_post(requesting_user, post):
         # This is brutal enough to do in SQLite, how tf do we do it in Django???
         # Can just bruteforce it I guess lol, for each user in authorsfriends
         # query all their friends then add to another set
-        if post.privacy == '4':
+        if post.privacy_setting == '4':
             for friend in friendObj:
                 friends1 = Friendship.objects.filter(friend_a=friend.author.id)
                 friends2 = Friendship.objects.filter(friend_b=friend.author.id)
@@ -121,52 +121,6 @@ def handle_friend_request(receiver_user, follower_user):
 
     updateNotificationsById(receiver_user.id)
     updateNotificationsById(follower_user.id)
-
-# This takes two custom user objects and adds them to the friend or follow table
-def handle_friend_request_with_id(receiver, follower):
-    # Do nothing if a friendship between the two users exists
-    receiver_id = receiver.id
-    follower_id = follower.id
-
-    check1 = Friendship.objects.filter(friend_a=receiver_id, friend_b=follower_id)
-    check2 = Friendship.objects.filter(friend_b=receiver_id, friend_a=follower_id)
-
-    if check1.exists() or check2.exists():
-        # Friendship already exists, so do nothing
-        return
-  
-    # Do nothing if the follow relationship already exists
-    check1 = Follow.objects.filter(receiver=receiver_id, follower=follower_id)
-    if check1.exists():
-        # Follow / friend request already exists, do nothing
-        return
-
-    # If the inverse relationship exists, remove it,
-    # Then add the relationship to friends instead
-    # So first, query for the relationship
-    if Follow.objects.filter(follower=receiver_id, receiver=follower_id).exists():
-        # Delete this entry, then create a friend relationship instead
-        follow = Follow.objects.get(follower=receiver_id, receiver=follower_id)
-        follow.delete()
-        friend = Friendship(friend_a=follower, friend_b=receiver)
-        friend.save()
-
-        # Addition by TOLU
-        # we have to add this because we need the relationship going both ways
-        # for the database SQL queries of friend of friends
-        friend = Friendship(friend_a=receiver, friend_b=follower)
-        friend.save()
-        
-
-    # maybe make sure the user cant send a new friend request after already
-    # being friends
-    else:
-        # Create the entry in follow, essentially sending the friend request
-        follow = Follow(follower=follower, receiver=receiver)
-        follow.save()
-
-    updateNotificationsById(receiver_id)
-    updateNotificationsById(follower_id)
 
 def updateNotificationsById(id):
     user = CustomUser.objects.get(id=id)

@@ -432,11 +432,8 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
             body = json.loads(request.body.decode('utf-8'))
 
             authorId = body["author"]["id"].split("/")[-1]
-            authorUsername = body["author"]["displayName"]
+            authorDisplayName = body["author"]["displayName"]
             friend = body["friend"]["id"].split("/")[-1]
-
-            if str(request.user.id) != str(authorId):
-                return Response(status=400)
 
             # This should be done better, but right now
             # we are gonna get the username using the id
@@ -448,7 +445,7 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
                 author = CustomUser.objects.get(pk=authorId)
             except:
                 # We should save the host they are from probably
-                newAuthor = CustomUser(id=authorId, username=authorUsername, password="thisdoesntmatter", displayname=authorUsername)
+                newAuthor = CustomUser(id=authorId, username=authorDisplayName, password="thisdoesntmatter", displayname=authorDisplayName)
                 newAuthor.save()
                 # Make a temp/foreign author profile
 
@@ -458,7 +455,7 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
             except:
                 return Response(status=200)
 
-            Services.handle_friend_request_with_id(author, friend)
+            Services.handle_friend_request(friend, author)
         # handleFriendRequest
         return Response(status=200)
     
