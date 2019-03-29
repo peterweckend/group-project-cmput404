@@ -10,7 +10,7 @@ import json
 # X-User: http://service/author/:uuid
 # this should be included in the headers of 
 # any requests that involve checking permissions
-LOCAL_USERNAME = 'local'
+LOCAL_USERNAME = 'local' #todo: put this in its own constants file
 def get_custom_header_for_user(user_id):
     try:
         queryset = Server.objects.filter(username=LOCAL_USERNAME)

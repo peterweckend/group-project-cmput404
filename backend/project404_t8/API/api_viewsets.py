@@ -40,6 +40,7 @@ import dateutil.parser as parser
 # extra is a boolean that returns list of friends as well as github,bio,etc.
 # pk is the authors ID
 # in theory, githubRequired shouldn't be true if extra is true
+LOCAL_USERNAME = 'local' #todo: put this in its own constants file
 def getAuthorData(request, extra=False, pk=None, githubRequired=False):
     
     # Modify the requests path
@@ -140,7 +141,12 @@ def getPostData(request, pk=None):
 
     # origin
     # just the path of the post
-    origin = str(post["original_host"]) + "/posts/" + str(post["id"])
+    if Services.isNotBlank(post["original_host"]):
+        origin = str(post["original_host"]) + "/posts/" + str(post["id"])
+    else:
+        queryset = Server.objects.filter(username=LOCAL_USERNAME)
+        server = ServerSerializer(queryset, many=True).data[0]
+        origin = server["host"] + "/posts/" + str(post["id"])
     currentPost.update({"origin":origin})
 
     # description
