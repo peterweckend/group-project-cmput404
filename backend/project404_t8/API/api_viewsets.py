@@ -397,7 +397,7 @@ class PostsViewSet(viewsets.ModelViewSet):
                     author = CustomUser(id=authorID, username=authorID, password="fixme", displayname = authorUsername)
                 author.save()
 
-                print(post.id)
+#                 print(post.id)
                 newComment = Comment(id=commentID, author=author, post=post, datetime=postTime, body=comment)
                 newComment.save()
                 response = {
