@@ -21,7 +21,7 @@ import API.services as Services
 from rest_framework.exceptions import APIException, MethodNotAllowed, NotFound, PermissionDenied
 from markdownx.utils import markdownify
 from .api_viewsets import PostsViewSet, AuthorViewSet, FriendRequestViewSet
-from .serverMethods import befriend_remote_author, get_remote_posts_for_feed,get_user
+from .serverMethods import befriend_remote_author_by_id, get_remote_posts_for_feed, get_user
 
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
 # Django REST API Tutorial: Filtering System - https://youtu.be/s9V9F9Jtj7Q
@@ -134,24 +134,26 @@ def friendRequestView(request):
             #     friend = Friendship(friend_a=request.user, friend_b=newUser)
             #     friend.save()
 
-            receiver_username = form.cleaned_data["friendToAdd"]
-            receiver_username = CustomUser.objects.get(username=receiver_username)
-            follower_username = request.user
+            # receiver_data is either a username or an id
+            receiver_data = form.cleaned_data["friendToAdd"]
+            follower = request.user
 
-            if receiver_username == follower_username:
+            # if receiver_data is a username, check its not the same as the follower's username
+            if receiver_data == follower.username:
                 # just return a redirect for now
                 return HttpResponseRedirect('/')
 
-            # not yet functionality to prevent multiple requests in a row
+            # TODO: functionality to prevent multiple requests in a row
 
             is_remote_author = form.cleaned_data["isRemoteAuthor"]
             if is_remote_author:
                 print("*** IS REMOTE AUTHOR")
-                result = befriend_remote_author(receiver_username, follower_username)
+                result = befriend_remote_author_by_id(receiver_data, follower.id)
                 print("RESULT OF THE BEFRIENDING:", result)
             else:
                 print("*** IS LOCAL AUTHOR")
-                Services.handle_friend_request(receiver_username, request.user.id)
+                receiver = CustomUser.objects.get(username=receiver_data)
+                Services.handle_friend_request(receiver, follower)
 
             # redirect to a new URL: homepage
             return HttpResponseRedirect('/')

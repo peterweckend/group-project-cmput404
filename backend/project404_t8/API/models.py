@@ -11,6 +11,7 @@ import random
 # import factory.django
 from users.models import CustomUser
 from datetime import datetime
+import django
 
 # @receiver(post_save, sender=User)
 # def create_author_profile(sender, instance, created, **kwargs):
@@ -47,7 +48,7 @@ class Post(models.Model):
     # If true, post can be in markdown
     is_markdown = models.BooleanField(default=False)
     is_unlisted = models.BooleanField(default=False)
-    published = DateTimeField(auto_now_add=True)
+    published = DateTimeField(default=django.utils.timezone.now)
 
     # if this post came from another server, store the original host here
     original_host = models.TextField()

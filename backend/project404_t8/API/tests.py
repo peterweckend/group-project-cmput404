@@ -13,65 +13,70 @@ import API.services as Services
 class PrivacyTestCase(TestCase):
 
     def setUp(self):
-        self.author = UserModels.CustomUser.objects.create(id=100, username='user1')
-        self.someUser = UserModels.CustomUser.objects.create(id=101, username='user2')
-        self.strangerUser = UserModels.CustomUser.objects.create(id=102, username='user3')
+        self.author = UserModels.CustomUser.objects.create(id="8c4f71d9-fcc5-48b0-8092-9b775969bc9c", username='user1')
+        self.someUser = UserModels.CustomUser.objects.create(id="8c4f71d9-fcc5-48b0-8092-9b775969bc9d", username='user2')
+        self.strangerUser = UserModels.CustomUser.objects.create(id="8c4f71d9-fcc5-48b0-8092-9b775969bc9e", username='user3')
         self.friendship = Friendship.objects.create(friend_a=self.author, friend_b=self.someUser)
-        Post.objects.create(id=1001, title="this is a post", body="hello", author=self.author, privacy_setting="1")
-        Post.objects.create(id=1002, title="this is a post", body="hello", author=self.author, privacy_setting="2", shared_author=self.someUser)
-        Post.objects.create(id=1003, title="this is a post", body="hello", author=self.author, privacy_setting="3")
-        Post.objects.create(id=1006, title="this is a post", body="hello", author=self.author, privacy_setting="6")
+        Post.objects.create(id="9c4f71d9-fcc5-48b0-8092-9b775969bc9c", title="this is a post", body="hello", author=self.author, privacy_setting="1")
+        Post.objects.create(id="9c4f71d9-fcc5-48b0-8092-9b775969bc9d", title="this is a post", body="hello", author=self.author, privacy_setting="2", shared_author=self.someUser)
+        Post.objects.create(id="9c4f71d9-fcc5-48b0-8092-9b775969bc9e", title="this is a post", body="hello", author=self.author, privacy_setting="3")
+        Post.objects.create(id="9c4f71d9-fcc5-48b0-8092-9b775969bc9f", title="this is a post", body="hello", author=self.author, privacy_setting="6")
 
         # use this to create HTTP Requests
         self.factory = RequestFactory()
 
     def test_user_can_see_their_own_posts(self):
         """Users can see their own posts"""
-        myPost = Post.objects.get(id=1001)
+        author = UserModels.CustomUser.objects.get(id="8c4f71d9-fcc5-48b0-8092-9b775969bc9c")
+        myPost = Post.objects.get(id="9c4f71d9-fcc5-48b0-8092-9b775969bc9c")
 
-        hasPermission = Services.has_permission_to_see_post(100, myPost)
+        hasPermission = Services.has_permission_to_see_post(author, myPost)
         self.assertEqual(True, hasPermission)
 
     def test_user_can_see_another_author_posts_when_allowed(self):
         """Authorized users can see the post when the post privacy is set to Another Author"""
-        myPost = Post.objects.get(id=1002)
-
-        hasPermission = Services.has_permission_to_see_post(101, myPost)
+        someUser = UserModels.CustomUser.objects.get(id="8c4f71d9-fcc5-48b0-8092-9b775969bc9d")
+        myPost = Post.objects.get(id="9c4f71d9-fcc5-48b0-8092-9b775969bc9d")
+        hasPermission = Services.has_permission_to_see_post(someUser, myPost)
         self.assertEqual(True, hasPermission)
 
     def test_user_cannot_see_another_author_posts_when_not_allowed(self):
         """Users cannot see Another Author posts if they aren't authorized"""
-        myPost = Post.objects.get(id=1002)
-        hasPermission = Services.has_permission_to_see_post(102, myPost)
+        strangerUser = UserModels.CustomUser.objects.get(id="8c4f71d9-fcc5-48b0-8092-9b775969bc9e")
+        myPost = Post.objects.get(id="9c4f71d9-fcc5-48b0-8092-9b775969bc9d")
+        hasPermission = Services.has_permission_to_see_post(strangerUser, myPost)
         self.assertEqual(False, hasPermission)
 
     def test_user_can_see_their_friends_posts_when_allowed(self):
         """Users can see their friends' posts when the posts are set to My Friends"""
-        myPost = Post.objects.get(id=1003)
-        hasPermission = Services.has_permission_to_see_post(101, myPost)
+        someUser = UserModels.CustomUser.objects.get(id="8c4f71d9-fcc5-48b0-8092-9b775969bc9d")
+        myPost = Post.objects.get(id="9c4f71d9-fcc5-48b0-8092-9b775969bc9e")
+        hasPermission = Services.has_permission_to_see_post(someUser, myPost)
         self.assertEqual(True, hasPermission)
 
     def test_user_cannot_see_friends_posts_of_non_friends(self):
         """Users can't see My Friends posts when they aren't friends"""
-        myPost = Post.objects.get(id=1003)
-        hasPermission = Services.has_permission_to_see_post(102, myPost)
+        strangerUser = UserModels.CustomUser.objects.get(id="8c4f71d9-fcc5-48b0-8092-9b775969bc9e")
+        myPost = Post.objects.get(id="9c4f71d9-fcc5-48b0-8092-9b775969bc9e")
+        hasPermission = Services.has_permission_to_see_post(strangerUser, myPost)
         self.assertEqual(False, hasPermission)
 
-    # friends of friends isn't implemented
+    # # friends of friends isn't implemented
 
-    # friends of host isn't implemented
+    # # friends of host isn't implemented
 
     def test_user_can_see_public_posts(self):
         """Users can see public posts"""
-        myPost = Post.objects.get(id=1006)
-        hasPermission = Services.has_permission_to_see_post(102, myPost)
+        strangerUser = UserModels.CustomUser.objects.get(id="8c4f71d9-fcc5-48b0-8092-9b775969bc9e")
+        myPost = Post.objects.get(id="9c4f71d9-fcc5-48b0-8092-9b775969bc9f")
+        hasPermission = Services.has_permission_to_see_post(strangerUser, myPost)
         self.assertEqual(True, hasPermission)
 
 class FriendFollowerTestCase(TestCase):
 
     def setUp(self):
-        self.userA = UserModels.CustomUser.objects.create(id=200, username='user10')
-        self.userB = UserModels.CustomUser.objects.create(id=201, username='user11')
+        self.userA = UserModels.CustomUser.objects.create(id="9c4f71d9-fcc5-48b0-8092-9b775969bc9c", username='user10')
+        self.userB = UserModels.CustomUser.objects.create(id="9c4f71d9-fcc5-48b0-8092-9b775969bc9d", username='user11')
 
     def test_adding_new_friend(self):
         """Check that after adding a friend, the user is following that friend"""
