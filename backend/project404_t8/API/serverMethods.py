@@ -160,7 +160,7 @@ def get_remote_posts_for_feed(current_user_id):
                 header = get_custom_header_for_user(current_user_id)
             except Exception as e:
                 print(e,52)
-            r = requests.get(request_url, headers=header)
+            r = requests.get(request_url, auth=(remote_server.username, remote_server.password), headers=header)
 
             print("\nRequesting:", request_url,"Status code:", r.status_code,"\n")
 
