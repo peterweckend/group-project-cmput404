@@ -349,8 +349,8 @@ class PostsViewSet(viewsets.ModelViewSet):
             # should we check if post visibility is serveronly/private?
             if Services.has_permission_to_see_post(request.user, requested_post): 
                 body = json.loads(request.body)
-                authorID = body["author"]["id"].split("/")[-1]
-                authorUsername = body["author"]["displayName"]
+                authorID = body["comment"]["author"]["id"].split("/")[-1]
+                authorUsername = body["comment"]["author"]["displayName"]
                 commentID = body["id"]
                 comment = body["comment"]
                 postTime = body["published"]
