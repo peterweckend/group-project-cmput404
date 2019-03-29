@@ -18,7 +18,7 @@
               <span class="ptitle">{{p.title}}</span>
             </div>
             <div class="col s4">
-              <div class="puser"><a href="{% url 'profile' username=p.author %}">{{p.author}}</a>
+              <div class="puser"><a href="{% url 'profile' username=p.author %}">{{p.author.displayname}}</a>
               <div class="timePub">{{p.published|timezone:"America/Edmonton"}}</div> </div>
             </div>
             {% if user.id == p.author_id %}
