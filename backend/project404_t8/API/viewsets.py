@@ -95,7 +95,7 @@ def postView(request, id):
     # Perform privacy calculations
     # Has permission will be passed in
     # If its False we could either display a 404 or a "you do not have permission"
-    hasPermission = Services.has_permission_to_see_post(request.user, post)
+    hasPermission = Services.has_permission_to_see_post(request.user.id, post)
 
     if post.is_markdown:
         post.body = markdownify(post.body)
@@ -177,7 +177,7 @@ def profileView(request, username):
         profile_posts = []
         for post in profile_posts_all:
             print("in post for loop")
-            if Services.has_permission_to_see_post(request.user, post):
+            if Services.has_permission_to_see_post(request.user.id, post):
                 print("has permission")
                 profile_posts.append(post)
     
@@ -239,7 +239,7 @@ def homeListView(request):
         viewable_posts = []
         all_posts = Post.objects.filter().order_by('published')
         for post in all_posts:
-            if Services.has_permission_to_see_post(uname, post):
+            if Services.has_permission_to_see_post(uid, post):
                 viewable_posts.append(post)
         
     except:

@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import UserSerializer, PostSerializer, CommentSerializer, FriendshipSerializer, FollowSerializer, ServerSerializer, PostCategorySerializer, PostAuthorizedAuthorSerializer
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.models import AnonymousUser
 from django.views import generic
 from .forms import uploadForm, friendRequestForm, EditProfileForm, commentForm
 from django.conf import settings
@@ -217,7 +218,27 @@ def getPostData(request, pk=None):
     
     return currentPost
 
-
+# returns the X-User header's author ID if present
+# otherwise returns the authenticated user
+# otherwise returns None
+def getAuthorIdForApiRequest(request):
+    # check if X-User header exists
+    if 'HTTP_X_USER' in request.META:
+        author_url = request.META['HTTP_X_USER']
+        author_split = author_url.split("/author/")
+        if len(author_split) == 2:
+            return author_split[1]
+        else:
+            return None
+    # check if auth information sent in
+    elif not isinstance(request.user, AnonymousUser):
+        try:
+            author = CustomUser.objects.get(username=request.user)
+            return author.id
+        except:
+            return None
+    else:
+        return None
 
 
 ############ API Methods
@@ -235,7 +256,6 @@ class PostsViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.filter()
     pagination_class = PostsPagination
     serializer_class = PostSerializer
-
     # Instantiates and returns the list of permissions that this view requires.
     # This is useful if you only want some Posts URLs to require authentication but not others
     # def get_permissions(self):
@@ -347,7 +367,11 @@ class PostsViewSet(viewsets.ModelViewSet):
             # check that we're allowed to see the post - for now just check if the posts are public
             # for right now, just return comments from public posts
             # should we check if post visibility is serveronly/private?
-            if Services.has_permission_to_see_post(request.user, requested_post): 
+            request_user_id = getAuthorIdForApiRequest(request)
+            if request_user_id = None:
+                raise ParseError("No correct X-User header or authentication were provided.")
+
+            if Services.has_permission_to_see_post(request_user_id, requested_post): 
                 body = json.loads(request.body)
                 authorID = body["comment"]["author"]["id"].split("/")[-1]
                 authorUsername = body["comment"]["author"]["displayName"]
@@ -392,7 +416,11 @@ class PostsViewSet(viewsets.ModelViewSet):
             # for right now, just return comments from public posts
             paginator = PostsPagination()
             # if requested_post.privacy_setting == "6": 
-            if Services.has_permission_to_see_post(request.user, requested_post): 
+            request_user_id = getAuthorIdForApiRequest(request)
+            if request_user_id = None:
+                raise ParseError("No correct X-User header or authentication were provided.")
+                
+            if Services.has_permission_to_see_post(request_user_id, requested_post): 
                 queryset = Comment.objects.filter(post=pk).order_by('-datetime')
                 comments = CommentSerializer(queryset, many=True).data
                 comments_response = []
@@ -467,7 +495,7 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
     
 
 class AuthorViewSet(viewsets.ModelViewSet):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     queryset = CustomUser.objects.filter()
     pagination_class = PostsPagination
     serializer_class = UserSerializer
@@ -489,8 +517,11 @@ class AuthorViewSet(viewsets.ModelViewSet):
     # http://service/author/posts (posts that are visible to the currently authenticated user)
     @action(methods=['get'], detail=False)
     def posts(self, request, pk=None):
-        uname = request.user
-        uid = uname.id
+        # uname = request.user
+        # uid = uname.id
+        uid = getAuthorIdForApiRequest(request)
+        if uid = None:
+            raise ParseError("No correct X-User header or authentication were provided.")
         uid = str(uid).replace('-','')
         
         # todo: properly escape this using https://docs.djangoproject.com/en/1.9/topics/db/sql/#passing-parameters-into-raw
@@ -510,8 +541,13 @@ class AuthorViewSet(viewsets.ModelViewSet):
         #     ORDER BY published DESC' , [str(uid)]*6)
         allowed_posts = []
         allPosts = Post.objects.filter().order_by('-published') # I think this returns them all
+
+        request_user_id = getAuthorIdForApiRequest(request)
+        if request_user_id = None:
+            raise ParseError("No correct X-User header or authentication were provided.")
+
         for post in allPosts:
-            if Services.has_permission_to_see_post(request.user, post):
+            if Services.has_permission_to_see_post(request_user_id, post):
                 allowed_posts.append(post)
 
         paginator = PostsPagination()
@@ -547,10 +583,12 @@ class AuthorViewSet(viewsets.ModelViewSet):
     def userPosts(self, request, pk=None):
         author_id = self.kwargs['pk']
         author_id = str(author_id)
-        uname = request.user
-        uid = uname.id
+        # uname = request.user
+        # uid = uname.id
+        uid = getAuthorIdForApiRequest(request)
+        if uid = None:
+            raise ParseError("No correct X-User header or authentication were provided.")
         uid = str(uid)
-        requester = request.user
         
         # allowed_posts = Post.objects.raw(' \
         # WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
@@ -573,7 +611,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
         allowed_posts = []
         allPosts = Post.objects.filter(author=author_id).order_by('-published') # I think this returns them all
         for post in allPosts:
-            if Services.has_permission_to_see_post(requester, post):
+            if Services.has_permission_to_see_post(uid, post):
                 allowed_posts.append(post)
 
 
