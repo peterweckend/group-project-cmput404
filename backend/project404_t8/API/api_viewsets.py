@@ -385,7 +385,8 @@ class PostsViewSet(viewsets.ModelViewSet):
             # check that we're allowed to see the post - for now just check if the posts are public
             # for right now, just return comments from public posts
             paginator = PostsPagination()
-            if requested_post.privacy_setting == "6": 
+            # if requested_post.privacy_setting == "6": 
+            if Services.has_permission_to_see_post(request.user, requested_post): 
                 queryset = Comment.objects.filter(post=pk).order_by('-datetime')
                 comments = CommentSerializer(queryset, many=True).data
                 comments_response = []
