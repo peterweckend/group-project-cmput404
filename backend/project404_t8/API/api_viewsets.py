@@ -312,17 +312,15 @@ class PostsViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, pk=None):
         # permission_classes = (IsAuthenticated,)
         queryset = Post.objects.filter(pk=pk)
-        serializer_class = PostSerializer(queryset, many=True)
-        print(queryset)
+        # serializer_class = PostSerializer(queryset, many=True)
         post = getPostData(request, pk=pk)
-        # response = OrderedDict()
-        # response.update({"query":"getPost"})
-        # response.update({"postID":})
-        # response.update({"url": })
-        # response.update({"previous": None})
+        response = OrderedDict()
+        response.update({"query":"getPost"})
+        response.update({"post":post})
+        
 
         # return Response(serializer_class.data)
-        return Response(post)
+        return Response(response)
     
     # the API endpoint accessible at GET http://service/posts/{post_id}/comments
     @action(methods=['get','post'], detail=True, url_path="comments")
