@@ -363,6 +363,7 @@ class PostsViewSet(viewsets.ModelViewSet):
                     'message':"Comment not allowed"
             }
             return Response(response, status=403)
+
         if request.method == "POST":
             # check that we're allowed to see the post - for now just check if the posts are public
             # for right now, just return comments from public posts
@@ -372,12 +373,12 @@ class PostsViewSet(viewsets.ModelViewSet):
                 raise ParseError("No correct X-User header or authentication were provided.")
 
             if Services.has_permission_to_see_post(request_user_id, requested_post): 
-                body = json.loads(request.body)
+                body = json.loads(request.body.decode('utf-8'))
                 authorID = body["comment"]["author"]["id"].split("/")[-1]
                 authorUsername = body["comment"]["author"]["displayName"]
-                commentID = body["id"]
-                comment = body["comment"]
-                postTime = body["published"]
+                commentID = body["comment"]["id"]
+                comment = body["comment"]["comment"]
+                postTime = body["comment"]["published"]
                 post = Post.objects.get(pk=post_id)
 
                 # swapped to UUID so this shouldn't be an issue 
@@ -393,8 +394,10 @@ class PostsViewSet(viewsets.ModelViewSet):
                 try:
                     author = CustomUser.objects.get(pk=authorID)
                 except:
-                    author = CustomUser(id=authorID, username=authorID, password="fixme", displayName = authorUsername)
-                    
+                    author = CustomUser(id=authorID, username=authorID, password="fixme", displayname = authorUsername)
+                author.save()
+
+#                 print(post.id)
                 newComment = Comment(id=commentID, author=author, post=post, datetime=postTime, body=comment)
                 newComment.save()
                 response = {
