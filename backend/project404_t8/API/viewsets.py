@@ -216,46 +216,24 @@ def homeListView(request):
     try:
         uname = request.user
         uid = uname.id
-        # uid = str(uid).replace('-','')
         foreignPosts = get_remote_posts_for_feed(request.user.id)
-        # For each post in the feed, get the comments
-        # for postt in foreignPosts:
-        #     print(postt.id)
-        #     print(len(foreignPosts))
-        #     get_remote_comments_by_post_id(postt.id, request.id)
 
-        # todo: properly escape this using https://docs.djangoproject.com/en/1.9/topics/db/sql/#passing-parameters-into-raw
-        # post = Post.objects.raw(' \
-        # WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
-        # (SELECT f2.friend_a_id AS fofid \
-        #     FROM API_friendship f \
-        #     JOIN API_friendship f2 ON f.friend_a_id = f2.friend_b_id \
-        #     WHERE fofid NOT IN (SELECT friend_a_ID FROM API_friendship  \
-        #     WHERE friend_b_id = %s) AND f.friend_b_id = %s AND fofid != %s) AND privacy_setting = 4 \
-        # UNION \
-        #     SELECT id FROM API_post WHERE (author_id in  \
-        #     (WITH friends(fid) AS (SELECT friend_b_id FROM API_friendship WHERE friend_a_id=%s) \
-        #     SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
-        #     AND (privacy_setting = 3 OR privacy_setting = 4 OR (privacy_setting = 5 AND original_host = \
-        #     (select host from users_customuser where id = %s)))) OR author_id = %s OR  privacy_setting = 6) \
-        #     SELECT * FROM API_post WHERE id in posts \
-        #     AND (is_unlisted = 0 OR (is_unlisted = 1 AND author_id = %s)) \
-        #     ORDER BY published ASC', [uid]*8)
-        # print(request.user.id,234)
-        viewable_posts = []
-        all_posts = Post.objects.filter().order_by('published')
-        for post in all_posts:
-            if Services.has_permission_to_see_post(uid, post):
-                viewable_posts.append(post)
-        
+        # ------------- set queries by Tolu ----------------------
+        userUser = CustomUser.objects.filter(username=uname)[0].id
+        hostHost = CustomUser.objects.filter(username=uname)[0].host
+        option1 = Post.objects.filter(author=userUser)
+        friendZone = Friendship.objects.filter(friend_a=userUser).values_list('friend_b', flat=True)
+        fofriendZone = Friendship.objects.filter(friend_a__in=friendZone).values_list('friend_b', flat=True)
+        option3 = Post.objects.filter(Q(author__in=friendZone) & Q(privacy_setting=3) | Q(author__in=friendZone) & Q(privacy_setting=4))
+        option4 = Post.objects.filter(Q(author__in=fofriendZone) & Q(privacy_setting=4))
+        option5 = Post.objects.filter(Q(author__in=friendZone) & Q(privacy_setting=5) &Q(original_host=hostHost))
+        option6 = Post.objects.filter(Q(privacy_setting=6))
+        unlistedPosts = Post.objects.filter(Q(is_unlisted=True) & ~Q(author=userUser))
+        allPosts = option1.union(option3,option4,option5,option6)
+        viewable_posts = allPosts.difference(unlistedPosts)
     except:
-        # post = Post.objects.all()
         pass
-    #     # Do not display an image if the image does not exist
-    # imageExists = False
-    # if post.image_link != "":
-    #     imageExists = True
-
+    
     # get the user and friends and pass it to homepage
     # user = CustomUser.objects.get(username=request.user)
     friend = Friendship.objects.all()
