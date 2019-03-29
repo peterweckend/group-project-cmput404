@@ -97,7 +97,7 @@ def get_user(remote_author_id):
 
 # we send friend request to a remote server
 # returns False if the operation fails
-def befriend_remote_author(remote_author_id, local_author_id):
+def befriend_remote_author_by_id(remote_author_id, local_author_id):
 
     local_author, _ = get_user(local_author_id)
     if local_author == None:
@@ -112,7 +112,7 @@ def befriend_remote_author(remote_author_id, local_author_id):
     if remote_author == None:
         return False
     if author_is_local:
-        Services.handle_friend_request(remote_author.username, local_author.username)
+        Services.handle_friend_request(remote_author, local_author)
         return True
     friend = {}
     friend["id"] = local_author.id
