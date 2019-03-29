@@ -9,12 +9,12 @@ from users.models import CustomUser
 def has_permission_to_see_post(requesting_user_id, post):
     hasPermission = False
     # requesting_user_id = requesting_user.id
-    
+
     # do we need to replace the '-'s in requesting_user_id? probably not but maybe?
 
     # ('1', 'me'),
     # This one will always apply, so it does not need an if conditional
-    if requesting_user_id == post.author.id:
+    if str(requesting_user_id) == str(post.author.id):
         hasPermission = True
 
     # ('2', 'another author'),
