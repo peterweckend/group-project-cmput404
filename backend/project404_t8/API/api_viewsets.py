@@ -318,15 +318,15 @@ class PostsViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, pk=None):
         # permission_classes = (IsAuthenticated,)
         queryset = Post.objects.filter(pk=pk)
-        serializer_class = PostSerializer(queryset, many=True)
+        # serializer_class = PostSerializer(queryset, many=True)
+        post = getPostData(request, pk=pk)
+        response = OrderedDict()
+        response.update({"query":"getPost"})
+        response.update({"posts":post})
+        
 
-        # response = OrderedDict()
-        # response.update({"query":"getPost"})
-        # response.update({"postID":})
-        # response.update({"url": })
-        # response.update({"previous": None})
-
-        return Response(serializer_class.data)
+        # return Response(serializer_class.data)
+        return Response(response)
     
     # the API endpoint accessible at GET http://service/posts/{post_id}/comments
     @action(methods=['get','post'], detail=True, url_path="comments")
@@ -349,8 +349,8 @@ class PostsViewSet(viewsets.ModelViewSet):
             # should we check if post visibility is serveronly/private?
             if Services.has_permission_to_see_post(request.user, requested_post): 
                 body = json.loads(request.body)
-                authorID = body["author"]["id"].split("/")[-1]
-                authorUsername = body["author"]["displayName"]
+                authorID = body["comment"]["author"]["id"].split("/")[-1]
+                authorUsername = body["comment"]["author"]["displayName"]
                 commentID = body["id"]
                 comment = body["comment"]
                 postTime = body["published"]
@@ -369,7 +369,7 @@ class PostsViewSet(viewsets.ModelViewSet):
                 try:
                     author = CustomUser.objects.get(pk=authorID)
                 except:
-                    author = CustomUser(id=authorID, username=authorUsername, password="fixme", displayName = authorUsername)
+                    author = CustomUser(id=authorID, username=authorID, password="fixme", displayName = authorUsername)
                     
                 newComment = Comment(id=commentID, author=author, post=post, datetime=postTime, body=comment)
                 newComment.save()
@@ -417,7 +417,7 @@ class PostsViewSet(viewsets.ModelViewSet):
 
                 return Response(response)
             else: 
-                raise PermissionDenied("Forbidden: The post you wished to access comments for is not Public")
+                raise PermissionDenied("Forbidden: You don't have permission to access comments for this post or you provided an invalid user.")
         else: 
             raise MethodNotAllowed(method=request.method)
 
@@ -451,7 +451,7 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
                 author = CustomUser.objects.get(pk=authorId)
             except:
                 # We should save the host they are from probably
-                newAuthor = CustomUser(id=authorId, username=authorDisplayName, password="thisdoesntmatter", displayname=authorDisplayName)
+                newAuthor = CustomUser(id=authorId, username=authorId, password="thisdoesntmatter", displayname=authorDisplayName)
                 newAuthor.save()
                 # Make a temp/foreign author profile
 

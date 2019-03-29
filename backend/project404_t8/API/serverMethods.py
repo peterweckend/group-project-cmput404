@@ -191,7 +191,7 @@ def get_remote_posts_for_feed(current_user_id):
             
                 # print(post["author"],1999)
                 try:
-                    post_author =  CustomUser(timestamp= timezone.now(), id=post["author"]["id"].split("author/")[1], host=remote_server.host, displayname=post["author"]["displayName"], github_url=post["author"]["github"], username = "str"+str(count), password= "12345" )
+                    post_author =  CustomUser(timestamp= timezone.now(), id=post["author"]["id"].split("author/")[1], host=remote_server.host, displayname=post["author"]["displayName"], github_url=post["author"]["github"], username = post["author"]["id"].split("author/")[1], password= "12345" )
                     post_author.save()
                 # print(187)
                 # there are a bunch of fields here that still need to be filled out
