@@ -21,7 +21,7 @@ import API.services as Services
 from rest_framework.exceptions import APIException, MethodNotAllowed, NotFound, PermissionDenied
 from markdownx.utils import markdownify
 from .api_viewsets import PostsViewSet, AuthorViewSet, FriendRequestViewSet
-from .serverMethods import befriend_remote_author_by_id, get_remote_posts_for_feed, get_user
+from .serverMethods import befriend_remote_author_by_id, get_remote_posts_for_feed, get_user, get_remote_comments_by_post_id
 
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
 # Django REST API Tutorial: Filtering System - https://youtu.be/s9V9F9Jtj7Q
@@ -217,7 +217,13 @@ def homeListView(request):
         uname = request.user
         uid = uname.id
         # uid = str(uid).replace('-','')
-        get_remote_posts_for_feed(request.user.id)
+        foreignPosts = get_remote_posts_for_feed(request.user.id)
+        # For each post in the feed, get the comments
+        # for postt in foreignPosts:
+        #     print(postt.id)
+        #     print(len(foreignPosts))
+        #     get_remote_comments_by_post_id(postt.id, request.id)
+
         # todo: properly escape this using https://docs.djangoproject.com/en/1.9/topics/db/sql/#passing-parameters-into-raw
         # post = Post.objects.raw(' \
         # WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
