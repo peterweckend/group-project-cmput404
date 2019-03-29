@@ -1,5 +1,6 @@
 from .models import Post, Comment, Friendship, Follow, Server
 from users.models import CustomUser
+import uuid
 
 # Exists between the data layers and the UI.
 # Holds the logic of the views.
@@ -8,18 +9,25 @@ from users.models import CustomUser
 
 def has_permission_to_see_post(requesting_user_id, post):
     hasPermission = False
-    requesting_user_id = str(requesting_user_id)
+
+    # convert to UUID object
+    if not isinstance(requesting_user_id, uuid.UUID):
+        try:
+            requesting_user_id = uuid.UUID(requesting_user_id)
+        except:
+            print("An error occurred.")
+            return False
 
     # do we need to replace the '-'s in requesting_user_id? probably not but maybe?
 
     # ('1', 'me'),
     # This one will always apply, so it does not need an if conditional
-    if requesting_user_id == str(post.author.id):
+    if requesting_user_id == post.author.id:
         hasPermission = True
 
     # ('2', 'another author'),
     if post.privacy_setting == '2':
-        if requesting_user_id == str(post.author.id) or requesting_user_id == str(post.shared_author.id):
+        if requesting_user_id == post.author.id or requesting_user_id == post.shared_author.id:
             hasPermission = True
 
     # ('3', 'my friends'),
@@ -34,10 +42,10 @@ def has_permission_to_see_post(requesting_user_id, post):
         # Iterate through each queryset, and append the ids of each element to the list
         friendObj = []
         for row in friends1:
-            friends.add(str(row.friend_b.id))
+            friends.add(row.friend_b.id)
             friendObj.append(row)
         for row in friends2:
-            friends.add(str(row.friend_a.id))
+            friends.add(row.friend_a.id)
             friendObj.append(row)
 
         # Friends are the authors friends
@@ -51,13 +59,13 @@ def has_permission_to_see_post(requesting_user_id, post):
         # query all their friends then add to another set
         if post.privacy_setting == '4':
             for friend in friendObj:
-                friends1 = Friendship.objects.filter(friend_a=friend.author.id)
-                friends2 = Friendship.objects.filter(friend_b=friend.author.id)
+                friends1 = Friendship.objects.filter(friend_a=post.author.id)
+                friends2 = Friendship.objects.filter(friend_b=post.author.id)
 
                 for row in friends1:
-                    friends.add(str(row.friend_b.id))
+                    friends.add(row.friend_b.id)
                 for row in friends2:
-                    friends.add(str(row.friend_a.id))
+                    friends.add(row.friend_a.id)
 
             if requesting_user_id in friends:
                 hasPermission = True
