@@ -135,11 +135,10 @@ def friendRequestView(request):
             #     friend = Friendship(friend_a=request.user, friend_b=newUser)
             #     friend.save()
 
-            receiver_username = form.cleaned_data["friendToAdd"]
-            receiver_username = CustomUser.objects.get(username=receiver_username)
+            receiver_data = form.cleaned_data["friendToAdd"]
             follower_username = request.user
 
-            if receiver_username == follower_username:
+            if receiver_data == follower_username:
                 # just return a redirect for now
                 return HttpResponseRedirect('/')
 
@@ -148,10 +147,11 @@ def friendRequestView(request):
             is_remote_author = form.cleaned_data["isRemoteAuthor"]
             if is_remote_author:
                 print("*** IS REMOTE AUTHOR")
-                result = befriend_remote_author(receiver_username, follower_username)
+                result = befriend_remote_author(receiver_data, follower_username)
                 print("RESULT OF THE BEFRIENDING:", result)
             else:
                 print("*** IS LOCAL AUTHOR")
+                receiver_username = CustomUser.objects.get(username=receiver_data)
                 Services.handle_friend_request(receiver_username, request.user.id)
 
             # redirect to a new URL: homepage
