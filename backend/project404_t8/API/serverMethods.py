@@ -211,8 +211,8 @@ def get_remote_posts_for_feed(current_user_id):
 
     # Lets just try to get all the comments in here instead
     # What could go wrong?
-    for post in remote_posts:
-        get_remote_comments_by_post_id(post.id, current_user_id)
+    # for post in remote_posts:
+    #     get_remote_comments_by_post_id(post.id, current_user_id)
 
     return remote_posts
 
@@ -265,6 +265,7 @@ def get_remote_comments_by_post_id(remote_post_id,current_user_id):
     # Ill try to copy the way you guys are doing it
 
     # Do we have to determine if we have permission to see the post?
+    return # return here just in case
     try:
         # Create a list of the connected servers
         queryset = Server.objects.all()
