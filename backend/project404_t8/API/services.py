@@ -8,18 +8,18 @@ from users.models import CustomUser
 
 def has_permission_to_see_post(requesting_user_id, post):
     hasPermission = False
-    # requesting_user_id = requesting_user.id
+    requesting_user_id = str(requesting_user_id)
 
     # do we need to replace the '-'s in requesting_user_id? probably not but maybe?
 
     # ('1', 'me'),
     # This one will always apply, so it does not need an if conditional
-    if str(requesting_user_id) == str(post.author.id):
+    if requesting_user_id == str(post.author.id):
         hasPermission = True
 
     # ('2', 'another author'),
     if post.privacy_setting == '2':
-        if requesting_user_id == post.author or requesting_user_id == post.shared_author.id:
+        if requesting_user_id == str(post.author.id) or requesting_user_id == str(post.shared_author.id):
             hasPermission = True
 
     # ('3', 'my friends'),
@@ -34,16 +34,15 @@ def has_permission_to_see_post(requesting_user_id, post):
         # Iterate through each queryset, and append the ids of each element to the list
         friendObj = []
         for row in friends1:
-            friends.add(row.friend_b.id)
+            friends.add(str(row.friend_b.id))
             friendObj.append(row)
         for row in friends2:
-            friends.add(row.friend_a.id)
+            friends.add(str(row.friend_a.id))
             friendObj.append(row)
 
         # Friends are the authors friends
         # If the requester is in the friends list they can view
         if requesting_user_id in friends:
-            # print(requesting_user_id, friends)
             hasPermission = True
 
         # ('4', 'friends of friends'),
@@ -56,12 +55,11 @@ def has_permission_to_see_post(requesting_user_id, post):
                 friends2 = Friendship.objects.filter(friend_b=friend.author.id)
 
                 for row in friends1:
-                    friends.add(row.friend_b.id)
+                    friends.add(str(row.friend_b.id))
                 for row in friends2:
-                    friends.add(row.friend_a.id)
+                    friends.add(str(row.friend_a.id))
 
             if requesting_user_id in friends:
-                # print(requesting_user_id, friends)
                 hasPermission = True
 
 
