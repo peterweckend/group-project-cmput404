@@ -35,7 +35,7 @@ header {
 }
 .mainlogo {
   margin-left: 2.5%;
-  width: 11%;
+  /* width: 11%; */
   height: 50%;
 }
 header::after {
@@ -75,6 +75,11 @@ nav a::before {
   top: 0;
   width: 0%;
   transition: all ease-in-out 250ms;
+}
+.sidenav-overlay {
+  z-index: 0 !important;
+  /* display: none !important; */
+  background-color: transparent;
 }
 /* ---------- PAGE OUTLINE ---------- */
 .leftcolumn {   

@@ -16,6 +16,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   <script>
     $(document).ready(function() {
+      $('.sidenav').sidenav();
       $('select').formSelect();
       $(".dropdown-trigger").dropdown();
       $('.materialboxed').materialbox();
@@ -25,32 +26,52 @@
 </head>
 <header class="z-depth-1">
     {% if user.is_authenticated %}
-    <ul id="dropdown1" class="dropdown-content">
+      <ul id="dropdown1" class="dropdown-content">
         <li><a href="/upload/">Create a post</a></li>
         <li><a href="{% url 'editprofile' pk=user.pk %}">Edit your profile</a></li>
         <li><a href="/addFriend/">Friend request</a></li>
         <li><a href="{% url 'logout' %}">Logout</a></li>
-    </ul>
-    <nav>
-        <div class="nav-wrapper">
-          <a href="/">
-            <img class="mainlogo" src="{% static 'img/connectifylogo.png' %}" alt="logo">
-          </a>
-          <ul id="nav-mobile" class="right hide-on-med-and-down">
-            <li><a href="/">Home</a></li>
-            <!--Display some extra stuff regarding friends if the user has unignored friend requests
-                Would this just be an if/else??? -->
-            {% if user.friend_requests > '0' %}
-              <li><a href="/friends/">My Friends <span class="new badge red">{{user.friend_requests}}</span></a></li>
-              <!-- <span class="new badge red" data-badge-caption="custom caption"></span> -->
-            {% else %}
-              <li><a href="/friends/">My Friends</a></li>
-            {% endif %}
-            <li><a href="{% url 'profile' username=user.username %}">My Profile</a></li>
-            <li><a class="dropdown-trigger" href="" data-target="dropdown1">Actions<i class="material-icons right">arrow_drop_down</i></a></li>
-          </ul>
+      </ul>
+      <div class="navbar-fixed">
+          <nav class="">
+            <div class="nav-wrapper">
+              <a href="/">
+                <img class="mainlogo" src="{% static 'img/connectifylogo.png' %}" alt="logo">
+              </a>
+              <a href="/" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+              <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li><a href="/">Home</a></li>
+                <!--Display some extra stuff regarding friends if the user has unignored friend requests
+                    Would this just be an if/else??? -->
+                {% if user.friend_requests > '0' %}
+                  <li><a href="/friends/">My Friends <span class="new badge red">{{user.friend_requests}}</span></a></li>
+                  <!-- <span class="new badge red" data-badge-caption="custom caption"></span> -->
+                {% else %}
+                  <li><a href="/friends/">My Friends</a></li>
+                {% endif %}
+                <li><a href="{% url 'profile' username=user.username %}">My Profile</a></li>
+                <li><a class="dropdown-trigger" href="" data-target="dropdown1">Actions<i class="material-icons right">arrow_drop_down</i></a></li>
+              </ul>
+            </div>
+          </nav>
         </div>
-      </nav>
+
+      <ul class="sidenav" id="mobile-demo">
+        <li><a href="/">Home</a></li>
+        <!--Display some extra stuff regarding friends if the user has unignored friend requests
+            Would this just be an if/else??? -->
+        {% if user.friend_requests > '0' %}
+          <li><a href="/friends/">My Friends <span class="new badge red">{{user.friend_requests}}</span></a></li>
+          <!-- <span class="new badge red" data-badge-caption="custom caption"></span> -->
+        {% else %}
+          <li><a href="/friends/">My Friends</a></li>
+        {% endif %}
+        <li><a href="{% url 'profile' username=user.username %}">My Profile</a></li>
+        <li><a href="/upload/">Create a post</a></li>
+        <li><a href="{% url 'editprofile' pk=user.pk %}">Edit your profile</a></li>
+        <li><a href="/addFriend/">Friend request</a></li>
+        <li><a href="{% url 'logout' %}">Logout</a></li>
+      </ul>
     {% endif %}
   <!-- </div> -->
 </header>
