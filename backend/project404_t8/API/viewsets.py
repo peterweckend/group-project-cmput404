@@ -230,7 +230,10 @@ def homeListView(request):
         option6 = Post.objects.filter(Q(privacy_setting=6))
         unlistedPosts = Post.objects.filter(Q(is_unlisted=True) & ~Q(author=userUser))
         allPosts = option1.union(option3,option4,option5,option6)
-        viewable_posts = allPosts.difference(unlistedPosts)
+        if unlistedPosts.exists():
+            viewable_posts = allPosts.difference(unlistedPosts).order_by('-published')
+        else:
+            viewable_posts = allPosts.order_by('-published')
     except:
         pass
     
