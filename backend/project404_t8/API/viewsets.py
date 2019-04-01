@@ -148,11 +148,8 @@ def friendRequestView(request):
 
             is_remote_author = form.cleaned_data["isRemoteAuthor"]
             if is_remote_author:
-                print("*** IS REMOTE AUTHOR")
                 result = befriend_remote_author_by_id(receiver_data, follower.id)
-                print("RESULT OF THE BEFRIENDING:", result)
             else:
-                print("*** IS LOCAL AUTHOR")
                 receiver = CustomUser.objects.get(username=receiver_data)
                 Services.handle_friend_request(receiver, follower)
 

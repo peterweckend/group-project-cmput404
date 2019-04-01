@@ -4,20 +4,18 @@ import requests
 import API.services as Services
 from .serializers import UserSerializer, PostSerializer, CommentSerializer, FriendshipSerializer, FollowSerializer, ServerSerializer
 from django.utils import timezone
+import API.constants as constants
 import json
 
 # returns a header object of the format:
 # X-User: http://service/author/:uuid
 # this should be included in the headers of 
 # any requests that involve checking permissions
-LOCAL_USERNAME = 'local' #todo: put this in its own constants file
+
 def get_custom_header_for_user(user_id):
     try:
-        queryset = Server.objects.filter(username=LOCAL_USERNAME)
-        # print(17 )
-        # print(queryset)
+        queryset = Server.objects.filter(username=constants.LOCAL_USERNAME)
         server = ServerSerializer(queryset, many=True).data[0]
-        # print(18)
         header = {'X-User': server["host"] + "/author/" + str(user_id)}
         return header
     except Exception as e:
@@ -38,7 +36,7 @@ def get_our_server():
     try:
         queryset = Server.objects.all()
         for server in queryset:
-            if server.username == LOCAL_USERNAME:
+            if server.username == constants.LOCAL_USERNAME:
                 return server
         return None
     except:
@@ -152,7 +150,7 @@ def get_remote_posts_for_feed(current_user_id):
     try:
         queryset = Server.objects.all()
         for remote_server in queryset:
-            if remote_server.username == LOCAL_USERNAME:
+            if remote_server.username == constants.LOCAL_USERNAME:
                 continue
 
             request_url = remote_server.host + "/author/posts?size=25"

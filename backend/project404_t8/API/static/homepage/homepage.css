@@ -194,6 +194,8 @@ padding-top: 2%;
 }
 .ptitle{
 font-size: 25px;
+font-weight: bold;
+text-decoration: underline;
 color:rgb(43, 43, 43);
 text-align: left;
 
