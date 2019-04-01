@@ -16,7 +16,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   <script>
     $(document).ready(function() {
-      $('.sidenav').sidenav();
+      $('.sidenav').sidenav({
+        edge: 'right'
+      });
       $('select').formSelect();
       $(".dropdown-trigger").dropdown();
       $('.materialboxed').materialbox();
@@ -79,15 +81,6 @@
   <div class="row">
     <!-- -------------------- LEFT COLUMN -------------------- -->
     <div class="leftcolumn">
-      {% if user.is_authenticated %}
-        <p>Coming Soon</p>
-        <h1 class="side-menu-item friends-menu" style= "font-size: 1em"> 
-
-      {% endif %}
-    </div>
-
-    <!-- -------------------- MAIN COLUMN -------------------- -->
-    <div class="midcolumn">
       {% block content %}
       {% endblock %}
     </div>
@@ -97,29 +90,6 @@
       {% if user.is_authenticated %}
         friends is no more here
       {% endif %}
-
-      <!-- <div class="item2">
-        <style type="text/css">
-        @import url("http://www.google.com/uds/solutions/dynamicfeed/gfdynamicfeedcontrol.css");
-
-        #feedControl {
-          margin-top : 10px;
-          margin-left: auto;
-          margin-right: auto;
-          width : 440px;
-          font-size: 12px;
-          color: #9CADD0;
-        }
-        </style>
-          <script type="text/javascript">
-          function load() {
-            var feed ="http://feeds.bbci.co.uk/news/world/rss.xml";
-            new GFdynamicFeedControl(feed, "feedControl");
-          }
-          google.load("feeds", "1");
-          google.setOnLoadCallback(load);
-        </script>
-      </div> -->
     </div>
   </div>
   
