@@ -183,6 +183,13 @@ def profileView(request, username):
     
     return render(request, 'profile/profile.html', {'author':author, "posts":profile_posts})
 
+class PostUpdate(UpdateView):
+    model = Post
+    success_url= reverse_lazy("home")
+    template_name= 'update/update_post.html'
+    form_class = updatePostForm
+
+
 class editProfile(UpdateView):
 
     model = CustomUser
@@ -318,6 +325,7 @@ def homeListView(request):
         pass
 
     return render(request, 'homepage/home.html', pageVariables)
+
 
 
 class PostDelete(DeleteView):

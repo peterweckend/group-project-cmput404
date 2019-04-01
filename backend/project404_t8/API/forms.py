@@ -66,7 +66,9 @@ class acceptIgnoreRequestForm(forms.Form):
     # nvm this might be a stupid idea
     pass
 
-class EditProfileForm(forms.ModelForm):
+    
+
+class updatePostForm(forms.ModelForm):
     displayname = forms.CharField(label='New Display Name', max_length=24, widget=forms.TextInput(
         attrs={
             'class': 'form-control',

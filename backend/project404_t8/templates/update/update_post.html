@@ -1,0 +1,26 @@
+{% extends "base_pages.html" %}
+
+{% block title %}Edit Post{% endblock %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+        {% load static %}
+        <h1 class="title">Edit Post</h1>
+        <br>
+        <!-- check if the logged in username is the same as the profile username -->
+        {% if user.username == profile_author.username %} 
+            <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
+            <form method="POST" action="{% url 'update_post' pk=user.pk %}">
+                {% csrf_token %}
+                {{form.as_p}}
+                <input type="submit" class="save-changes btn btn-primary"  value="Save Changes">
+            </form>
+        {% else %}
+            <h2>You do not have permission to access this page.</h2>
+        {% endif %}
+    {% else %}
+        <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
+        <p>You are not logged in</p>
+        <a href="{% url 'login' %}">login</a>
+    {% endif %}
+{% endblock %}
