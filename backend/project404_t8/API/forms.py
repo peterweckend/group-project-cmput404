@@ -67,14 +67,37 @@ class acceptIgnoreRequestForm(forms.Form):
     pass
 
 class EditProfileForm(forms.ModelForm):
+
     displayname = forms.CharField(label='New Display Name', max_length=24, widget=forms.TextInput(
         attrs={
             'class': 'form-control',
             'placeholder': 'Enter Display Name...'
         }))
+    first_name = forms.CharField(label='New First Name', max_length=24, required=False, widget=forms.TextInput(
+        attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter a First Name...'
+        }))
+
+    last_name = forms.CharField(label='New Last Name', max_length=24, required=False, widget=forms.TextInput(
+        attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter a Last Name...'
+        }))
+
+    github_id = forms.CharField(label='http', max_length=24, required=False, widget=forms.TextInput(
+        attrs={
+            'class': 'form-control',
+            'placeholder': 'Your Github Username'
+        }))
+    github_url = forms.CharField(label='http', required=False, widget=forms.TextInput(
+        attrs={
+            'class': 'form-control',
+            'placeholder': 'https://github.com/yourgithubid'
+        }))
     class Meta:
         model = CustomUser
-        fields = ['displayname']
+        fields = ['displayname', 'first_name', 'last_name', 'github_id','github_url']
         
     def save(self, user=None):
         user_profile = super(EditProfileForm, self).save(commit=False)
