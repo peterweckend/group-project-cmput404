@@ -1,30 +1,35 @@
-from django.shortcuts import render
-from rest_framework import generics,status,viewsets
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.response import Response
-from rest_framework.decorators import action
-from .models import Post, Comment, Friendship, Follow, Server, PostCategory, PostAuthorizedAuthor
-from users.models import CustomUser
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from .serializers import UserSerializer, PostSerializer, CommentSerializer, FriendshipSerializer, FollowSerializer, ServerSerializer, PostCategorySerializer, PostAuthorizedAuthorSerializer
-from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.models import AnonymousUser
-from django.views import generic
-from .forms import uploadForm, friendRequestForm, EditProfileForm, commentForm
-from django.conf import settings
-from users.models import CustomUser
-from random import uniform
 import json
-from django.urls import reverse_lazy
-from django.views.generic.edit import DeleteView, UpdateView
-import API.services as Services
-from rest_framework.exceptions import APIException, MethodNotAllowed, NotFound, PermissionDenied, ParseError
-from markdownx.utils import markdownify
 from collections import OrderedDict
+from random import uniform
+
 import dateutil.parser as parser
+
 import API.constants as constants
+import API.services as Services
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
+from django.urls import reverse_lazy
+from django.views import generic
+from django.views.generic.edit import DeleteView, UpdateView
+from markdownx.utils import markdownify
+from rest_framework import generics, status, viewsets
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.exceptions import (APIException, MethodNotAllowed,
+                                       NotFound, ParseError, PermissionDenied)
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from users.models import CustomUser
+
+from .forms import EditProfileForm, commentForm, friendRequestForm, uploadForm
+from .models import (Comment, Follow, Friendship, Post, PostAuthorizedAuthor,
+                     PostCategory, Server)
+from .serializers import (CommentSerializer, FollowSerializer,
+                          FriendshipSerializer, PostAuthorizedAuthorSerializer,
+                          PostCategorySerializer, PostSerializer,
+                          ServerSerializer, UserSerializer)
 
 ### Helper methods ###
 # To help get data, and so we don't have to reuse code all the time
@@ -120,9 +125,6 @@ def getCommentData(request, pk=None):
 # Get post information for a single post
 # pk is the post ID
 def getPostData(request, pk=None):
-
-    # Modify the request path
-    request_path = "/posts/" + str(pk)
 
     # permission_classes = (IsAuthenticated,)
     queryset = Post.objects.filter(pk=pk)#.order_by('-published')
@@ -374,8 +376,7 @@ class PostsViewSet(viewsets.ModelViewSet):
 
             if Services.has_permission_to_see_post(request_user_id, requested_post): 
                 body = json.loads(request.body.decode('utf-8'))
-                authorID = body["comment"]["author"]["id"].split("/")[-1]
-                authorUsername = body["comment"]["author"]["displayName"]
+                author = body["comment"]["author"]
                 commentID = body["comment"]["id"]
                 comment = body["comment"]["comment"]
                 postTime = body["comment"]["published"]
@@ -391,13 +392,8 @@ class PostsViewSet(viewsets.ModelViewSet):
                 #     }
                 #     return Response(response, status=403)
 
-                try:
-                    author = CustomUser.objects.get(pk=authorID)
-                except:
-                    author = CustomUser(id=authorID, username=authorID, password="fixme", displayname = authorUsername)
-                author.save()
+                Services.addAuthor(author)
 
-#                 print(post.id)
                 newComment = Comment(id=commentID, author=author, post=post, datetime=postTime, body=comment)
                 newComment.save()
                 response = {
@@ -468,8 +464,7 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
             # extract the author and receiver IDs
             body = json.loads(request.body.decode('utf-8'))
 
-            authorId = body["author"]["id"].split("/")[-1]
-            authorDisplayName = body["author"]["displayName"]
+            author = body["author"]
             friend = body["friend"]["id"].split("/")[-1]
 
             # This should be done better, but right now
@@ -478,13 +473,7 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
 
             # If the sender ID or the receiver ID do not exist still just 200 them
             # If the author doesn't exist create a foregin account for them on connectify
-            try: 
-                author = CustomUser.objects.get(pk=authorId)
-            except:
-                # We should save the host they are from probably
-                newAuthor = CustomUser(id=authorId, username=authorId, password="thisdoesntmatter", displayname=authorDisplayName)
-                newAuthor.save()
-                # Make a temp/foreign author profile
+            Services.addAuthor(author)
 
             # If the receiver doesn't exist do nothing
             try:

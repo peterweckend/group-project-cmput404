@@ -66,17 +66,44 @@ class acceptIgnoreRequestForm(forms.Form):
     # nvm this might be a stupid idea
     pass
 
+<<<<<<< HEAD
     
 
 class updatePostForm(forms.ModelForm):
+=======
+class EditProfileForm(forms.ModelForm):
+
+>>>>>>> origin/master
     displayname = forms.CharField(label='New Display Name', max_length=24, widget=forms.TextInput(
         attrs={
             'class': 'form-control',
             'placeholder': 'Enter Display Name...'
         }))
+    first_name = forms.CharField(label='New First Name', max_length=24, required=False, widget=forms.TextInput(
+        attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter a First Name...'
+        }))
+
+    last_name = forms.CharField(label='New Last Name', max_length=24, required=False, widget=forms.TextInput(
+        attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter a Last Name...'
+        }))
+
+    github_id = forms.CharField(label='Github Username', max_length=24, required=False, widget=forms.TextInput(
+        attrs={
+            'class': 'form-control',
+            'placeholder': 'Your Github Username'
+        }))
+    github_url = forms.CharField(label='Github URL', required=False, widget=forms.TextInput(
+        attrs={
+            'class': 'form-control',
+            'placeholder': 'https://github.com/yourgithubid'
+        }))
     class Meta:
         model = CustomUser
-        fields = ['displayname']
+        fields = ['displayname', 'first_name', 'last_name', 'github_id','github_url']
         
     def save(self, user=None):
         user_profile = super(EditProfileForm, self).save(commit=False)
