@@ -59,18 +59,15 @@ def has_permission_to_see_post(requesting_user_id, post):
         # query all their friends then add to another set
         if post.privacy_setting == '4':
             for friend in friendObj:
-                friends1 = Friendship.objects.filter(friend_a=post.author.id)
-                friends2 = Friendship.objects.filter(friend_b=post.author.id)
+                friends1 = Friendship.objects.filter(friend_a=friend.friend_a.id)
+                friends2 = Friendship.objects.filter(friend_b=friend.friend_b.id)
 
                 for row in friends1:
                     friends.add(row.friend_b.id)
                 for row in friends2:
                     friends.add(row.friend_a.id)
-
             if requesting_user_id in friends:
                 hasPermission = True
-
-
 
     # ('5', 'only friends on my host'),
     # Not sure how to implement this one, how do we know where the user's hosted on?
