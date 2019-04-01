@@ -1,6 +1,8 @@
 from .models import Post, Comment, Friendship, Follow, Server
 from users.models import CustomUser
 import uuid
+from urllib.parse import urlparse
+from django.utils import timezone
 
 # Exists between the data layers and the UI.
 # Holds the logic of the views.
@@ -174,11 +176,32 @@ def get_privacy_string_for_post(post_privacy_value):
         return "-1"
 
 # Takes a JSON representation of an author as served in the API spec
-# Adds the author if it does not exist
+# Adds the author if it does not exist and returns it
+# Otherwise returns the existing author
 # Otherwise does nothing (as the author already exists !)
 def addAuthor(author):
     try:
         author = CustomUser.objects.get(pk=author["id"].split("/")[-1])
+        return author
+
     except:
-        author = CustomUser(id=author["id"].split("/")[-1], username=author["displayName"], password="fixme", displayname = author["displayName"])
+        host = urlparse(author["url"]).hostname
+
+        author = CustomUser(
+            timestamp = timezone.now(),
+            id = author["id"].split("/")[-1],
+            username = author["id"],
+            password = "fixme",
+            displayname = author["displayName"],
+            host = host,
+            github_url=author["github"],
+        )
         author.save()
+        return author
+
+# Takes a JSON representation of a post as served in the API spec
+# Adds the post if it doesn't already exist
+# Otherwise does nothing (as the post already exists !)
+# What are we going to do with image data here? Surely we cannot save it as a giant full string!
+def addPost(post): 
+    pass
