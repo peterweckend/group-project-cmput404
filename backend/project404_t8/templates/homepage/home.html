@@ -8,7 +8,7 @@
   {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
     <h1 id="greeting">Hi {{ user.displayname }}!<hr></h1>
-    {% for p in post reversed %}
+    {% for p in post %}
       <div class="z-depth-2">
         <div class="card">
           <div class="row z-depth-1" id="mainpost">

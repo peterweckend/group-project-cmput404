@@ -5,11 +5,14 @@ from django.forms import ModelForm
 
 class CustomUserCreationForm(UserCreationForm):
 
+    github_id = forms.CharField(required=False)
+
     class Meta(UserCreationForm):
         model = CustomUser
-        fields = ('username', 'displayname', 'email', 'is_approved_by_admin')
+        fields = ('username', 'displayname', 'email', 'is_approved_by_admin', 'github_id')
         labels = {
-            'displayname': 'Display name'
+            'displayname': 'Display name',
+            'github_id': 'Github Username'
         }
         widgets = {
             'password': forms.PasswordInput(),
