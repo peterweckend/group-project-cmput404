@@ -179,7 +179,10 @@ def get_privacy_string_for_post(post_privacy_value):
 # Adds the author if it does not exist and returns it
 # Otherwise returns the existing author
 # Otherwise does nothing (as the author already exists !)
-def addAuthor(author):
+def addAuthor(authorJSON):
+
+    author = authorJSON
+
     try:
         author = CustomUser.objects.get(pk=author["id"].split("/")[-1])
         return author
@@ -190,7 +193,7 @@ def addAuthor(author):
         author = CustomUser(
             timestamp = timezone.now(),
             id = author["id"].split("/")[-1],
-            username = author["id"],
+            username = author["id"].split("/")[-1],
             password = "fixme",
             displayname = author["displayName"],
             host = host,
@@ -200,8 +203,30 @@ def addAuthor(author):
         return author
 
 # Takes a JSON representation of a post as served in the API spec
-# Adds the post if it doesn't already exist
-# Otherwise does nothing (as the post already exists !)
+# Adds the post if it does not exist and returns it
+# Otherwise returns the existing post
 # What are we going to do with image data here? Surely we cannot save it as a giant full string!
-def addPost(post): 
-    pass
+def addPost(postJSON):
+
+    post = postJSON
+# post_object = Post(id=post["id"], author=post_author, title=post["title"], description=post["description"], body=post["content"], privacy_setting='6', published=post["published"], original_host=remote_server.host)
+
+    try:
+        post_object = Post.objects.get(pk=post["id"])
+        return post_object
+    except:
+        origin = urlparse(post["origin"]).hostname
+        post_author = CustomUser.objects.get(pk=post["author"]["id"].split("/")[-1])
+
+        post_object = Post(
+            id = post["id"],
+            author = post_author, 
+            title = post["title"], 
+            description = post["description"], 
+            body = post["content"], 
+            privacy_setting = '6', # Hardcoded for now lel, not looking good
+            published = post["published"], 
+            original_host = origin
+        )
+        post_object.save()
+        return post

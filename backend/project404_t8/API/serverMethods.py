@@ -177,7 +177,7 @@ def get_remote_posts_for_feed(current_user_id):
             # print(posts["id"].split("author/")[1],22) # hopefully this is the correct syntax for getting data from the response
             count = 0
             # print(posts["posts"])
-            print(posts)
+            # print(posts)
             for post in posts["posts"]:
                 # print("in foor loop")
                 # print(post)
@@ -189,21 +189,19 @@ def get_remote_posts_for_feed(current_user_id):
                 # todo: grab the author from the post and create/save a new author objects
             
                 # print(post["author"],1999)
-                print("here")
                 try:
                     # post_author =  CustomUser(timestamp= timezone.now(), id=post["author"]["id"].split("author/")[1], host=remote_server.host, displayname=post["author"]["displayName"], github_url=post["author"]["github"], username = post["author"]["id"].split("author/")[1], password= "12345" )
-                    print("we get here")
-                    post_author = Services.getAuthor(post["author"])
-                    print("get here tho ?")
+                    post_author = Services.addAuthor(post["author"])
 
                 # print(187)
                 # there are a bunch of fields here that still need to be filled out
                 
                     # print(post["content"],189)
                     # print((post["content"]),189)
-                    post_object = Post(id=post["id"], author=post_author, title=post["title"], description=post["description"], body=post["content"], privacy_setting='6', published=post["published"], original_host=remote_server.host)
+                    # post_object = Post(id=post["id"], author=post_author, title=post["title"], description=post["description"], body=post["content"], privacy_setting='6', published=post["published"], original_host=remote_server.host)
+                    post_object = Services.addPost(post)
                     # print(192)
-                    post_object.save()
+                    # post_object.save()
                 except Exception as e:
                     print(e,189)   
                 remote_posts.append(post_object)
@@ -229,7 +227,7 @@ def get_remote_posts_for_feed(current_user_id):
                             newComment.id = comment["id"]
                             newComment.datetime = comment["published"]
                             newComment.save()
-                            print("NEW COMMENT:" , newComment)
+                            # print("NEW COMMENT:" , newComment)
                         except Exception as e:
                             print(e)
                             print("comment not being made properly")
@@ -277,8 +275,9 @@ def get_remote_post_by_id(remote_post_id,current_user_id):
                 post_author = Services.addAuthor(post["author"])
 
                 # there are a bunch of fields here that still need to be filled out
-                post_object = Post(id=post.id, author=post_author, title=post.title, description=post.description, body=post.content, privacy_setting='6', published=post.published, original_host=remote_server.host)
-                post_object.save()
+                # post_object = Post(id=post.id, author=post_author, title=post.title, description=post.description, body=post.content, privacy_setting='6', published=post.published, original_host=remote_server.host)
+                # post_object.save()
+                post_object = Services.addPost(post)
 
                 remote_posts.append(post_object)
             
