@@ -172,3 +172,13 @@ def get_privacy_string_for_post(post_privacy_value):
         return "-1"
     else:
         return "-1"
+
+# Takes a JSON representation of an author as served in the API spec
+# Adds the author if it does not exist
+# Otherwise does nothing (as the author already exists !)
+def addAuthor(author):
+    try:
+        author = CustomUser.objects.get(pk=author["id"].split("/")[-1])
+    except:
+        author = CustomUser(id=author["id"].split("/")[-1], username=author["displayName"], password="fixme", displayname = author["displayName"])
+        author.save()
