@@ -85,12 +85,12 @@ class EditProfileForm(forms.ModelForm):
             'placeholder': 'Enter a Last Name...'
         }))
 
-    github_id = forms.CharField(label='http', max_length=24, required=False, widget=forms.TextInput(
+    github_id = forms.CharField(label='Github Username', max_length=24, required=False, widget=forms.TextInput(
         attrs={
             'class': 'form-control',
             'placeholder': 'Your Github Username'
         }))
-    github_url = forms.CharField(label='http', required=False, widget=forms.TextInput(
+    github_url = forms.CharField(label='Github URL', required=False, widget=forms.TextInput(
         attrs={
             'class': 'form-control',
             'placeholder': 'https://github.com/yourgithubid'
