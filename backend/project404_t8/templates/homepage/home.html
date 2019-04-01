@@ -8,14 +8,14 @@
   {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
     <h1 id="greeting">Hi {{ user.displayname }}!<hr></h1>
-    {% for p in post reversed %}
+    {% for p in post %}
       <div class="z-depth-2">
         <div class="card">
           <div class="row z-depth-1" id="mainpost">
             {% load tz %}
             <br>
             <div class="col s8">
-              <span class="ptitle">{{p.title}}</span>
+              <a href="{% url 'Post' id=p.id %}"><span class="ptitle">{{p.title}}</span></a>
             </div>
             <div class="col s4">
               <div class="puser"><a href="{% url 'profile' username=p.author %}">{{p.author.displayname}}</a>
@@ -56,7 +56,7 @@
                   <p class="commentBody">{{comment.body}} </p>
                   <div class="col s12">
                     <p class="commentUser">
-                      <a href="{% url 'profile' username=comment.author %}"> {{comment.author}}</a>
+                      <a href="{% url 'profile' username=comment.author %}"> {{comment.author.displayname}}</a>
                       <p class="commentDate">{{comment.datetime}} </p>
                     </p>
                   </div>

@@ -23,6 +23,8 @@ from markdownx.utils import markdownify
 from .api_viewsets import PostsViewSet, AuthorViewSet, FriendRequestViewSet
 from .serverMethods import befriend_remote_author_by_id, get_remote_posts_for_feed, get_user, get_remote_comments_by_post_id
 from django.db.models import Q
+import requests
+
 
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
 # Django REST API Tutorial: Filtering System - https://youtu.be/s9V9F9Jtj7Q
@@ -148,11 +150,8 @@ def friendRequestView(request):
 
             is_remote_author = form.cleaned_data["isRemoteAuthor"]
             if is_remote_author:
-                print("*** IS REMOTE AUTHOR")
                 result = befriend_remote_author_by_id(receiver_data, follower.id)
-                print("RESULT OF THE BEFRIENDING:", result)
             else:
-                print("*** IS LOCAL AUTHOR")
                 receiver = CustomUser.objects.get(username=receiver_data)
                 Services.handle_friend_request(receiver, follower)
 
@@ -245,9 +244,45 @@ def homeListView(request):
     try:
         user = CustomUser.objects.get(username=request.user)        
         # print(user.github_id,1)
-        if user.github_id != 1:
-            user.github_url = "https://api.github.com/users/%s/events/public".format(user.github_id)
+        if user.github_id != "":
+            user.github_url = "https://api.github.com/users/{}/events/public".format(user.github_id)
             github_url= user.github_url
+            r = requests.get(github_url)
+            # print(github_url)
+            print("\nRequesting:", github_url,"Status code:", r.status_code,"\n")
+
+            if r.status_code != 200:
+                print("An error occured")
+                
+            
+            response = r.content.decode("utf-8")
+            github_posts= json.loads(response)
+            # print(github_posts[0],1111)
+            count = 0
+            
+            for post in github_posts:
+                # print(post["repo"]["name"])
+                
+                if count ==5:
+                    break
+                try:
+                    if post["type"]== "PushEvent":
+                        message= "I just pushed to my repository "+ str(post["repo"]["name"]) 
+                    elif post["type"] == "CreateEvent":
+                        message = "I just created "+ str(post["repo"]["name"])
+                    else:
+                        message= "About Github"
+                        
+                    if Post.objects.filter(published=post["created_at"], title="Made a post about github").exists():
+                        print("has post")
+                        break
+
+                    post_object = Post( author=user, title="Made a post about github", description=post["type"], body=message, privacy_setting='6', published=post["created_at"])
+                    # print(192)
+                    post_object.save()
+                    count +=1
+                except Exception as e:
+                    print(e,189) 
 
     except:
         pass
