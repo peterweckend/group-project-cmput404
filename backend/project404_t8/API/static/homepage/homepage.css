@@ -10,7 +10,11 @@
   --letter-grey: #afaeae;
   --links-color: #3e81c4;
 }
-* { padding: 0; margin: 0; }
+* { 
+  padding: 0; 
+  margin: 0; 
+  /* font-size: 15px !important; */
+}
 
 
 html, body {
@@ -26,6 +30,7 @@ a {
 textarea {
   rows: 6;
 }
+
 /* ---------- HEADER ---------- */
 header {
   background: var(--dark-main) !important;
@@ -136,7 +141,15 @@ nav a::before {
 @media screen and (max-width: 800px) {
   .leftcolumn, .midcolumn, .rightcolumn {   
     width: 100%;
-    padding: 0;
+    padding: 10;
+  }
+  .leftcolumn {
+    float: left;
+    width: 25%;
+    padding-right: 50px;
+    position: relative !important;
+    top: 10%;
+    z-index: 2;
   }
 }
 
