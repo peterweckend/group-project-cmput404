@@ -66,15 +66,79 @@ class acceptIgnoreRequestForm(forms.Form):
     # nvm this might be a stupid idea
     pass
 
+
+class updatePostForm(forms.ModelForm):
+    # Furthermore, a post should require at least a summary or an image
+    title = forms.CharField(label='Title', max_length=24, widget=forms.TextInput(
+        attrs={
+            'class': 'form-control',
+            'placeholder': 'Post Title...'
+        }))
+    body = forms.CharField(label='Body', max_length=250, required = False, widget=forms.Textarea(
+        attrs={
+            'rows':7,
+            'class': 'form-control',
+            'placeholder': 'Write a post...'
+        }))
+    markdown = forms.BooleanField(required = False, widget=forms.CheckboxInput(
+        attrs={
+            'class': 'checkbox form-control'
+        }
+    ))
+    imageLink = forms.ImageField(label="Image",required = False)
+    # privacy = forms.CharField(label='Privacy', widget=forms.Select(choices=privacyOptions))
+    privacy = forms.ChoiceField(widget=forms.Select, choices=privacyOptions, label='Privacy')
+    # If we wanted to get fancy, this could autofill from the user's friends
+    sharedAuthor = forms.CharField(label='Shared Author', required = False, widget=forms.TextInput(
+        attrs={
+            'class': 'form-control',
+            'placeholder': 'Shared Author?...'
+        }))
+    class Meta:
+        model = Post
+        fields = ['title', 'body', 'markdown', 'image_link','shared_author']
+        
+    def save(self, post=None):
+        post_up = super(updatePostForm, self).save(commit=False)
+        if post:
+            # print("true")
+            post_up = post 
+        # print(" no true")
+        post_up.save()
+        return post_up
+  
 class EditProfileForm(forms.ModelForm):
+
     displayname = forms.CharField(label='New Display Name', max_length=24, widget=forms.TextInput(
         attrs={
             'class': 'form-control',
             'placeholder': 'Enter Display Name...'
         }))
+    first_name = forms.CharField(label='New First Name', max_length=24, required=False, widget=forms.TextInput(
+        attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter a First Name...'
+        }))
+
+    last_name = forms.CharField(label='New Last Name', max_length=24, required=False, widget=forms.TextInput(
+        attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter a Last Name...'
+        }))
+
+    github_id = forms.CharField(label='Github Username', max_length=24, required=False, widget=forms.TextInput(
+        attrs={
+            'class': 'form-control',
+            'placeholder': 'Your Github Username'
+        }))
+    github_url = forms.CharField(label='Github URL', required=False, widget=forms.TextInput(
+        attrs={
+            'class': 'form-control',
+            'placeholder': 'https://github.com/yourgithubid'
+        }))
     class Meta:
         model = CustomUser
-        fields = ['displayname']
+        fields = ['displayname', 'first_name', 'last_name', 'github_id','github_url']
         
     def save(self, user=None):
         user_profile = super(EditProfileForm, self).save(commit=False)

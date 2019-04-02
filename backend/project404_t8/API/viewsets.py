@@ -10,7 +10,7 @@ from .serializers import UserSerializer, PostSerializer, CommentSerializer, Frie
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
-from .forms import uploadForm, friendRequestForm, EditProfileForm, commentForm
+from .forms import uploadForm, friendRequestForm, EditProfileForm, commentForm, updatePostForm
 from django.conf import settings
 from users.models import CustomUser
 from random import uniform
@@ -21,7 +21,10 @@ import API.services as Services
 from rest_framework.exceptions import APIException, MethodNotAllowed, NotFound, PermissionDenied
 from markdownx.utils import markdownify
 from .api_viewsets import PostsViewSet, AuthorViewSet, FriendRequestViewSet
-from .serverMethods import befriend_remote_author_by_id, get_remote_posts_for_feed, get_user
+from .serverMethods import befriend_remote_author_by_id, get_remote_posts_for_feed, get_user, get_remote_comments_by_post_id
+from django.db.models import Q
+import requests
+
 
 # Token and Session Authetntication: https://youtu.be/PFcnQbOfbUU
 # Django REST API Tutorial: Filtering System - https://youtu.be/s9V9F9Jtj7Q
@@ -95,7 +98,7 @@ def postView(request, id):
     # Perform privacy calculations
     # Has permission will be passed in
     # If its False we could either display a 404 or a "you do not have permission"
-    hasPermission = Services.has_permission_to_see_post(request.user, post)
+    hasPermission = Services.has_permission_to_see_post(request.user.id, post)
 
     if post.is_markdown:
         post.body = markdownify(post.body)
@@ -147,11 +150,8 @@ def friendRequestView(request):
 
             is_remote_author = form.cleaned_data["isRemoteAuthor"]
             if is_remote_author:
-                print("*** IS REMOTE AUTHOR")
                 result = befriend_remote_author_by_id(receiver_data, follower.id)
-                print("RESULT OF THE BEFRIENDING:", result)
             else:
-                print("*** IS LOCAL AUTHOR")
                 receiver = CustomUser.objects.get(username=receiver_data)
                 Services.handle_friend_request(receiver, follower)
 
@@ -177,11 +177,40 @@ def profileView(request, username):
         profile_posts = []
         for post in profile_posts_all:
             print("in post for loop")
-            if Services.has_permission_to_see_post(request.user, post):
+            if Services.has_permission_to_see_post(request.user.id, post):
                 print("has permission")
                 profile_posts.append(post)
     
     return render(request, 'profile/profile.html', {'author':author, "posts":profile_posts})
+
+class PostUpdate(UpdateView):
+    model = Post
+    success_url= reverse_lazy("home")
+    template_name= 'update/update_post.html'
+    form_class = updatePostForm
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        # print(self.object)
+        return super(PostUpdate, self).get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # if the profile doesn't exist, return 404, otherwise return the profile author object 
+        context['post'] = get_object_or_404(Post, id=self.object.id)
+        return context
+    
+    # update the model
+    def form_valid(self, form):
+        #save cleaned post data
+        clean = form.cleaned_data
+        self.object = form.save()
+        return super(PostUpdate, self).form_valid(form)
+
+    # redirects to homepage after successful edit 
+    def get_success_url(self, *args, **kwargs):
+        return reverse_lazy("home")
+
 
 class editProfile(UpdateView):
 
@@ -216,40 +245,27 @@ def homeListView(request):
     try:
         uname = request.user
         uid = uname.id
-        # uid = str(uid).replace('-','')
-        get_remote_posts_for_feed(request.user.id)
-        # todo: properly escape this using https://docs.djangoproject.com/en/1.9/topics/db/sql/#passing-parameters-into-raw
-        # post = Post.objects.raw(' \
-        # WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
-        # (SELECT f2.friend_a_id AS fofid \
-        #     FROM API_friendship f \
-        #     JOIN API_friendship f2 ON f.friend_a_id = f2.friend_b_id \
-        #     WHERE fofid NOT IN (SELECT friend_a_ID FROM API_friendship  \
-        #     WHERE friend_b_id = %s) AND f.friend_b_id = %s AND fofid != %s) AND privacy_setting = 4 \
-        # UNION \
-        #     SELECT id FROM API_post WHERE (author_id in  \
-        #     (WITH friends(fid) AS (SELECT friend_b_id FROM API_friendship WHERE friend_a_id=%s) \
-        #     SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
-        #     AND (privacy_setting = 3 OR privacy_setting = 4 OR (privacy_setting = 5 AND original_host = \
-        #     (select host from users_customuser where id = %s)))) OR author_id = %s OR  privacy_setting = 6) \
-        #     SELECT * FROM API_post WHERE id in posts \
-        #     AND (is_unlisted = 0 OR (is_unlisted = 1 AND author_id = %s)) \
-        #     ORDER BY published ASC', [uid]*8)
-        # print(request.user.id,234)
-        viewable_posts = []
-        all_posts = Post.objects.filter().order_by('published')
-        for post in all_posts:
-            if Services.has_permission_to_see_post(uname, post):
-                viewable_posts.append(post)
-        
-    except:
-        # post = Post.objects.all()
-        pass
-    #     # Do not display an image if the image does not exist
-    # imageExists = False
-    # if post.image_link != "":
-    #     imageExists = True
+        foreignPosts = get_remote_posts_for_feed(request.user.id)
 
+        # ------------- set queries by Tolu ----------------------
+        userUser = CustomUser.objects.filter(username=uname)[0].id
+        hostHost = CustomUser.objects.filter(username=uname)[0].host
+        option1 = Post.objects.filter(author=userUser)
+        friendZone = Friendship.objects.filter(friend_a=userUser).values_list('friend_b', flat=True)
+        fofriendZone = Friendship.objects.filter(friend_a__in=friendZone).values_list('friend_b', flat=True)
+        option3 = Post.objects.filter(Q(author__in=friendZone) & Q(privacy_setting=3) | Q(author__in=friendZone) & Q(privacy_setting=4))
+        option4 = Post.objects.filter(Q(author__in=fofriendZone) & Q(privacy_setting=4))
+        option5 = Post.objects.filter(Q(author__in=friendZone) & Q(privacy_setting=5) &Q(original_host=hostHost))
+        option6 = Post.objects.filter(Q(privacy_setting=6))
+        unlistedPosts = Post.objects.filter(Q(is_unlisted=True) & ~Q(author=userUser))
+        allPosts = option1.union(option3,option4,option5,option6)
+        if unlistedPosts.exists():
+            viewable_posts = allPosts.difference(unlistedPosts).order_by('-published')
+        else:
+            viewable_posts = allPosts.order_by('-published')
+    except:
+        pass
+    
     # get the user and friends and pass it to homepage
     # user = CustomUser.objects.get(username=request.user)
     friend = Friendship.objects.all()
@@ -257,9 +273,45 @@ def homeListView(request):
     try:
         user = CustomUser.objects.get(username=request.user)        
         # print(user.github_id,1)
-        if user.github_id != 1:
-            user.github_url = "https://api.github.com/users/%s/events/public".format(user.github_id)
+        if user.github_id != "":
+            user.github_url = "https://api.github.com/users/{}/events/public".format(user.github_id)
             github_url= user.github_url
+            r = requests.get(github_url)
+            # print(github_url)
+            print("\nRequesting:", github_url,"Status code:", r.status_code,"\n")
+
+            if r.status_code != 200:
+                print("An error occured")
+                
+            
+            response = r.content.decode("utf-8")
+            github_posts= json.loads(response)
+            # print(github_posts[0],1111)
+            count = 0
+            
+            for post in github_posts:
+                # print(post["repo"]["name"])
+                
+                if count ==5:
+                    break
+                try:
+                    if post["type"]== "PushEvent":
+                        message= "I just pushed to my repository "+ str(post["repo"]["name"]) 
+                    elif post["type"] == "CreateEvent":
+                        message = "I just created "+ str(post["repo"]["name"])
+                    else:
+                        message= "About Github"
+                        
+                    if Post.objects.filter(published=post["created_at"], title="Made a post about github").exists():
+                        print("has post")
+                        break
+
+                    post_object = Post( author=user, title="Made a post about github", description=post["type"], body=message, privacy_setting='6', published=post["created_at"])
+                    # print(192)
+                    post_object.save()
+                    count +=1
+                except Exception as e:
+                    print(e,189) 
 
     except:
         pass
@@ -295,6 +347,7 @@ def homeListView(request):
         pass
 
     return render(request, 'homepage/home.html', pageVariables)
+
 
 
 class PostDelete(DeleteView):

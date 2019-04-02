@@ -1,14 +1,26 @@
 from .models import Post, Comment, Friendship, Follow, Server
 from users.models import CustomUser
+import uuid
+from urllib.parse import urlparse
+from django.utils import timezone
 
 # Exists between the data layers and the UI.
 # Holds the logic of the views.
 # This allows multiple views to access the same functions
 # and logic easily and allows us to change the logic all in one place.
 
-def has_permission_to_see_post(requesting_user, post):
+def has_permission_to_see_post(requesting_user_id, post):
     hasPermission = False
-    requesting_user_id = requesting_user.id
+
+    # convert to UUID object
+    if not isinstance(requesting_user_id, uuid.UUID):
+        try:
+            requesting_user_id = uuid.UUID(requesting_user_id)
+        except:
+            print("An error occurred.")
+            return False
+
+    # do we need to replace the '-'s in requesting_user_id? probably not but maybe?
 
     # ('1', 'me'),
     # This one will always apply, so it does not need an if conditional
@@ -17,7 +29,7 @@ def has_permission_to_see_post(requesting_user, post):
 
     # ('2', 'another author'),
     if post.privacy_setting == '2':
-        if requesting_user_id == post.author or requesting_user_id == post.shared_author.id:
+        if requesting_user_id == post.author.id or requesting_user_id == post.shared_author.id:
             hasPermission = True
 
     # ('3', 'my friends'),
@@ -41,7 +53,6 @@ def has_permission_to_see_post(requesting_user, post):
         # Friends are the authors friends
         # If the requester is in the friends list they can view
         if requesting_user_id in friends:
-            # print(requesting_user_id, friends)
             hasPermission = True
 
         # ('4', 'friends of friends'),
@@ -50,19 +61,15 @@ def has_permission_to_see_post(requesting_user, post):
         # query all their friends then add to another set
         if post.privacy_setting == '4':
             for friend in friendObj:
-                friends1 = Friendship.objects.filter(friend_a=friend.author.id)
-                friends2 = Friendship.objects.filter(friend_b=friend.author.id)
+                friends1 = Friendship.objects.filter(friend_a=friend.friend_a.id)
+                friends2 = Friendship.objects.filter(friend_b=friend.friend_b.id)
 
                 for row in friends1:
                     friends.add(row.friend_b.id)
                 for row in friends2:
                     friends.add(row.friend_a.id)
-
             if requesting_user_id in friends:
-                # print(requesting_user_id, friends)
                 hasPermission = True
-
-
 
     # ('5', 'only friends on my host'),
     # Not sure how to implement this one, how do we know where the user's hosted on?
@@ -73,6 +80,8 @@ def has_permission_to_see_post(requesting_user, post):
     # ('6', 'public')
     # ('7', 'unlisted')
     # The special thing about unlisted is the URL must be complicated or hard to guess
+    # Something can be unlisted but not private, so this is separate logic here
+
     if post.privacy_setting in ["6","7"]:
         hasPermission = True
 
@@ -122,6 +131,8 @@ def handle_friend_request(receiver_user, follower_user):
     updateNotificationsById(receiver_user.id)
     updateNotificationsById(follower_user.id)
 
+# In theory this should update notifications by object, not ID
+# But its fine for now, dont fix what isnt broken 
 def updateNotificationsById(id):
     user = CustomUser.objects.get(id=id)
     total = Follow.objects.filter(receiver=user.id, ignored=0)
@@ -167,3 +178,66 @@ def get_privacy_string_for_post(post_privacy_value):
         return "-1"
     else:
         return "-1"
+
+# Takes a JSON representation of an author as served in the API spec
+# Adds the author if it does not exist and returns it
+# Otherwise returns the existing author
+# Otherwise does nothing (as the author already exists !)
+def addAuthor(authorJSON):
+
+    author = authorJSON
+
+    try:
+        author = CustomUser.objects.get(pk=author["id"].split("/")[-1])
+        return author
+
+    except:
+        parsed = urlparse(author["url"])
+        host =  parsed.scheme + "://" + parsed.netloc
+
+        author = CustomUser(
+            timestamp = timezone.now(),
+            id = author["id"].split("/")[-1],
+            username = author["id"].split("/")[-1],
+            password = "fixme",
+            displayname = author["displayName"],
+            host = host,
+            github_url=author["github"],
+        )
+        author.save()
+        return author
+
+# Takes a JSON representation of a post as served in the API spec
+# Adds the post if it does not exist and returns it
+# Otherwise returns the existing post
+# What are we going to do with image data here? Surely we cannot save it as a giant full string!
+
+# Issue rn, if the content type is image, fucked shit happens
+def addPost(postJSON):
+
+    post = postJSON
+# post_object = Post(id=post["id"], author=post_author, title=post["title"], description=post["description"], body=post["content"], privacy_setting='6', published=post["published"], original_host=remote_server.host)
+
+    try:
+        post_object = Post.objects.get(pk=post["id"])
+        return post_object
+    except:
+        post_author = CustomUser.objects.get(pk=post["author"]["id"].split("/")[-1])
+
+        # Prevent fucky shit shit encoded images
+        # TODO decode/save the image somehow
+        if post["contentType"] not in ["text/plain", "text/markdown"]:
+            post["content"] = "THIS SHOULD BE AN IMAGE SOMEHOW"        
+
+        post_object = Post(
+            id = post["id"],
+            author = post_author, 
+            title = post["title"], 
+            description = post["description"], 
+            body = post["content"], 
+            privacy_setting = '6', # Hardcoded for now lel, not looking good
+            published = post["published"], 
+            original_host = post["origin"]
+        )
+        post_object.save()
+        return post
