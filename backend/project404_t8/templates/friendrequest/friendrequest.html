@@ -7,17 +7,20 @@
   {% if user.is_authenticated %}
     {% load static %}
       <link rel="stylesheet" type="text/css" href="{% static 'upload/upload.css' %}">
+      <div class="row">
+        <div class="col s8 offset-s2">
+          <!--This is the friend request page
+              This is for testing honestly, not final
+              Will just be a JS/AJAX button instead down the road -->
+          <h1 class="title">Send a friend request</h1>
+          <form method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              {{ form.as_p }}
+              <button class="send-request btn btn-primary" type="submit" name="action" style="background-color: #34495e" onMouseOver="this.style.color='#f09177'" onMouseOut="this.style.color='#f4f7f7'">Save Changes</button>
+          </form>
+        </div>
+      </div>
 
-    <!--This is the friend request page
-        This is for testing honestly, not final
-        Will just be a JS/AJAX button instead down the road -->
-    <h1 class="title">Send a friend request</h1>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" class="send-request btn btn-primary" value="Send Request">
-    </form>
-    </form>
   {% else %}
     {% load static %}
       <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
