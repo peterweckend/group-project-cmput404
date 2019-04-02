@@ -7,46 +7,77 @@
 {% load static %}
 
 <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
-<div class="displayname">{{author.displayname}}</div>
-<div class="username">@{{author.username}}</div>
-{% for post in posts reversed %}
-  <div class="row">
-    <div class="panel panel-default">
-      {% load tz %}
-      <div class="puser"><a href="{% url 'profile' username=user.username %}">{{post.author}}</a> 
-      <div class="timePub">{{post.published|timezone:"America/Edmonton"}}</div> </div>
-      {% if user.id == post.author_id %}
-      <p class="delete_post">
-          <a href="{% url 'delete_post' pk=post.pk  %}"><span class="glyphicon glyphicon-trash"> </a>
-      </p>
-      {% endif %}
-      <div class="panel-body">
-          <p class="ptitle">{{post.title}} </p>
-          <p class="pbody">{{post.body|safe}}</p>
-          {% if post.image_link != "" %}
-          {% load static %}
-          <!--CSS should ensure images fit within a certain size
-              Atleast when they are being displayed on the homepage -->
-          <img class= "pimage" src="{% get_media_prefix %}{{ post.image_link }}">
-          {% endif %}
-
-          <div class="comment"><a href="{% url 'comment' pk=post.pk %}">leave a comment </a></div>
-        
+  <div class="displayname">{{author.displayname}}</div>
+  <div class="username">(@{{author.username}})</div>
+  <hr>
+  {% for p in posts reversed %}
+    <div class="">
+      <div class="card" id="post-top">
+        <div class="row z-depth-1" id="mainpost">
+          {% load tz %}
+          <br>
+          <div class = "row">
+            <div class="col s11">
+              <span class="ptitle">{{p.title}}</span>
+              <div class="puser"><a href="{% url 'profile' username=user.username %}">{{p.author.displayname}}</a>
+              <div class="timePub">{{p.published|timezone:"America/Edmonton"}}</div></div>
+            </div>
+            <div class="col s1">
+              {% if user.id == p.author_id %}
+                <p class="delete_post">
+                  <a href="{% url 'delete_post' pk=p.pk  %}"><span class="glyphicon glyphicon-trash"> </a>
+                </p>
+              {% endif %}
+            </div>
+          </div>
+          <div class = "row" id="post-body">
+            {% if p.image_link != "" and p.image_link != NONE %}
+              <div class="col s9">
+                <br>
+                <p class="pbody">{{p.body|safe}}</p>
+              </div>
+              <div class="col s3" id="post-image-body">
+                {% load static %}
+                <br>
+                <!--CSS should ensure images fit within a certain size
+                  Atleast when they are being displayed on the homepage -->
+                  <div class="pimage_parent">
+                    <img id= "pimage" class=" materialboxed" src="{% get_media_prefix %}{{ p.image_link }}">
+                    <img id= "pimage_bg" class="" src="{% get_media_prefix %}{{ p.image_link }}">
+                  </div>
+              </div>
+            {% else %}
+              <div class="col s12">
+                <br>
+                <p class="pbody">{{p.body|safe}}</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="panel-body" id="maincomments">
+          <a href="{% url 'comment' pk=p.pk %}" class="btn-floating halfway-fab waves-effect waves-light blue"><i class="material-icons">comment</i></a>
           {% for comment in p.comments.all %}
-          <hr>
-          <p class="commentUser"><a href="{% url 'profile' username=comment.author %}">{{comment.author}}</a> </p>
-          <p class ="commentDate">{{comment.datetime}} </p>
-          <p class="commentBody">{{comment.body}} </p>
-          
+            <div class=row>
+              <div class="col s12">
+                <p class="commentBody">{{comment.body}} </p>
+                <div class="col s12">
+                  <p class="commentUser">
+                    <a href="{% url 'profile' username=comment.author %}"> {{comment.author.displayname}}</a>
+                    <p class="commentDate">{{comment.datetime}} </p>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <hr>
           {% empty %}
-          <hr><br><p class="nocomments">There are currently no comments.</p><br>
+              <p class="nocomments">There are currently no comments.</p>
           {% endfor %}
-          
+        </div>
       </div>
+      <br>
     </div>
-  </div>
-{% endfor %}
-
+  {% endfor %}
+  <div class="page-bottom"></div>
 {% else %}
 {% load static %}
 <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">

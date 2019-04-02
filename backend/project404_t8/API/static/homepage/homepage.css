@@ -143,7 +143,7 @@ nav a::before {
   z-index: 2;
   width: 100%;
   height: 50px;
-  position: sticky;
+  /* position: sticky; */
   text-align: center;
   background: var(--dark-main);
 }
@@ -210,7 +210,6 @@ nav a::before {
   position: relative;
   top: 0;
   left: 0;
-  padding-top: 5px;
 }
 #pimage{
   z-index: 2;
@@ -227,8 +226,8 @@ nav a::before {
   height:100px;
   object-fit: cover;
   position: relative;
-  filter: blur(2px);
-  -webkit-filter: blur(2px) !important;
+  filter: blur(10px);
+  -webkit-filter: blur(10px) !important;
 }
 .commentBody{
   text-align: left;
@@ -258,17 +257,18 @@ nav a::before {
 .displayname{
   color: #14171a;
   text-align: left;
-  margin-left: -2%;
-  margin-top: 5%;
-  font-size: 30px;
+  margin-top: 2.5%;
+  font-size: 25px;
+  display: inline-block;
 }
 .username{
   color: #657786;
   text-align: left;
-  font-size: 30px;
-  margin-top: -0.5%;
-  margin-left: -2%;
-  padding-bottom: 5%;
+  font-size: 20px;
+  font-style: italic;
+  display: inline-block;
+  margin-top: 2%;
+  padding-left: 5px;
 }
 .collection-item .delete_friend{
   padding-top: 10px;
@@ -289,4 +289,7 @@ li hr {
   text-align:center; 
   margin: 0 auto;
   margin-bottom: 5px;
+}
+.page-bottom {
+  padding-bottom: 10%;
 }
