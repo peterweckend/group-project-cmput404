@@ -52,7 +52,7 @@
                   <li><a href="/friends/">My Friends</a></li>
                 {% endif %}
                 <li><a href="{% url 'profile' username=user.username %}">My Profile</a></li>
-                <li><a class="dropdown-trigger" href="" data-target="dropdown1">Actions<i class="material-icons right">arrow_drop_down</i></a></li>
+                <li><a class="dropdown-trigger" href="" data-target="dropdown1" style="color: #f4f7f7 !important">Actions<i class="material-icons right">arrow_drop_down</i></a></li>
               </ul>
             </div>
           </nav>
@@ -76,26 +76,53 @@
         <li><hr></li>
         <li><a href="{% url 'logout' %}"><i class="material-icons">exit_to_app</i>Logout</a></li>
       </ul>
-      
+    {% else %}
+      <div class="navbar-fixed">
+        <nav class="">
+          <div class="nav-wrapper center">
+            <a href="/">
+              <img class="mainlogo" src="{% static 'img/connectifylogo.png' %}" alt="logo">
+            </a>
+          </div>
+        </nav>
+      </div>
     {% endif %}
   <!-- </div> -->
 </header>
 <body>
-  <div class="row">
-    <!-- -------------------- LEFT COLUMN -------------------- -->
-    <div class="leftcolumn">
-      {% block content %}
-      {% endblock %}
-    </div>
+  {% if user.is_authenticated %}
+    <div class="row">
+      <!-- -------------------- LEFT COLUMN -------------------- -->
+      <div class="leftcolumn">
+        {% block content %}
+        {% endblock %}
+      </div>
 
-    <!-- -------------------- RIGHT COLUMN -------------------- -->
-    <div class="rightcolumn">
-      {% if user.is_authenticated %}
-        right column
-      {% endif %}
+      <!-- -------------------- RIGHT COLUMN -------------------- -->
+      <div class="rightcolumn">
+        {% if user.is_authenticated %}
+          right column
+        {% endif %}
+      </div>
     </div>
-  </div>
-  
+  {% else %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
+    <div class="row">
+      <!-- -------------------- MAIN COLUMN -------------------- -->
+      <div class="one-main-column">
+        <div class="col s12">
+          <div class="login-objects">
+            <p class="login-object">You are not logged in.
+              Please 
+              <a href="{% url 'signup' %}">sign up</a> or 
+              <a href="{% url 'login' %}">log in</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
   <div class="footer navbar-fixed-bottom">
     <p>Connectify © 2019</p>
   </div>
