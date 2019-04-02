@@ -33,6 +33,7 @@ urlpatterns = [
     url(r'^', include(api_router.urls)),
     url(r'^',include('API.urls')), 
     url(r'^',include('users.urls')),
+    url(r'^updatePost/(?P<pk>[0-9A-Fa-f-]+)/$', PostUpdate.as_view(), name="update_post"),
     url(r'^deletePost/(?P<pk>[0-9A-Fa-f-]+)/$', PostDelete.as_view(), name="delete_post"),
     url(r'^deleteFriend/(?P<pk>[0-9A-Fa-f-]+)/$', FriendDelete.as_view(), name="delete_friend"),
     url(r'^post/(?P<pk>[0-9A-Fa-f-]+)/commentPost/', comment_thread, name="comment"),

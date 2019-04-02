@@ -10,7 +10,7 @@ from .serializers import UserSerializer, PostSerializer, CommentSerializer, Frie
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
-from .forms import uploadForm, friendRequestForm, EditProfileForm, commentForm
+from .forms import uploadForm, friendRequestForm, EditProfileForm, commentForm, updatePostForm
 from django.conf import settings
 from users.models import CustomUser
 from random import uniform
@@ -183,6 +183,35 @@ def profileView(request, username):
     
     return render(request, 'profile/profile.html', {'author':author, "posts":profile_posts})
 
+class PostUpdate(UpdateView):
+    model = Post
+    success_url= reverse_lazy("home")
+    template_name= 'update/update_post.html'
+    form_class = updatePostForm
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        # print(self.object)
+        return super(PostUpdate, self).get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # if the profile doesn't exist, return 404, otherwise return the profile author object 
+        context['post'] = get_object_or_404(Post, id=self.object.id)
+        return context
+    
+    # update the model
+    def form_valid(self, form):
+        #save cleaned post data
+        clean = form.cleaned_data
+        self.object = form.save()
+        return super(PostUpdate, self).form_valid(form)
+
+    # redirects to homepage after successful edit 
+    def get_success_url(self, *args, **kwargs):
+        return reverse_lazy("home")
+
+
 class editProfile(UpdateView):
 
     model = CustomUser
@@ -318,6 +347,7 @@ def homeListView(request):
         pass
 
     return render(request, 'homepage/home.html', pageVariables)
+
 
 
 class PostDelete(DeleteView):
