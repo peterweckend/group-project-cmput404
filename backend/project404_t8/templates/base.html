@@ -16,7 +16,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   <script>
     $(document).ready(function() {
-      $('.sidenav').sidenav();
+      $('.sidenav').sidenav({
+        edge: 'right'
+      });
       $('select').formSelect();
       $(".dropdown-trigger").dropdown();
       $('.materialboxed').materialbox();
@@ -27,10 +29,10 @@
 <header class="z-depth-1">
     {% if user.is_authenticated %}
       <ul id="dropdown1" class="dropdown-content">
-        <li><a href="/upload/">Create a post</a></li>
-        <li><a href="{% url 'editprofile' pk=user.pk %}">Edit your profile</a></li>
-        <li><a href="/addFriend/">Friend request</a></li>
-        <li><a href="{% url 'logout' %}">Logout</a></li>
+        <li><a href="/upload/"><i class="material-icons right">add_circle</i>Create a post</a></li>
+        <li><a href="{% url 'editprofile' pk=user.pk %}"><i class="material-icons right">edit</i>Edit your profile</a></li>
+        <li><a href="/addFriend/"><i class="material-icons right">person_add</i>Friend request</a></li>
+        <li><a href="{% url 'logout' %}"><i class="material-icons right">exit_to_app</i>Logout</a></li>
       </ul>
       <div class="navbar-fixed">
           <nav class="">
@@ -38,7 +40,7 @@
               <a href="/">
                 <img class="mainlogo" src="{% static 'img/connectifylogo.png' %}" alt="logo">
               </a>
-              <a href="/" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+              <a href="/" data-target="mobile-demo" class="sidenav-trigger right"><i class="material-icons">menu</i></a>
               <ul id="nav-mobile" class="right hide-on-med-and-down">
                 <li><a href="/">Home</a></li>
                 <!--Display some extra stuff regarding friends if the user has unignored friend requests
@@ -57,21 +59,24 @@
         </div>
 
       <ul class="sidenav" id="mobile-demo">
-        <li><a href="/">Home</a></li>
+        <li><a href="/">Home <i class="material-icons">home</i></a></li>
         <!--Display some extra stuff regarding friends if the user has unignored friend requests
             Would this just be an if/else??? -->
+        <li><a href="/upload/"><i class="material-icons">add_circle</i>Create a post</a></li>
+        <!-- <li><div class="divider"></div></li> -->
+        <li><a href="{% url 'profile' username=user.username %}"><i class="material-icons">portrait</i>My Profile</a></li>
+        <li><a href="{% url 'editprofile' pk=user.pk %}"><i class="material-icons">edit</i>Edit Profile</a></li>
+        <!-- <li><div class="divider"></div></li> -->
         {% if user.friend_requests > '0' %}
-          <li><a href="/friends/">My Friends <span class="new badge red">{{user.friend_requests}}</span></a></li>
-          <!-- <span class="new badge red" data-badge-caption="custom caption"></span> -->
-        {% else %}
-          <li><a href="/friends/">My Friends</a></li>
+          <li><a href="/friends/"><i class="material-icons">people</i>My Friends <span class="new badge red">{{user.friend_requests}}</span></a></li>
+          {% else %}
+          <li><a href="/friends/"><i class="material-icons">people</i>My Friends</a></li>
         {% endif %}
-        <li><a href="{% url 'profile' username=user.username %}">My Profile</a></li>
-        <li><a href="/upload/">Create a post</a></li>
-        <li><a href="{% url 'editprofile' pk=user.pk %}">Edit your profile</a></li>
-        <li><a href="/addFriend/">Friend request</a></li>
-        <li><a href="{% url 'logout' %}">Logout</a></li>
+        <li><a href="/addFriend/"><i class="material-icons">person_add</i>Friend Request</a></li>
+        <li><hr></li>
+        <li><a href="{% url 'logout' %}"><i class="material-icons">exit_to_app</i>Logout</a></li>
       </ul>
+      
     {% endif %}
   <!-- </div> -->
 </header>
@@ -79,15 +84,6 @@
   <div class="row">
     <!-- -------------------- LEFT COLUMN -------------------- -->
     <div class="leftcolumn">
-      {% if user.is_authenticated %}
-        <p>Coming Soon</p>
-        <h1 class="side-menu-item friends-menu" style= "font-size: 1em"> 
-
-      {% endif %}
-    </div>
-
-    <!-- -------------------- MAIN COLUMN -------------------- -->
-    <div class="midcolumn">
       {% block content %}
       {% endblock %}
     </div>
@@ -97,29 +93,6 @@
       {% if user.is_authenticated %}
         friends is no more here
       {% endif %}
-
-      <!-- <div class="item2">
-        <style type="text/css">
-        @import url("http://www.google.com/uds/solutions/dynamicfeed/gfdynamicfeedcontrol.css");
-
-        #feedControl {
-          margin-top : 10px;
-          margin-left: auto;
-          margin-right: auto;
-          width : 440px;
-          font-size: 12px;
-          color: #9CADD0;
-        }
-        </style>
-          <script type="text/javascript">
-          function load() {
-            var feed ="http://feeds.bbci.co.uk/news/world/rss.xml";
-            new GFdynamicFeedControl(feed, "feedControl");
-          }
-          google.load("feeds", "1");
-          google.setOnLoadCallback(load);
-        </script>
-      </div> -->
     </div>
   </div>
   
