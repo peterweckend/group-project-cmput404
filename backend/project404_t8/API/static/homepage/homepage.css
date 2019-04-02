@@ -210,7 +210,6 @@ nav a::before {
   position: relative;
   top: 0;
   left: 0;
-  padding-top: 5px;
 }
 #pimage{
   z-index: 2;
@@ -227,8 +226,8 @@ nav a::before {
   height:100px;
   object-fit: cover;
   position: relative;
-  filter: blur(2px);
-  -webkit-filter: blur(2px) !important;
+  filter: blur(10px);
+  -webkit-filter: blur(10px) !important;
 }
 .commentBody{
   text-align: left;
@@ -290,4 +289,7 @@ li hr {
   text-align:center; 
   margin: 0 auto;
   margin-bottom: 5px;
+}
+.page-bottom {
+  padding-bottom: 10%;
 }
