@@ -192,7 +192,7 @@ def addAuthor(authorJSON):
         return author
 
     except:
-
+        print(author["url"])
         author = CustomUser(
             timestamp = timezone.now(),
             id = author["id"].split("/")[-1],
@@ -201,6 +201,7 @@ def addAuthor(authorJSON):
             displayname = author["displayName"],
             host = author["host"],
             github_url=author["github"],
+            url = author["url"]
         )
         author.save()
         return author

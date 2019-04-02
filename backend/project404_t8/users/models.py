@@ -36,6 +36,7 @@ class CustomUser(AbstractUser):
     host        = models.TextField()
     bio         = models.TextField()
     is_approved_by_admin = models.BooleanField(default=False)
+    url = models.TextField()
 
     objects = CustomUserManager()
 

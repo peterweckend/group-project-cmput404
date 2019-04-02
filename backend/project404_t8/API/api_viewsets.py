@@ -53,19 +53,21 @@ def getAuthorData(request, extra=False, pk=None, githubRequired=False):
     user = get_object_or_404(queryset, pk=pk)
     response = {}
 
-    # response["id"] = "https://" + request.get_host() + request_path
-    response["id"] = user.host + "/author/" + str(user.id)
-    # todo: look up the user, find what host they belong to, and return that value
-    # instead of using request.get_host() here
-    # response["host"] = "https://" + request.get_host() + "/"
+    request_path = "/author/" + str(pk)
+
+    # So if the url is not blank, return what is stored
+    if Services.isNotBlank(user.url):
+        response["url"] = user.url
+        response["id"] = user.url
+    # If it is blank, do what was done before, defaulting to where it is currently hosted (local/live)
+    else:
+        response["id"] = "https://" + request.get_host() + request_path
+        response["url"] = response["id"]
+
     response["host"] = user.host
     response["displayName"] = user.displayname
-    # URL is the URL to the authors profile
-    # The url should point to the authors profile on the client side
-    # I dont think we are storing this currently but we should
-    # Pavlo just sends to the api view of the profile so thats what we might as well do LOL
-    # response["url"] = "https://" + user + request_path
-    response["url"] = response["id"]
+    
+    
     if githubRequired:
         response["github"] = user.github_url
 
