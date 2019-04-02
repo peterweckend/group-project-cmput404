@@ -11,22 +11,22 @@
   --links-color: #3e81c4;
 }
 * { padding: 0; margin: 0; }
-
-
 html, body {
   background-color: var(--light-main);
-  font-family: Roboto;
-}
-.create-post {
-  margin-bottom: 20%;
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 a {
   color: var(--links-color);
 }
-textarea {
-  rows: 6;
+a:hover {
+  color: var(--orange-color);
 }
-/* ---------- HEADER ---------- */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--dark-main);
+  font-size: 25px;
+}
+
+/* -------------------- HEADER -------------------- */
 header {
   background: var(--dark-main) !important;
   position: sticky !important;
@@ -57,14 +57,17 @@ nav li {
   padding-top: 15px;
   position: relative;
 }
-nav a {
-  color: var(--light-main);
+nav a, a:active, a:visited, a:focus {
+  color: var(--light-main) !important;
   text-decoration: none;
   text-transform: uppercase;
-  font-size: 20px;
 }
 nav a:hover {
-  color: var(--light-secondary);
+  color: var(--orange-color);
+}
+nav a:visited {
+  color: var(--light-main);
+  text-decoration: none;
 }
 nav a::before {
   content: '';
@@ -76,26 +79,48 @@ nav a::before {
   width: 0%;
   transition: all ease-in-out 250ms;
 }
+.dropdown-content {
+  width: 250px !important;
+  color: var(--light-main) !important;
+  background-color: var(--dark-main) !important;
+  padding-top: 10px;
+  margin-right: 10px;
+}
+.dropdown-content a {
+  color: var(--light-main) !important;
+  text-transform: uppercase;
+}
+.dropdown-content a:hover {
+  background-color: var(--orange-color) !important;
+}
+.dropdown-content i.material-icons {
+  color: var(--light-main) !important;
+  margin-right: 0;
+}
+.sidenav {
+  width: 250px;
+  color: var(--light-main) !important;
+  background-color: var(--dark-main);
+}
+.sidenav a {
+  color: var(--light-main) !important;
+  text-transform: uppercase;
+}
+.sidenav a:hover {
+  background-color: var(--orange-color) !important;
+}
+.sidenav i.material-icons {
+  color: var(--light-main) !important;
+}
 .sidenav-overlay {
   z-index: 0 !important;
-  /* display: none !important; */
-  background-color: transparent;
 }
-/* ---------- PAGE OUTLINE ---------- */
+/* -------------------- PAGE OUTLINE -------------------- */
 .leftcolumn {   
   float: left;
-  width: 25%;
-  padding-left: 50px;
-  position: sticky !important;
-  top: 10%;
-  z-index: 2;
-  text-align: left !important;
-}
-.midcolumn {   
-  float: left;
-  width: 50%;
-  padding-left: 30px;
-  padding-right: 60px;
+  width: 75%;
+  padding-left: 5%;
+  padding-right: 5%;
   min-height: 83vh;
 }
 .rightcolumn {
@@ -106,17 +131,12 @@ nav a::before {
   top: 10%;
   z-index: 2;
 }
-
-.row h1{
-  color: var(--dark-main);
-}
 /* Clear floats after the columns */
 .row:after {
   content: "";
   display: table;
   clear: both;
 }
-
 /* Footer */
 .footer {
   bottom: 0;
@@ -132,46 +152,19 @@ nav a::before {
   color: var(--light-main);
   font-size: 15px !important;
 }
-/* Responsive layout - when the screen is less than 800px wide, make the two columns stack on top of each other instead of next to each other */
+/* Responsive layout */
 @media screen and (max-width: 800px) {
-  .leftcolumn, .midcolumn, .rightcolumn {   
+  .leftcolumn, .rightcolumn {   
     width: 100%;
-    padding: 0;
+    padding-left: 5%;
+    padding-right: 5%;
+  }
+  .rightcolumn {
+    padding-top: 10%;
   }
 }
 
-/* ---------- NEXT PART HERE ---------- */
-
-.panel-heading {
-font-size: 20px;
-text-align:left;
-}
-
-.page-header {
-margin-top: 0px !important;
-}
-
-.side-menu-item {
-margin-top: 20px;
-}
-
-.friends-menu {
-margin-top: 40px;
-}
-
-.section-header {
-text-decoration: underline;
-}
-
-.links{
-/* text-align: center; */
-margin-top: 20px;
-color: var(--dark-secondary);
-}
-.timePub{
-font-size: 10px;
-color: #657786;
-}
+/* -------------------- POSTS AND COMMENTS -------------------- */
 #mainpost {
   padding-bottom: 30px;
   background-color: var(--light-card);
@@ -185,35 +178,44 @@ color: #657786;
   margin: 0 auto;
   margin-bottom: 5px;
 }
-.puser{
-font-size: 20px;
-color:black;
-text-align: left;
-padding-left: 15px;
-padding-top: 2%;
-}
 .ptitle{
-font-size: 25px;
-font-weight: bold;
-text-decoration: underline;
-color:rgb(43, 43, 43);
-text-align: left;
-
+  font-size: 20px;
+  color:rgb(43, 43, 43);
+  text-align: left;
+  word-wrap: break-word;
+  display: block;
+}
+.puser,.commentUser{
+  font-size: 11px;
+  color:black;
+  text-align: left;
+  display: inline-block;
+}
+.timePub, .commentDate{
+  font-size: 11px;
+  color: #657786;
+  display: inline-block;
+  padding-left: 10px;
 }
 .pbody{
-font-size: 15px;
-color:rgb(43, 43, 43);
-text-align: left;
+  font-size: 15px;
+  color:rgb(43, 43, 43);
+  text-align: justify;
+  word-wrap: break-word;
+}
+#post-image-body{
+  padding-right: 10px;
 }
 .pimage_parent {
   position: relative;
   top: 0;
   left: 0;
+  padding-top: 5px;
 }
 #pimage{
   z-index: 2;
-  width:150px;
-  height:150px;
+  width:100px;
+  height:100px;
   position: absolute;
   object-fit: contain;
 }
@@ -221,44 +223,20 @@ text-align: left;
   top: 0;
   left: 0;
   z-index: 1;
-  width:150px;
-  height:150px;
+  width:100px;
+  height:100px;
   object-fit: cover;
   position: relative;
   filter: blur(2px);
   -webkit-filter: blur(2px) !important;
 }
-/* .image1 {
-  position: relative;
-  top: 0;
-  left: 0;
-}
-.image2 {
-  position: absolute;
-  top: 30px;
-  left: 70px;
-} */
-.commentUser{
-  float: left;
-  font-size: 11px;
-  padding-right: 10px;
-}
-.commentDate{
-  font-size: 11px;
-  color: #657786;
-}
 .commentBody{
-  font-family: Arial, Garamond !important; 
-  /* font-weight: book; */
-  font-style: italic;
   text-align: left;
   padding-left: 8px;
   font-size: 17px;
-}
-.comment {
+  word-wrap: break-word;
   font-size: 15px;
-  text-align: center;
-  padding-left: 4%;
+  margin-bottom: 0;
 }
 .nocomments {
   font-size: 13px;
@@ -267,9 +245,16 @@ text-align: left;
   padding-left: 4%
 }
 .card .row {
-  padding-left: 30px;
+  padding-left: 10px;
+  padding-right: 10px;
   margin-bottom: 0;
 }
+.delete_post{
+  float: right;
+  padding-top: 7px;
+}
+
+/* -------------------- OTHERS -------------------- */
 .displayname{
   color: #14171a;
   text-align: left;
@@ -285,12 +270,6 @@ text-align: left;
   margin-left: -2%;
   padding-bottom: 5%;
 }
-.delete_post{
-  float: right;
-  margin-top: -7%;
-  padding: 1% 1%;
-  margin-right: 25px;
-}
 .collection-item .delete_friend{
   padding-top: 10px;
 }
@@ -299,4 +278,15 @@ text-align: left;
 }
 .upload .create-post {
   padding-bottom: 100px !important;
+}
+
+/* ---------- NEXT PART HERE ---------- */
+li hr {
+  height:1px; 
+  border:none; 
+  background-color: var(--light-card); 
+  width:82%; 
+  text-align:center; 
+  margin: 0 auto;
+  margin-bottom: 5px;
 }
