@@ -164,6 +164,7 @@ backend/project404_t8/media
 
 # Migrations
 backend/project404_t8/API/migrations
+backend/project404_t8/users/migrations
 
 # Media
 backend/media_cdn
