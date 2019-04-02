@@ -5,32 +5,35 @@
 
 {% block content %}
 {% if user.is_authenticated %}
-{% load static %}
-  <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
-  
-  <!--We also need to make sure the current use has permission to view the file
-      This can be done in the viewsets.py first im pretty sure, then you could pass
-      in a boolean, like hasPermission, and only display content if that is true -->
-{% if hasPermission %}
-
-  <h1>{{ post.title }}</h1>
-  {% if imageExists %}
   {% load static %}
-  <!--CSS should ensure images fit within a certain size
-      Atleast when they are being displayed on the homepage -->
-  <img src="{% get_media_prefix %}{{ post.image_link }}">
-  {% endif %}
-  
-  <p>{{ post.body|safe }}</p>
-  
-  <!--Display the comments below here somehow
-      Have a form element to add a new comment
-      Could implement JS to show the new comment after the user posts it  -->
+    <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
+    <div class="row">
+      <div class="col s8 offset-s2">
+        <!--We also need to make sure the current use has permission to view the file
+          This can be done in the viewsets.py first im pretty sure, then you could pass
+          in a boolean, like hasPermission, and only display content if that is true -->
+        {% if hasPermission %}
+    
+          <h1>{{ post.title }}</h1>
+          {% if imageExists %}
+            {% load static %}
+            <!--CSS should ensure images fit within a certain size
+              Atleast when they are being displayed on the homepage -->
+            <img src="{% get_media_prefix %}{{ post.image_link }}">
+          {% endif %}
+    
+          <p>{{ post.body|safe }}</p>
+    
+          <!--Display the comments below here somehow
+            Have a form element to add a new comment
+            Could implement JS to show the new comment after the user posts it  -->
+        {% else %}
+          <h1>You do not have permission to view this page</h1>
+        {% endif %}
+      </div>
+    </div>
 {% else %}
-<h1>You do not have permission to view this page</h1>
-{% endif %}
-{% else %}
-{% load static %}
+  {% load static %}
   <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
 
   <p>You are not logged in</p>
