@@ -101,9 +101,9 @@ class updatePostForm(forms.ModelForm):
     def save(self, post=None):
         post_up = super(updatePostForm, self).save(commit=False)
         if post:
-            print("true")
+            # print("true")
             post_up = post 
-        print(" no true")
+        # print(" no true")
         post_up.save()
         return post_up
   

@@ -10,7 +10,7 @@
         <!-- check if the logged in username is the same as the profile username -->
         {% if user.username == object.author.username %} 
             <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
-            <form method="POST" >
+            <form method="POST" action="{% url 'update_post' pk=object.pk %}">
                 {% csrf_token %}
                 {{form.as_p}}
                 <input type="submit" class="save-changes btn btn-primary"  value="Save Changes">
