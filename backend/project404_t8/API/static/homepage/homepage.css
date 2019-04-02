@@ -25,7 +25,6 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--dark-main);
   font-size: 25px;
 }
-
 /* -------------------- HEADER -------------------- */
 header {
   background: var(--dark-main) !important;
@@ -43,6 +42,19 @@ header::after {
   display: table;
   clear: both;
 }
+/* -------------------- LOGIN HOME -------------------- */
+.login-objects {
+  padding-top: 50px;
+  text-align: center;
+}
+.login-object {
+  font-size: 20px;
+}
+.login-object a:active, a:visited, a:focus{ 
+  color: var(--dark-main) !important;
+  text-decoration: none;
+}
+/* -------------------- NAV -------------------- */
 nav {
   background-color: var(--dark-main) !important;
   padding: 0px 10px 10px 10px;
@@ -57,17 +69,17 @@ nav li {
   padding-top: 15px;
   position: relative;
 }
-nav a, a:active, a:visited, a:focus {
+nav a {
   color: var(--light-main) !important;
   text-decoration: none;
   text-transform: uppercase;
 }
+nav a:active, a:visited, a:focus {
+  color: var(--links-color) !important;
+  text-decoration: none;
+}
 nav a:hover {
   color: var(--orange-color);
-}
-nav a:visited {
-  color: var(--light-main);
-  text-decoration: none;
 }
 nav a::before {
   content: '';
@@ -268,7 +280,6 @@ nav a::before {
   float: right;
   padding-top: 7px;
 }
-
 /* -------------------- OTHERS -------------------- */
 .displayname{
   color: #14171a;

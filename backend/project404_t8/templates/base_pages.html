@@ -52,7 +52,7 @@
                   <li><a href="/friends/">My Friends</a></li>
                 {% endif %}
                 <li><a href="{% url 'profile' username=user.username %}">My Profile</a></li>
-                <li><a class="dropdown-trigger" href="" data-target="dropdown1">Actions<i class="material-icons right">arrow_drop_down</i></a></li>
+                <li><a class="dropdown-trigger" href="" data-target="dropdown1" style="color: #f4f7f7 !important">Actions<i class="material-icons right">arrow_drop_down</i></a></li>
               </ul>
             </div>
           </nav>
@@ -76,6 +76,16 @@
           <li><hr></li>
           <li><a href="{% url 'logout' %}"><i class="material-icons">exit_to_app</i>Logout</a></li>
         </ul>
+    {% else %}
+      <div class="navbar-fixed">
+        <nav class="">
+          <div class="nav-wrapper center">
+            <a href="/">
+              <img class="mainlogo" src="{% static 'img/connectifylogo.png' %}" alt="logo">
+            </a>
+          </div>
+        </nav>
+      </div>
     {% endif %}
   <!-- </div> -->
 </header>
