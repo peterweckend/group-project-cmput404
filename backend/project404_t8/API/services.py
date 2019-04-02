@@ -80,6 +80,8 @@ def has_permission_to_see_post(requesting_user_id, post):
     # ('6', 'public')
     # ('7', 'unlisted')
     # The special thing about unlisted is the URL must be complicated or hard to guess
+    # Something can be unlisted but not private, so this is separate logic here
+
     if post.privacy_setting in ["6","7"]:
         hasPermission = True
 
@@ -129,6 +131,8 @@ def handle_friend_request(receiver_user, follower_user):
     updateNotificationsById(receiver_user.id)
     updateNotificationsById(follower_user.id)
 
+# In theory this should update notifications by object, not ID
+# But its fine for now, dont fix what isnt broken 
 def updateNotificationsById(id):
     user = CustomUser.objects.get(id=id)
     total = Follow.objects.filter(receiver=user.id, ignored=0)
@@ -188,7 +192,8 @@ def addAuthor(authorJSON):
         return author
 
     except:
-        host = urlparse(author["url"]).hostname
+        parsed = urlparse(author["url"])
+        host =  parsed.scheme + "://" + parsed.netloc
 
         author = CustomUser(
             timestamp = timezone.now(),
@@ -206,6 +211,8 @@ def addAuthor(authorJSON):
 # Adds the post if it does not exist and returns it
 # Otherwise returns the existing post
 # What are we going to do with image data here? Surely we cannot save it as a giant full string!
+
+# Issue rn, if the content type is image, fucked shit happens
 def addPost(postJSON):
 
     post = postJSON
@@ -215,8 +222,12 @@ def addPost(postJSON):
         post_object = Post.objects.get(pk=post["id"])
         return post_object
     except:
-        origin = urlparse(post["origin"]).hostname
         post_author = CustomUser.objects.get(pk=post["author"]["id"].split("/")[-1])
+
+        # Prevent fucky shit shit encoded images
+        # TODO decode/save the image somehow
+        if post["contentType"] not in ["text/plain", "text/markdown"]:
+            post["content"] = "THIS SHOULD BE AN IMAGE SOMEHOW"        
 
         post_object = Post(
             id = post["id"],
@@ -226,7 +237,7 @@ def addPost(postJSON):
             body = post["content"], 
             privacy_setting = '6', # Hardcoded for now lel, not looking good
             published = post["published"], 
-            original_host = origin
+            original_host = post["origin"]
         )
         post_object.save()
         return post
