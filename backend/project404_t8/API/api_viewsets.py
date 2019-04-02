@@ -49,19 +49,23 @@ from .serializers import (CommentSerializer, FollowSerializer,
 # in theory, githubRequired shouldn't be true if extra is true
 def getAuthorData(request, extra=False, pk=None, githubRequired=False):
     
-    # Modify the requests path
-    request_path = "/author/" + str(pk)
-
     queryset = CustomUser.objects.all()
     user = get_object_or_404(queryset, pk=pk)
     response = {}
 
-    response["id"] = "https://" + request.get_host() + request_path
+    # response["id"] = "https://" + request.get_host() + request_path
+    response["id"] = user.host + "/author/" + str(user.id)
     # todo: look up the user, find what host they belong to, and return that value
     # instead of using request.get_host() here
-    response["host"] = "https://" + request.get_host() + "/"
+    # response["host"] = "https://" + request.get_host() + "/"
+    response["host"] = user.host
     response["displayName"] = user.displayname
-    response["url"] = "https://" + request.get_host() + request_path
+    # URL is the URL to the authors profile
+    # The url should point to the authors profile on the client side
+    # I dont think we are storing this currently but we should
+    # Pavlo just sends to the api view of the profile so thats what we might as well do LOL
+    # response["url"] = "https://" + user + request_path
+    response["url"] = response["id"]
     if githubRequired:
         response["github"] = user.github_url
 
@@ -283,7 +287,6 @@ class PostsViewSet(viewsets.ModelViewSet):
         # This serializes all the posts into an ordered dictionary
         # Hopefully only the amount requested
         serialized_posts = PostSerializer(public_posts, many=True)
-        # print(serialized_posts.data)
 
         # We don't want to use this one, the order is all messed up and shit
         # Although in theory the order shouldn't matter if they 
@@ -326,7 +329,6 @@ class PostsViewSet(viewsets.ModelViewSet):
         
         for post in serialized_posts.data:
             # Get single post information
-            # print(post)
             postId = str(post["id"])            
             posts.append(getPostData(request, pk=postId))
 
@@ -384,7 +386,6 @@ class PostsViewSet(viewsets.ModelViewSet):
 
                 # swapped to UUID so this shouldn't be an issue 
                 # if Comment.objects.get(pk=commentID):
-                #     # print("comment exists")
                 #     response = {
                 #     'query': 'addComment',
                 #         'success':False,
@@ -459,7 +460,6 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
     # @action(methods=['post'], detail=True, url_path="friendrequest/")
     # Should this allow unathenticated users??
     def create(self, request):
-        # print(request.body)
         if request.method == "POST":
             # extract the author and receiver IDs
             body = json.loads(request.body.decode('utf-8'))
@@ -610,7 +610,6 @@ class AuthorViewSet(viewsets.ModelViewSet):
         paginator = PostsPagination()
         paginated_posts = paginator.paginate_queryset(allowed_posts, request)
         serialized_posts = PostSerializer(paginated_posts, many=True)
-        # print(Services.get_page_size(request, paginator))
 
         response = OrderedDict()
         response.update({"query":"posts"})
@@ -624,7 +623,6 @@ class AuthorViewSet(viewsets.ModelViewSet):
         
         for post in serialized_posts.data:
             # Get single post information
-            # print(post)
             postId = str(post["id"])            
             posts.append(getPostData(request, pk=postId))
 
@@ -635,7 +633,6 @@ class AuthorViewSet(viewsets.ModelViewSet):
             response["next"] = paginator.get_next_link()
         if paginator.get_previous_link() is not None:
             response["previous"] = paginator.get_previous_link()
-        # print(paginator.get_next_link())
         return Response(response)
 
     # the API endpoint accessible at GET http://service/author/<authorid>/friends/

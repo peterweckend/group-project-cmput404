@@ -44,23 +44,14 @@ def get_our_server():
 
 def get_remote_author(remote_server, remote_author_id):
     request_url = remote_server.host + "/author/" + str(remote_author_id)
-    # print("here",65)
 
     r = requests.get(request_url, auth=(remote_server.username, remote_server.password))
-    # print("r",39)
     if r.status_code == 200:
-        # print("hi")
         response = r.content.decode("utf-8")
-        # print(response,43)
-        # print(type(response))
-        # print(222222222222)
         author_data= json.loads(response)
-        # print(11111111111111111)
-        # print(author_data["id"].split("author/")[1],22)
         try:
             remote_author = CustomUser(timestamp=timezone.now(), id=author_data["id"].split("author/")[1], host=remote_server.host, displayname=author_data["displayName"], github_url=author_data["github"], username = "gart", password= "12345", bio=author_data["bio"])
         
-            # print("here",65)
         
             remote_author.save()
         except Exception as e:
@@ -160,47 +151,30 @@ def get_remote_posts_for_feed(current_user_id):
                 print(e,52)
             r = requests.get(request_url, auth=(remote_server.username, remote_server.password), headers=header)
 
-            print("\nRequesting:", request_url,"Status code:", r.status_code,"\n")
 
             if r.status_code != 200:
-                print("An error occured")
+                print("\nAn error occured while requesting:", request_url,"Status code:", r.status_code,"\n")
                 continue
             
-            # print("hi")
             response = r.content.decode("utf-8")
-            # print(response,43)
-            # print(type(response))
-            # print(222222222222)
             posts= json.loads(response)
-            # print(172)
-            # print(posts,11111111111111111)
-            # print(posts["id"].split("author/")[1],22) # hopefully this is the correct syntax for getting data from the response
+            
             count = 0
-            # print(posts["posts"])
-            # print(posts)
             for post in posts["posts"]:
-                # print("in foor loop")
-                # print(post)
                 count +=1
-                # print(count)
                 # check if the post is already saved in our db from a previous request
                 # if it is, continue to next post. If it isn't, save it?
 
                 # todo: grab the author from the post and create/save a new author objects
             
-                # print(post["author"],1999)
                 try:
                     # post_author =  CustomUser(timestamp= timezone.now(), id=post["author"]["id"].split("author/")[1], host=remote_server.host, displayname=post["author"]["displayName"], github_url=post["author"]["github"], username = post["author"]["id"].split("author/")[1], password= "12345" )
                     post_author = Services.addAuthor(post["author"])
 
-                # print(187)
                 # there are a bunch of fields here that still need to be filled out
                 
-                    # print(post["content"],189)
-                    # print((post["content"]),189)
                     # post_object = Post(id=post["id"], author=post_author, title=post["title"], description=post["description"], body=post["content"], privacy_setting='6', published=post["published"], original_host=remote_server.host)
                     post_object = Services.addPost(post)
-                    # print(192)
                     # post_object.save()
                 except Exception as e:
                     print(e,189)   
@@ -213,11 +187,12 @@ def get_remote_posts_for_feed(current_user_id):
                             # comment_author =  CustomUser(timestamp= timezone.now(), id=comment["author"]["id"].split("author/")[1], host=remote_server.host, displayname=comment["author"]["displayName"], github_url=comment["author"]["github"], username = comment["author"]["id"].split("author/")[1], password= "12345" )
                             comment_author = Services.addAuthor(comment["author"])
                         except Exception as e:
-                            print("author already exists")
+                            print(e)
                             pass
                         try:
                             # Probably make sure comments are not overwritte here
                             # AKA try to get the comment first
+                            # TODO Create addComment function similar to the other ones
                             newComment = Comment()
                             newComment.body = comment["comment"]
                             newComment.post = post_object

@@ -192,8 +192,6 @@ def addAuthor(authorJSON):
         return author
 
     except:
-        parsed = urlparse(author["url"])
-        host =  parsed.scheme + "://" + parsed.netloc
 
         author = CustomUser(
             timestamp = timezone.now(),
@@ -201,7 +199,7 @@ def addAuthor(authorJSON):
             username = author["id"].split("/")[-1],
             password = "fixme",
             displayname = author["displayName"],
-            host = host,
+            host = author["host"],
             github_url=author["github"],
         )
         author.save()
