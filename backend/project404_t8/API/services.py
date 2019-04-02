@@ -34,7 +34,7 @@ def has_permission_to_see_post(requesting_user_id, post):
 
     # ('3', 'my friends'),
     # So first get the IDs of all the author's friends
-    if post.privacy_setting == '3' or post.privacy_setting == '4':
+    if post.privacy_setting == '3' or post.privacy_setting == '4' or post.privacy_setting == '5':
         # Get a list of all the rows in friends where friend_a/b == requesting_user_id
         friends1 = Friendship.objects.filter(friend_a=post.author.id)
         friends2 = Friendship.objects.filter(friend_b=post.author.id)
@@ -53,7 +53,17 @@ def has_permission_to_see_post(requesting_user_id, post):
         # Friends are the authors friends
         # If the requester is in the friends list they can view
         if requesting_user_id in friends:
-            hasPermission = True
+            # If friends only on host
+            if post.privacy_setting == '5':
+                print("fox is here")
+                # Get the requesting user object
+                requester = CustomUser.objects.get(pk=id)
+                if not isNotBlank(requester.host):
+                    hasPermission = True
+
+            # otherwise
+            else:
+                hasPermission = True
 
         # ('4', 'friends of friends'),
         # This is brutal enough to do in SQLite, how tf do we do it in Django???
@@ -72,9 +82,6 @@ def has_permission_to_see_post(requesting_user_id, post):
                 hasPermission = True
 
     # ('5', 'only friends on my host'),
-    # Not sure how to implement this one, how do we know where the user's hosted on?
-    # This is a problem for the next deadline lel
-    # TODO
     # basically same as friends above, but make sure they are from the connectify host
 
     # ('6', 'public')
