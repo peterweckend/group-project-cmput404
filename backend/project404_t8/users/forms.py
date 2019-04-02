@@ -9,17 +9,17 @@ class CustomUserCreationForm(UserCreationForm):
 
     class Meta(UserCreationForm):
         model = CustomUser
-        fields = ('username', 'displayname', 'email', 'is_approved_by_admin', 'github_id')
+        fields = ('username', 'displayname', 'email', 'github_id', 'github_url')
         labels = {
             'displayname': 'Display name',
-            'github_id': 'Github Username'
+            'github_id': 'Github Username',
+            'github_url': 'Github URL'
         }
         widgets = {
             'password': forms.PasswordInput(),
         }
 
 class CustomUserChangeForm(UserChangeForm):
-
     class Meta:
         model = CustomUser
         fields = UserChangeForm.Meta.fields
