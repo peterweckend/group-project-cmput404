@@ -8,9 +8,9 @@
         <h1 class="title">Edit Post</h1>
         <br>
         <!-- check if the logged in username is the same as the profile username -->
-        {% if user.username == profile_author.username %} 
+        {% if user.username == object.author.username %} 
             <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
-            <form method="POST" action="{% url 'update_post' pk=user.pk %}">
+            <form method="POST" >
                 {% csrf_token %}
                 {{form.as_p}}
                 <input type="submit" class="save-changes btn btn-primary"  value="Save Changes">
