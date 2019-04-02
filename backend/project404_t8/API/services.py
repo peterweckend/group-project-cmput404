@@ -192,7 +192,8 @@ def addAuthor(authorJSON):
         return author
 
     except:
-        host = urlparse(author["url"]).hostname 
+        parsed = urlparse(author["url"])
+        host =  parsed.scheme + "://" + parsed.netloc
 
         author = CustomUser(
             timestamp = timezone.now(),
@@ -221,8 +222,6 @@ def addPost(postJSON):
         post_object = Post.objects.get(pk=post["id"])
         return post_object
     except:
-        parsed = urlparse(post["origin"])
-        origin =  parsed.scheme + "://" + parsed.netloc
         post_author = CustomUser.objects.get(pk=post["author"]["id"].split("/")[-1])
 
         # Prevent fucky shit shit encoded images
@@ -238,7 +237,7 @@ def addPost(postJSON):
             body = post["content"], 
             privacy_setting = '6', # Hardcoded for now lel, not looking good
             published = post["published"], 
-            original_host = origin
+            original_host = post["origin"]
         )
         post_object.save()
         return post
