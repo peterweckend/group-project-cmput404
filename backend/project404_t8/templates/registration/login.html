@@ -5,10 +5,17 @@
 
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
-<h2>Login</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button class="btn btn-dark" type="submit">Login</button>
-</form>
+<div class="container">
+  <div class="col s4 offset-s4">
+    <br>
+    <h3>Login</h3>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <br>
+      <button class="btn waves-effect waves-light" type="submit" name="action" style="background-color: #34495e" onMouseOver="this.style.color='#f09177'" onMouseOut="this.style.color='#f4f7f7'">LOGIN
+      </button>
+    </form>
+  </div>
+</div>
 {% endblock %}
