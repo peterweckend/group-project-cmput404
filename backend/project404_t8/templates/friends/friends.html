@@ -7,14 +7,15 @@
 {% if user.is_authenticated %}
   {% load static %}
   <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <!--This is the friends page
       In the future this will probably be on the users profile page
       But again, this is like the first iteration of the thingy, proof of concept
       The accept and ignore buttons should use AJAX to send/ignore the request
       Then refresh the dom/friend list
       -->
-  <h1 class="section-header">Friend Requests</h1>
+  <h1 class="section-header friendtitle">Friend Requests</h1>
   {% for r in requests %}
     <div>
       {{ r }} 
@@ -23,12 +24,21 @@
     </div>    
   {% endfor %}
   </br>
-  <h1 class="section-header">Friends</h1>
-  {% for friend in friends %}
+  <h1 class="section-header friendtitle">Friends</h1>
+  {% for friend in friendsObj %}
     <!-- this should be a hyperlink to their profile -->
+    {% if user.id == friend.friend_a_id %}
+
+              
     <div>
-      {{ friend }}
+        <p class="friends"> <a class="friendsp" href="{% url 'profile' username=friend.friend_b %}">{{friend.friend_b.displayname}}</a>
+          <a class=friendshref href ="{% url 'delete_friend' pk=friend.pk %}"> 
+              <button type="button" class="btn btn-danger btn-xs friendsbutton">Remove</button>
+          </a>
+        </p>
+     
     </div>
+    {% endif %}
   {% endfor %}
 {% else %}
   {% load static %}
