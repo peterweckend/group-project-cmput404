@@ -64,9 +64,12 @@ def getAuthorData(request, extra=False, pk=None, githubRequired=False):
         response["id"] = "https://" + request.get_host() + request_path
         response["url"] = response["id"]
 
-    response["host"] = user.host
+    if Services.isNotBlank(user.host):
+        response["host"] = user.host
+    else:
+        response["host"] = "https://" + request.get_host() + "/"
+
     response["displayName"] = user.displayname
-    
     
     if githubRequired:
         response["github"] = user.github_url
@@ -467,7 +470,6 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
         if request.method == "POST":
             # extract the author and receiver IDs
             body = json.loads(request.body.decode('utf-8'))
-
             author = body["author"]
             friend = body["friend"]["id"].split("/")[-1]
 
@@ -482,11 +484,12 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
             # If the receiver doesn't exist do nothing
             try:
                 friend = CustomUser.objects.get(pk=friend)
+                author = CustomUser.objects.get(pk=author["id"].split("/")[-1])
             except:
                 return Response(status=200)
 
             Services.handle_friend_request(friend, author)
-        # handleFriendRequest
+
         return Response(status=200)
     
 
