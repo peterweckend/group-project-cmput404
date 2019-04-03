@@ -64,9 +64,12 @@ def getAuthorData(request, extra=False, pk=None, githubRequired=False):
         response["id"] = "https://" + request.get_host() + request_path
         response["url"] = response["id"]
 
-    response["host"] = user.host
+    if Services.isNotBlank(user.host):
+        response["host"] = user.host
+    else:
+        response["host"] = "https://" + request.get_host() + "/"
+
     response["displayName"] = user.displayname
-    
     
     if githubRequired:
         response["github"] = user.github_url
@@ -85,7 +88,7 @@ def getAuthorData(request, extra=False, pk=None, githubRequired=False):
             friend_entry["id"] = url
             # todo: look up the user, find what host they belong to, and return that value
             # instead of using request.get_host() here
-            friend_entry["host"] = "https://" + request.get_host() + "/" 
+            friend_entry["host"] = "https://" + request.get_host()
             friend_entry["displayName"] =  friend_object.displayname
             friend_entry["url"] = url
             friends_list.append(friend_entry)
@@ -264,6 +267,7 @@ class PostsViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.filter()
     pagination_class = PostsPagination
     serializer_class = PostSerializer
+    permission_classes = (IsAuthenticated,)
     # Instantiates and returns the list of permissions that this view requires.
     # This is useful if you only want some Posts URLs to require authentication but not others
     # def get_permissions(self):
@@ -357,6 +361,7 @@ class PostsViewSet(viewsets.ModelViewSet):
     # the API endpoint accessible at GET http://service/posts/{post_id}/comments
     @action(methods=['get','post'], detail=True, url_path="comments")
     def userPostComments(self, request, pk=None):
+        permission_classes = (IsAuthenticated,)
         post_id = pk
         
         # does the post exist?
@@ -453,7 +458,7 @@ class PostsViewSet(viewsets.ModelViewSet):
 
 class FriendRequestViewSet(viewsets.ModelViewSet):
     http_method_names = ['post']
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     queryset = CustomUser.objects.filter()
     serializer_class = UserSerializer
 
@@ -465,7 +470,6 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
         if request.method == "POST":
             # extract the author and receiver IDs
             body = json.loads(request.body.decode('utf-8'))
-
             author = body["author"]
             friend = body["friend"]["id"].split("/")[-1]
 
@@ -480,11 +484,12 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
             # If the receiver doesn't exist do nothing
             try:
                 friend = CustomUser.objects.get(pk=friend)
+                author = CustomUser.objects.get(pk=author["id"].split("/")[-1])
             except:
                 return Response(status=200)
 
             Services.handle_friend_request(friend, author)
-        # handleFriendRequest
+
         return Response(status=200)
     
 

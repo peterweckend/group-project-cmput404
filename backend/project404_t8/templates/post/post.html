@@ -1,36 +1,101 @@
 <!-- templates/home.html-->
-{% extends 'base.html' %}
+{% extends 'base_pages.html' %}
 
-{% block title %}Home{% endblock %}
+{% block title %}View Post{% endblock %}
 
 {% block content %}
 {% if user.is_authenticated %}
   {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
     <div class="row">
-      <div class="col s8 offset-s2">
+      <div class="col s10 offset-s1">
         <!--We also need to make sure the current use has permission to view the file
           This can be done in the viewsets.py first im pretty sure, then you could pass
           in a boolean, like hasPermission, and only display content if that is true -->
         {% if hasPermission %}
-    
-          <h1>{{ post.title }}</h1>
-          {% if imageExists %}
-            {% load static %}
-            <!--CSS should ensure images fit within a certain size
-              Atleast when they are being displayed on the homepage -->
-            <img src="{% get_media_prefix %}{{ post.image_link }}">
-          {% endif %}
-    
-          <p>{{ post.body|safe }}</p>
-    
-          <!--Display the comments below here somehow
-            Have a form element to add a new comment
-            Could implement JS to show the new comment after the user posts it  -->
-        {% else %}
-          <h1>You do not have permission to view this page</h1>
-        {% endif %}
+          <div class="container">
+            <div class="row">
+              <h1 class="center" style="margin-bottom:5px; font-size:40px;">{{ post.title }}</h1> 
+              <p class="center"><i>by <a href="{% url 'profile' username=post.author %}">{{post.author.displayname}}</a> on {{post.published}}</i></p>
+              <!-- |timezone:"America/Edmonton" IS NOT WORKING ?! -->
+              <!-- <p class="center"><i>Description: {{ post.description }}</i></p> -->
+            </div>
+
+            
+            <div class="row">
+              <!-- <div class="card" style="min-height: 100px; padding: 20px;"> -->
+              <div class="col s12">
+                <p class="post-body">{{ post.body|safe }}</p>
+              </div>
+            </div>
+
+
+            <ul class="collapsible">
+                <li class="active">
+                  <div class="collapsible-header"><i class="material-icons">attach_file</i>Attachments</div>
+                  <div class="collapsible-body">
+                    {% if imageExists %}
+                      {% load static %}
+                      <div class="row">
+                        <!-- <div class="col s12"> -->
+                          <img id="post-image" class="materialboxed z-depth-5" src="{% get_media_prefix %}{{ post.image_link }}">
+                        <!-- </div> -->
+                      </div>
+                      {% else %}
+                        <p>None</p>
+                    {% endif %}
+                  </div>
+                </li>
+              <li>
+                <div class="collapsible-header"><i class="material-icons">more_vert</i>Details</div>
+                <div class="collapsible-body">
+                  <div class="row" style="font-size: 15px; line-height: 25px;">
+                    <div class="col s12 m4 l4"><b>Unlisted Status: </b><br> {{ post.is_unlisted }} </div>
+                    <div class="col s12 m4 l4"><b>Markdown Format:</b><br> {{ post.is_markdown }} </div>
+                    <div class="col s12 m4 l4"><b>Privacy Setting:</b><br> {{ post.privacy_setting }} </div>
+                    <!-- for string version of privacy, try using "function privacyStrFunc(privacy)"" in API/templates/base_pages.html -->
+                    <div class="col s12"><b>Shared Author(s):</b><br> {{ post.shared_author }}</div>
+                  </div>
+                </div>
+              </li>
+              {% else %}
+                <h1>You do not have permission to view this page</h1>
+              {% endif %}
+            </ul>
+
+            
+            <div class="row">
+              <hr>
+              <div class="col s12">
+                <h2 style="margin-top:0; font-size: 24px;">Comments</h2>
+                {% for comment in post.comments.all %}
+                  <div class=row style="margin: 0 !important">
+                    <div class="col s12">
+                      <p class="commentBody">{{comment.body}} </p>
+                      <div class="col s12">
+                        <p class="commentUser">
+                          <a href="{% url 'profile' username=comment.author %}"> {{comment.author.displayname}}</a>
+                          <p class="commentDate">{{comment.datetime}} </p>
+                        </p>
+                        <hr style="margin: 0 !important">
+                      </div>
+                    </div>
+                  </div>
+                {% empty %}
+                    <p class="nocomments">There are currently no comments.</p>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="center">
+              <a href="{% url 'comment' pk=post.pk %}">
+                <button class="btn waves-effect waves-light" type="submit" name="action" style="background-color: #34495e; margin:25px;" onMouseOver="this.style.color='#f09177'" onMouseOut="this.style.color='#f4f7f7'">add a comment
+                </button>
+              </a>
+            </div>
+          </div>
+          <div class="" style="margin-bottom: 50px;"></div>
       </div>
+      <br>
     </div>
 {% else %}
   {% load static %}
