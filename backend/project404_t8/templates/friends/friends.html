@@ -7,7 +7,11 @@
 {% if user.is_authenticated %}
   {% load static %}
   <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
   <!--This is the friends page
       In the future this will probably be on the users profile page
       But again, this is like the first iteration of the thingy, proof of concept
@@ -24,11 +28,18 @@
   {% endfor %}
   </br>
   <h1 class="section-header">Friends</h1>
-  {% for friend in friends %}
+  {% for friend in friendsObj %}
     <!-- this should be a hyperlink to their profile -->
+    {% if user.id == friend.friend_a_id %}
+
+              
     <div>
-      {{ friend }}
+        <p class="friends"> <a class="friendsp" href="{% url 'profile' username=friend.friend_b %}">{{friend.friend_b.displayname}}
+          <a class=friendshref href ="{% url 'delete_friend' pk=friend.pk %}"> <button type="button" class="btn btn-danger btn-xs">Remove Friend</button></a>  </a>
+      </p>
+     
     </div>
+    {% endif %}
   {% endfor %}
 {% else %}
   {% load static %}

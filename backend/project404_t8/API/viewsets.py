@@ -236,9 +236,9 @@ class editProfile(UpdateView):
         self.object = form.save()
         return super(editProfile, self).form_valid(form)
 
-    # redirects to homepage after successful edit 
-    def get_success_url(self, *args, **kwargs):
-        return reverse_lazy("home")
+        # redirects to homepage after successful edit 
+        def get_success_url(self, *args, **kwargs):
+            return reverse_lazy("home")
   
 def homeListView(request):
     # this try and except is to render posts into homepage
@@ -413,12 +413,16 @@ def friendsView(request):
     friends = list(friends)
     friends.sort()
 
+    friends_obj = Friendship.objects.all()
+
     # Make sure None isn't being passed to the template at all
     pageVariables = {}
     if friends != {}:
         pageVariables["friends"] = friends
     if requests != []:
         pageVariables["requests"] = requests
+    if friends_obj != {}:
+        pageVariables["friendsObj"] = friends_obj
     
 
     return render(request, 'friends/friends.html', pageVariables)

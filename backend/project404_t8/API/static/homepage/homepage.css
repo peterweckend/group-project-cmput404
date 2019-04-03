@@ -327,3 +327,16 @@ ul.dropdown-content.select-dropdown {
 ul.dropdown-content.select-dropdown li span {
   color: var(--light-main) !important;
 }
+/* --------- for friend page------------ */
+.friendshref{
+  padding:5%;
+  max-width:50px;
+  max-height:30px;
+}
+.friends{
+  font-size: 1em;
+  padding:5%;
+}
+.friendsp{
+  size: 1em;
+}
