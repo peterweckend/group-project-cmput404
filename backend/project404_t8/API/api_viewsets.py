@@ -156,7 +156,7 @@ def getPostData(request, pk=None):
     # origin
     # just the path of the post
     if Services.isNotBlank(post["original_host"]):
-        origin = str(post["original_host"]) + "/posts/" + str(post["id"])
+        origin = str(post["original_host"]) #+ "/posts/" + str(post["id"])
     else:
         queryset = Server.objects.filter(username=constants.LOCAL_USERNAME)
         server = ServerSerializer(queryset, many=True).data[0]
@@ -338,6 +338,7 @@ class PostsViewSet(viewsets.ModelViewSet):
         for post in serialized_posts.data:
             # Get single post information
             postId = str(post["id"])            
+            # print(postId)
             posts.append(getPostData(request, pk=postId))
 
         # response.update({"posts":serialized_posts.data})

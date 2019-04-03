@@ -199,7 +199,7 @@ def addAuthor(authorJSON):
         return author
 
     except:
-        print(author["url"])
+        # print(author["url"])
 
         if "github" not in author:
             author["github"] = ""
