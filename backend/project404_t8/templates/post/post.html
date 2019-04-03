@@ -15,47 +15,89 @@
         {% if hasPermission %}
           <div class="container">
             <div class="row">
-              <h1 class="center" style="margin-bottom:5px;">{{ post.title }}</h1> 
+              <h1 class="center" style="margin-bottom:5px; font-size:40px;">{{ post.title }}</h1> 
               <p class="center"><i>by <a href="{% url 'profile' username=post.author %}">{{post.author.displayname}}</a> on {{post.published}}</i></p>
               <!-- |timezone:"America/Edmonton" IS NOT WORKING ?! -->
               <!-- <p class="center"><i>Description: {{ post.description }}</i></p> -->
             </div>
+
+            
             <div class="row">
+              <!-- <div class="card" style="min-height: 100px; padding: 20px;"> -->
+              <div class="col s12">
                 <p class="post-body">{{ post.body|safe }}</p>
               </div>
-            {% if imageExists %}
-            {% load static %}
-            <!--CSS should ensure images fit within a certain size
-              Atleast when they are being displayed on the homepage -->
-              <div class="row">
-                <hr>
-                <!-- <div class="col s12"> -->
-                    <h2 class="">Details</h2>
-                    <div class="row" style="font-size: 15px; line-height: 25px;">
-                        <div class="col s12 m4 l4"><b>Unlisted Status: </b><br> {{ post.is_unlisted }} </div>
-                        <div class="col s12 m4 l4"><b>Markdown Format:</b><br> {{ post.is_markdown }} </div>
-                        <div class="col s12 m4 l4"><b>Privacy Setting:</b><br> {{ post.privacy_setting }} </div>
-                        <!-- for string version of privacy, try using "function privacyStrFunc(privacy)"" in API/templates/base_pages.html -->
-                        <div class="col s12"><b>Shared Author(s):</b><br> {{ post.shared_author }}</div>
+            </div>
+
+            <div class="row">
+              <hr>
+              <div class="col s12">
+                <h2 style="margin-top:0;">Comments</h2>
+                {% for comment in post.comments.all %}
+                  <div class=row>
+                    <div class="col s12">
+                      <p class="commentBody">{{comment.body}} </p>
+                      <div class="col s12">
+                        <p class="commentUser">
+                          <a href="{% url 'profile' username=comment.author %}"> {{comment.author.displayname}}</a>
+                          <p class="commentDate">{{comment.datetime}} </p>
+                        </p>
                       </div>
-                <!-- </div> -->
-                <hr style="margin-bottom: 0">
-                </div>
-                <div class="row">
-                <!-- <div class="col s12"> -->
-                  <h2 class="">Attachments</h2>
-                  <img id="post-image" class="materialboxed z-depth-5" src="{% get_media_prefix %}{{ post.image_link }}">
-                <!-- </div> -->
+                    </div>
+                  </div>
+                  <hr>
+                {% empty %}
+                    <p class="nocomments">There are currently no comments.</p>
+                {% endfor %}
               </div>
-            {% endif %}
-            <!--Display the comments below here somehow
-              Have a form element to add a new comment
-              Could implement JS to show the new comment after the user posts it  -->
+            </div>
+            <div class="center">
+              <button class="btn waves-effect waves-light" 
+                type="submit" name="action" style="background-color: #34495e; margin-top:25px !important; margin-bottom: 25px !important;" 
+                onMouseOver="this.style.color='#f09177'" onMouseOut="this.style.color='#f4f7f7'">
+                <a href="{% url 'comment' pk=post.pk %}">ADD A COMMENT
+                </a>
+              </button>
+            </div>
+
+
+
+            <ul class="collapsible">
+                <li>
+                  <div class="collapsible-header"><i class="material-icons">attach_file</i>Attachments</div>
+                  <div class="collapsible-body">
+                    {% if imageExists %}
+                      {% load static %}
+                      <div class="row">
+                        <!-- <div class="col s12"> -->
+                          <img id="post-image" class="materialboxed z-depth-5" src="{% get_media_prefix %}{{ post.image_link }}">
+                        <!-- </div> -->
+                      </div>
+                      {% else %}
+                        <p>None</p>
+                    {% endif %}
+                  </div>
+                </li>
+              <li>
+                <div class="collapsible-header"><i class="material-icons">more_vert</i>Details</div>
+                <div class="collapsible-body">
+                  <div class="row" style="font-size: 15px; line-height: 25px;">
+                    <div class="col s12 m4 l4"><b>Unlisted Status: </b><br> {{ post.is_unlisted }} </div>
+                    <div class="col s12 m4 l4"><b>Markdown Format:</b><br> {{ post.is_markdown }} </div>
+                    <div class="col s12 m4 l4"><b>Privacy Setting:</b><br> {{ post.privacy_setting }} </div>
+                    <!-- for string version of privacy, try using "function privacyStrFunc(privacy)"" in API/templates/base_pages.html -->
+                    <div class="col s12"><b>Shared Author(s):</b><br> {{ post.shared_author }}</div>
+                  </div>
+                </div>
+              </li>
+              {% else %}
+                <h1>You do not have permission to view this page</h1>
+              {% endif %}
+            </ul>
           </div>
-        {% else %}
-          <h1>You do not have permission to view this page</h1>
-        {% endif %}
+          <div class="" style="margin-bottom: 50px;"></div>
       </div>
+      <br>
     </div>
 {% else %}
   {% load static %}
