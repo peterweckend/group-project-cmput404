@@ -237,7 +237,7 @@ nav a::before {
   position: relative;
   object-fit: contain;
   top: 0;
-  left: 0;
+  /* left: 0; */
 }
 #post-image {
   max-width:100%;

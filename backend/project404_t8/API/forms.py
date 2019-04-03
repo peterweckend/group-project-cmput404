@@ -74,7 +74,7 @@ class updatePostForm(forms.ModelForm):
             'class': 'form-control',
             'placeholder': 'Post Title...'
         }))
-    body = forms.CharField(label='Body', max_length=250, required = False, widget=forms.Textarea(
+    body = forms.CharField(label='Body', required = False, widget=forms.Textarea(
         attrs={
             'rows':7,
             'class': 'form-control',
