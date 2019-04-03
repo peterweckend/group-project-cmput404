@@ -1,28 +1,33 @@
 <!-- templates/friendrequest/friendrequest.html -->
 {% extends 'base_pages.html' %}
 
-{% block title %}Add new comment{% endblock %}
+{% block title %}Add New Comment{% endblock %}
 
 {% block content %}
 {% if user.is_authenticated %}
-{% load static %}
-  <link rel="stylesheet" type="text/css" href="{% static 'upload/upload.css' %}">
+  {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'upload/upload.css' %}">
 
-<!--This is the friend request page
-    This is for testing honestly, not final
-    Will just be a JS/AJAX button instead down the road -->
-<h1>Add new comment</h1>
-<br>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" class="comment btn btn-primary" value="Comment">
-</form>
-{% else %}
-{% load static %}
-  <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
-
-  <p>You are not logged in</p>
-  <a href="{% url 'login' %}">login</a>
+  <!--This is the friend request page
+      This is for testing honestly, not final
+      Will just be a JS/AJAX button instead down the road -->
+      <div class="row">
+        <div class="col m8 offset-m2">
+          <h1>Add New Comment</h1>
+          <br>
+          <form method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              {{ form.as_p }}
+              <br>
+              <button class="comment btn waves-effect waves-light" type="submit" name="action" style="background-color: #34495e" onMouseOver="this.style.color='#f09177'" onMouseOut="this.style.color='#f4f7f7'">Comment</button>
+          </form>
+          {% else %}
+          {% load static %}
+            <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
+          
+            <p>You are not logged in</p>
+            <a href="{% url 'login' %}">login</a>
+        </div>
+      </div>
 {% endif %}
 {% endblock %}

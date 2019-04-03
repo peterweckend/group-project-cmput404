@@ -98,7 +98,6 @@ def has_permission_to_see_post(requesting_user_id, post):
 
 def handle_friend_request(receiver_user, follower_user):
     # Do nothing if a friendship between the two users exists
-    
     check1 = Friendship.objects.filter(friend_a=receiver_user, friend_b=follower_user)
     check2 = Friendship.objects.filter(friend_b=receiver_user, friend_a=follower_user)
 
@@ -201,6 +200,13 @@ def addAuthor(authorJSON):
 
     except:
         print(author["url"])
+
+        if "github" not in author:
+            author["github"] = ""
+
+        if "url" not in author:
+            author["url"] = ""
+
         author = CustomUser(
             timestamp = timezone.now(),
             id = author["id"].split("/")[-1],
