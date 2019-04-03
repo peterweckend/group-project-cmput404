@@ -236,9 +236,9 @@ class editProfile(UpdateView):
         self.object = form.save()
         return super(editProfile, self).form_valid(form)
 
-        # redirects to homepage after successful edit 
-        def get_success_url(self, *args, **kwargs):
-            return reverse_lazy("home")
+    # redirects to homepage after successful edit 
+    def get_success_url(self, *args, **kwargs):
+        return reverse_lazy("home")
   
 def homeListView(request):
     # this try and except is to render posts into homepage
@@ -396,7 +396,7 @@ def friendsView(request):
     # We can do this by querying for each username based on the id
     requests2 = []
     for r in requests: 
-        requests2.append(CustomUser.objects.get(id=r.follower_id).username)
+        requests2.append(CustomUser.objects.get(id=r.follower_id).displayname)
     requests = requests2
 
     # Get the users friends
