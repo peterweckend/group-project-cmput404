@@ -64,9 +64,12 @@ def getAuthorData(request, extra=False, pk=None, githubRequired=False):
         response["id"] = "https://" + request.get_host() + request_path
         response["url"] = response["id"]
 
-    response["host"] = user.host
+    if Services.isNotBlank(user.host):
+        response["host"] = user.host
+    else:
+        response["host"] = "https://" + request.get_host() + "/"
+
     response["displayName"] = user.displayname
-    
     
     if githubRequired:
         response["github"] = user.github_url
