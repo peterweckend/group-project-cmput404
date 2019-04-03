@@ -83,7 +83,7 @@ def getAuthorData(request, extra=False, pk=None, githubRequired=False):
             friend_object = get_object_or_404(queryset, pk=friend.friend_b.id)
 
             friend_entry["id"] = url
-            # todo: look up the user, find what host they belong to, and return that value
+            # TODO: look up the user, find what host they belong to, and return that value
             # instead of using request.get_host() here
             friend_entry["host"] = "https://" + request.get_host() + "/" 
             friend_entry["displayName"] =  friend_object.displayname

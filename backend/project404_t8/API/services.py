@@ -52,12 +52,13 @@ def has_permission_to_see_post(requesting_user_id, post):
 
         # Friends are the authors friends
         # If the requester is in the friends list they can view
+        # print("crash here?")
         if requesting_user_id in friends:
             # If friends only on host
             if post.privacy_setting == '5':
-                print("fox is here")
+                # print("fox is here")
                 # Get the requesting user object
-                requester = CustomUser.objects.get(pk=id)
+                requester = CustomUser.objects.get(pk=requesting_user_id)
                 if not isNotBlank(requester.host):
                     hasPermission = True
 
