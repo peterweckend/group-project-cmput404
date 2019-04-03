@@ -7,9 +7,10 @@ class CustomUserCreationForm(UserCreationForm):
 
     github_id = forms.CharField(required=False)
 
+
     class Meta(UserCreationForm):
         model = CustomUser
-        fields = ('username', 'displayname', 'email', 'is_approved_by_admin', 'github_id')
+        fields = ('username', 'displayname', 'email', 'github_id')
         labels = {
             'displayname': 'Display name',
             'github_id': 'Github Username'
@@ -17,6 +18,13 @@ class CustomUserCreationForm(UserCreationForm):
         widgets = {
             'password': forms.PasswordInput(),
         }
+    def save(self, user=None):
+        user_profile = super(CustomUserCreationForm, self).save(commit=False)
+        if user:
+            user_profile = user 
+        user_profile.is_active= False
+        user_profile.save()
+        return user_profile
 
 class CustomUserChangeForm(UserChangeForm):
 
