@@ -6,7 +6,7 @@ import uuid
 
 # https://youtu.be/HshbjK1vDtY
 class CustomUserManager(UserManager):
-    def create_user(self, username, email, password=None, is_admin=False):
+    def create_user(self, username, email, password=None, is_admin=False,is_approved_by_active=False):
         if not username:
             raise ValueError("Users must have a username")
         if not password:
@@ -15,7 +15,11 @@ class CustomUserManager(UserManager):
         user_obj = self.model(
             username = username
         )
+
         user_obj.set_password(password) # change user password
+        # user_obj.is_active=False 
+        # print("+++++++++++++++++++++++++++")
+        print(user_obj.is_active)
         user_obj.save(using=self._db)
         return user_obj
 
@@ -37,7 +41,7 @@ class CustomUser(AbstractUser):
     bio         = models.TextField()
     is_approved_by_admin = models.BooleanField(default=False)
     url = models.TextField()
-
+    # active = models.BooleanField(default=False)
     objects = CustomUserManager()
 
     def __str__(self):
@@ -46,5 +50,10 @@ class CustomUser(AbstractUser):
     @property
     def is_admin(self):
         return self.admin
+    @property
+    def is_approved(self):
+        return self.is_approved_by_admin
+        
+
 
         
