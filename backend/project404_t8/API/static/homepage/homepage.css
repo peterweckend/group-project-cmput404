@@ -239,6 +239,21 @@ nav a::before {
   top: 0;
   left: 0;
 }
+#post-image {
+  max-width:100%;
+  position: relative;
+  object-fit: contain;
+  text-align: center;
+}
+.post-body{
+  font-size: 20px !important;
+  color:rgb(43, 43, 43);
+  text-align: justify;
+  word-wrap: break-word;
+}
+.post-details li {
+  font-size: 20px !important;
+}
 /* #pimage{
   z-index: 2;
   width:100px;

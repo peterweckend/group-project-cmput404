@@ -16,7 +16,7 @@
             <br>
             <div class = "row">
               <div class="col s11">
-                <span class="ptitle">{{p.title}}</span>
+                <span class="ptitle"><a href="post/{{ p.id }}">{{p.title}}</a></span>
                 <div class="puser"><a href="{% url 'profile' username=p.author %}">{{p.author.displayname}}</a>
                 <div class="timePub">{{p.published|timezone:"America/Edmonton"}}</div></div>
               </div>
