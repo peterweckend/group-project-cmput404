@@ -5,18 +5,16 @@ from django.forms import ModelForm
 
 class CustomUserCreationForm(UserCreationForm):
 
-    github_id = forms.CharField(required=False)
-
+    github_url = forms.URLField(required=False)
+    github_username = forms.CharField(required=False)
 
     class Meta(UserCreationForm):
         model = CustomUser
-        fields = ('username', 'displayname', 'email', 'github_id')
+        fields = ('username', 'displayname', 'first_name', 'last_name', 'email', 'github_url', 'github_username', 'password1', 'password2')
         labels = {
             'displayname': 'Display name',
-            'github_id': 'Github Username'
-        }
-        widgets = {
-            'password': forms.PasswordInput(),
+            'github_url': 'Github URL',
+            'github_username': 'Github Username',
         }
     def save(self, user=None):
         user_profile = super(CustomUserCreationForm, self).save(commit=False)
@@ -33,6 +31,5 @@ class CustomUserChangeForm(UserChangeForm):
         fields = UserChangeForm.Meta.fields
         widgets = {
             'password': forms.PasswordInput(attrs={'class':'password'}),
-            
         }
 
