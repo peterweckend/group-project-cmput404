@@ -470,7 +470,6 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
         if request.method == "POST":
             # extract the author and receiver IDs
             body = json.loads(request.body.decode('utf-8'))
-
             author = body["author"]
             friend = body["friend"]["id"].split("/")[-1]
 
@@ -485,11 +484,12 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
             # If the receiver doesn't exist do nothing
             try:
                 friend = CustomUser.objects.get(pk=friend)
+                author = CustomUser.objects.get(pk=author["id"].split("/")[-1])
             except:
                 return Response(status=200)
 
             Services.handle_friend_request(friend, author)
-        # handleFriendRequest
+
         return Response(status=200)
     
 
