@@ -44,43 +44,48 @@ def get_our_server():
 
 def get_remote_author(remote_server, remote_author_id):
     request_url = remote_server.host + "/author/" + str(remote_author_id)
-
     r = requests.get(request_url, auth=(remote_server.username, remote_server.password))
     if r.status_code == 200:
         response = r.content.decode("utf-8")
-        author_data= json.loads(response)
+        author_data = json.loads(response)
+
         try:
-            remote_author = CustomUser(timestamp=timezone.now(), id=author_data["id"].split("author/")[1], host=remote_server.host, displayname=author_data["displayName"], github_url=author_data["github"], username = "gart", password= "12345", bio=author_data["bio"])
-        
-        
+            author_id = author_data["id"].split("/")[-1]
+            remote_author = CustomUser(timestamp=timezone.now(), id=author_id, host=remote_server.host, 
+                    displayname=author_data["displayName"], friend_requests = 1, username = author_id, 
+                    password= "12345", url = author_data["id"])
             remote_author.save()
+            return remote_author
+            
         except Exception as e:
-            print(e,52)
-        return remote_author
+            print("Exception:", e)
+            return None
+        
     else:
         return None
 
 # returns a second parameter stating if the author is local
 def get_user(remote_author_id):
-    # search for any local authors with the username
-    remote_author_id ="e204d9bb-73aa-41d7-aceb-b9fce475d65f"
+    # search for any local authors with the id
     try:
-        queryset = CustomUser.objects.filter(pk=remote_author_id)
-        author = UserSerializer(queryset, many=True).data[0]
-        author_is_local = True
-        return author, author_is_local
+        author = CustomUser.objects.get(pk=remote_author_id)
+        author_exists_on_local = True
+        return author, author_exists_on_local
 
-    # search for any server authors with the username
+    # search for any remote authors with the id
     except:
         queryset = Server.objects.all()
         for server in queryset:
+            if server.username == constants.LOCAL_USERNAME:
+                continue
+
             author = get_remote_author(server, remote_author_id)
-            if author == None:
-                return None
-            else:
-                author_is_local = False
-                return author, author_is_local
-    return None
+
+            if author != None:
+                author_exists_on_local = False
+                return author, author_exists_on_local
+
+    return None, None
 
 
 
@@ -92,33 +97,39 @@ def befriend_remote_author_by_id(remote_author_id, local_author_id):
     if local_author == None:
         return False
     author = {}
-    author["id"] = local_author.id
-    author["host"] = local_author.host
+    local_host = get_our_server().host
+    author["id"] = local_host + "/author/" + str(local_author.id)
+    author["host"] = local_host
     author["displayName"] = local_author.displayname
-    author["url"] = local_author.url
+    author["url"] = local_host + "/author/" + str(local_author.id)
 
-    remote_author, author_is_local = get_user(remote_author_id)
+    remote_author, author_exists_on_local = get_user(remote_author_id)
     if remote_author == None:
         return False
-    if author_is_local:
-        Services.handle_friend_request(remote_author, local_author)
-        return True
+
+    # by now, either the remote author is already saved locally, or
+    # they didn't exist locally but have been newly saved locally.
+    # either way, we want to send the local friend a friend request
+    Services.handle_friend_request(remote_author, local_author)
+
     friend = {}
-    friend["id"] = local_author.id
-    friend["host"] = local_author.host
-    friend["displayName"] = local_author.displayname
-    friend["url"] = local_author.url
+    friend["id"] = remote_author.url
+    friend["host"] = remote_author.host
+    friend["displayName"] = remote_author.displayname
+    friend["url"] = remote_author.url
 
     data = {}
     data["query"] = "friendrequest"
     data["author"] = author
     data["friend"] = friend
-    # todo send to all servers?
-    request_url = remote_server.host + "/author/" + str(remote_author_id)
-    r = requests.post(request_url, auth=(remote_server.username, remote_server.password))
+
+    request_url = remote_author.host + "/friendrequest"
+    remote_server = get_server_info(remote_author.host)
+    r = requests.post(request_url, auth=(remote_server.username, remote_server.password), data = json.dumps(data))
     response = r.text
 
     if r.status_code != 200:
+        print(response)
         return False
 
     return True
