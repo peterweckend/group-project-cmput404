@@ -1,32 +1,57 @@
 <!-- templates/home.html-->
-{% extends 'base.html' %}
+{% extends 'base_pages.html' %}
 
-{% block title %}Home{% endblock %}
+{% block title %}View Post{% endblock %}
 
 {% block content %}
 {% if user.is_authenticated %}
   {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
     <div class="row">
-      <div class="col s8 offset-s2">
+      <div class="col s10 offset-s1">
         <!--We also need to make sure the current use has permission to view the file
           This can be done in the viewsets.py first im pretty sure, then you could pass
           in a boolean, like hasPermission, and only display content if that is true -->
         {% if hasPermission %}
-    
-          <h1>{{ post.title }}</h1>
-          {% if imageExists %}
+          <div class="container">
+            <div class="row">
+              <h1 class="center" style="margin-bottom:5px;">{{ post.title }}</h1> 
+              <p class="center"><i>by <a href="{% url 'profile' username=post.author %}">{{post.author.displayname}}</a> on {{post.published}}</i></p>
+              <!-- |timezone:"America/Edmonton" IS NOT WORKING ?! -->
+              <!-- <p class="center"><i>Description: {{ post.description }}</i></p> -->
+            </div>
+            <div class="row">
+                <p class="post-body">{{ post.body|safe }}</p>
+              </div>
+            {% if imageExists %}
             {% load static %}
             <!--CSS should ensure images fit within a certain size
               Atleast when they are being displayed on the homepage -->
-            <img src="{% get_media_prefix %}{{ post.image_link }}">
-          {% endif %}
-    
-          <p>{{ post.body|safe }}</p>
-    
-          <!--Display the comments below here somehow
-            Have a form element to add a new comment
-            Could implement JS to show the new comment after the user posts it  -->
+              <div class="row">
+                <hr>
+                <!-- <div class="col s12"> -->
+                    <h2 class="">Details</h2>
+                    <div class="row" style="font-size: 15px; line-height: 25px;">
+                        <div class="col s12 m4 l4"><b>Unlisted Status: </b><br> {{ post.is_unlisted }} </div>
+                        <div class="col s12 m4 l4"><b>Markdown Format:</b><br> {{ post.is_markdown }} </div>
+                        <div class="col s12 m4 l4"><b>Privacy Setting:</b><br> {{ post.privacy_setting }} </div>
+                        <!-- for string version of privacy, try using "function privacyStrFunc(privacy)"" in API/templates/base_pages.html -->
+                        <div class="col s12"><b>Shared Author(s):</b><br> {{ post.shared_author }}</div>
+                      </div>
+                <!-- </div> -->
+                <hr style="margin-bottom: 0">
+                </div>
+                <div class="row">
+                <!-- <div class="col s12"> -->
+                  <h2 class="">Attachments</h2>
+                  <img id="post-image" class="materialboxed z-depth-5" src="{% get_media_prefix %}{{ post.image_link }}">
+                <!-- </div> -->
+              </div>
+            {% endif %}
+            <!--Display the comments below here somehow
+              Have a form element to add a new comment
+              Could implement JS to show the new comment after the user posts it  -->
+          </div>
         {% else %}
           <h1>You do not have permission to view this page</h1>
         {% endif %}

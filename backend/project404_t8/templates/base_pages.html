@@ -24,6 +24,28 @@
         $('.materialboxed').materialbox();
         $('input#title, textarea#body').characterCounter();
       });
+      function privacyStrFunc(privacy) {
+        switch(privacy) {
+          case 1:
+            document.write("Private");
+            break;
+          case 2:
+            document.write("Specific Users");
+            break;
+          case 3:
+            document.write("All Friends");
+            break;
+          case 4:
+            document.write("Friends of Friends");
+            break;
+          case 5:
+            document.write("Connectify Friends Only");
+            break;
+          case 6:
+            document.write("Public");
+            break;
+        }
+      }
     </script>
 </head>
 <header class="z-depth-1">
