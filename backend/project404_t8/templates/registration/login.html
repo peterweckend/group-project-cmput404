@@ -12,9 +12,9 @@
     <h3>Login</h3>
     {% if messages %}
       <script>
-        for (message in messages) {
+        {% for message in messages %}
           alert('{{message}}');
-        }
+        {% endfor %}
       </script>
     {% endif %}
     <form method="post">
