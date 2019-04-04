@@ -6,13 +6,15 @@ from django.forms import ModelForm
 class CustomUserCreationForm(UserCreationForm):
 
     github_url = forms.URLField(required=False)
+    displayname = forms.URLField(required=True)
     github_username = forms.CharField(required=False)
+    bio = forms.CharField(required=False)
 
     class Meta(UserCreationForm):
         model = CustomUser
-        fields = ('username', 'displayname', 'first_name', 'last_name', 'bio', 'email', 'github_url', 'github_username', 'password1', 'password2')
+        fields = ('username', 'displayname', 'first_name', 'last_name', 'email', 'github_username', 'github_url', 'bio', 'password1', 'password2')
         labels = {
-            'displayname': 'Display name',
+            'displayname': 'Display Name',
             'github_url': 'Github URL',
             'github_username': 'Github Username',
         }
