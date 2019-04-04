@@ -18,10 +18,10 @@
       -->
   <h1 class="section-header friendtitle">Friend Requests</h1>
   {% for r in requests %}
-    <div>
+    <div id="{{r.id}}_row">
       <p class="friends"><a class="friendsp" href="{% url 'profile' username=r.username %}">{{ r.displayname }}</a>
       <button type="button" class="addfriend btn btn-secondary">Accept</button>
-      <button type="button" class="removefriend btn btn-danger">Ignore</button>
+      <button type="button" class="ignorefriend btn btn-danger">Ignore</button>
       </p>
       <hr class="separator">
       <script type="text/javascript">
@@ -45,6 +45,7 @@
               data: jsonData,
               contentType: "application/json",
               success: function(result){
+                console.log(result)
                 console.log("time to remove this row");
                 removeRequest(requestorID);
               },
@@ -56,14 +57,16 @@
               }
             })
           })
-          $(".removefriend").click(function() {
+          $(".ignorefriend").click(function() {
             console.log("remove this friend");
+            // this should call removeRequest after as well
           });
         });
 
-        function removeRequest(friend) {
+        // called on accept or ignore request to delete the row 
+        function removeRequest(requestorID) {
           console.log("let's remove this request now");
-          $("addfriend"+friend+"_box").remove();
+          $("#"+requestorID+"_row").remove();
         }
         
         // https://docs.djangoproject.com/en/1.10/ref/csrf/#ajax
