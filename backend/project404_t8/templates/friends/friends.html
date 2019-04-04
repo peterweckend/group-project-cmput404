@@ -104,13 +104,54 @@
           </a>
         </p>
      
+<!--   <div class="one-main-column">
+    <div class="col s12">
+      <h1 style="font-size: 45px; margin-bottom:15px;">Friends</h1>
+      {% for friend in friendsObj %}
+      <div class="row"> -->
+        <!-- this should be a hyperlink to their profile -->
+<!--         {% if user.id == friend.friend_a_id %}   
+          <div>
+            <div class="col s7">
+              <p class="" style="font-size: 25px"> <a class="friendsp" href="{% url 'profile' username=friend.friend_b %}">{{friend.friend_b.displayname}}</a></p>
+            </div>
+            <div class="col s5">
+              <div class="right">
+                <a class=friendshref href ="{% url 'delete_friend' pk=friend.pk %}">
+                    <button class="btn waves-effect waves-light friendsbutton" type="submit" name="action" style="background-color: #34495e;" onMouseOver="this.style.color='#f4f7f7'" onMouseOut="this.style.color='#f4f7f7'">Remove
+                      </button>
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+      {% endfor %}
     </div>
-    {% endif %}
-  {% endfor %}
+    <div class="col s12">
+      <hr>
+      <h1 style="font-size: 45px; margin-bottom:15px;">Requests</h1>
+      {% for r in requests %}
+        <div class="row">
+          <div class="col s7">
+              <p style="font-size: 25px">{{ r }}</p>
+          </div>
+          <div class="col s5">
+            <div class="right">
+              <a class="btn-floating btn-small waves-effect waves-light" style="background-color: rgb(57, 190, 57);">
+              <i class="material-icons">check</i></a>
+              <a class="btn-floating btn-small waves-effect waves-light" style="background-color: rgb(235, 45, 45)">
+              <i class="material-icons">clear</i></a>
+            </div>
+          </div>
+        </div>
+      {% endfor %} -->
+    </div>
+    
+  </div>
 {% else %}
   {% load static %}
   <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
-
   <p>You are not logged in</p>
   <a href="{% url 'login' %}">login</a>
 {% endif %}

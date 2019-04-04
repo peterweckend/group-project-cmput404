@@ -7,7 +7,7 @@
 
 body {
     height: 100vh;
-    background-color: var(--light-main);
+    background-color: var(--light-main) !important;
 }
 .confirmation {
     margin-top: 10%;
