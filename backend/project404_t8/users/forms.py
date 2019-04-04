@@ -6,7 +6,7 @@ from django.forms import ModelForm
 class CustomUserCreationForm(UserCreationForm):
 
     github_url = forms.URLField(required=False)
-    displayname = forms.URLField(required=True)
+    displayname = forms.CharField(required=True)
     github_username = forms.CharField(required=False)
     bio = forms.CharField(required=False)
 
