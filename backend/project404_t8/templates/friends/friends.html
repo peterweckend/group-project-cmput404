@@ -46,7 +46,9 @@
               <div class="col s2">
                 <div class="right">
                   <div class="row" style="display: inline-block">
-                    <a class="addfriend btn-floating btn-small waves-effect waves-light" style="background-color: rgb(57, 190, 57);">
+                    <a class="addfriend btn-floating btn-small waves-effect waves-light" 
+                    id={{r.id}} 
+                    style="background-color: rgb(57, 190, 57);">
                     <i class="material-icons">check</i></a>
                   </div>
                 </div>
@@ -54,77 +56,104 @@
               <div class="col s2">
                 <div class="center">
                   <div class="row" style="display: inline-block">
-                      <a class="ignorefriend btn-floating btn-small waves-effect waves-light" style="background-color: rgb(235, 45, 45)">
+                      <a class="ignorefriend btn-floating btn-small waves-effect waves-light" 
+                      id={{r.id}} 
+                      style="background-color: rgb(235, 45, 45)">
                       <i class="material-icons">clear</i></a>
                   </div>
                 </div>
               </div>
             </p>
-            <script type="text/javascript">
-              $(document).ready(function() {
-                // const Url = "http://connectifyapp.herokuapp.com/friendrequest/processRequest";
-                const Url = "http://127.0.0.1:8000/friendrequest/processRequest";
-                var authorID = "{{request.user.id}}";
-                var requestorID = "{{r.id}}";
-                var csrftoken = getCookie('csrftoken');
-                $(".addfriend").click(function() {
-                  console.log("add this friend");
-                  var data = {
-                    "action": "ACCEPT",
-                    "IdOfLoggedInUser": authorID,
-                    "IdOfFriendToAddOrDeny": requestorID,
-                  };
-                  var jsonData = JSON.stringify(data);
-                  $.ajax({
-                    url: Url,
-                    type: "POST",
-                    data: jsonData,
-                    // dataType: "jsonp",
-                    contentType: "application/json",
-                    success: function(result){
-                      console.log("success");
-                      removeRequest(requestorID);
-                    },
-                    beforeSend: function(xhr) {
-                      xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                    },
-                    error: function(XMLHttpRequest, textStatus, errorThrown) {
-                      console.log(errorThrown);
-                    }
-                  })
-                })
-                $(".ignorefriend").click(function() {
-                  console.log("remove this friend");
-                  // delete request
-                  // this should call removeRequest after as well
-                });
-              });
-
-              // called on accept or ignore request to delete the row 
-              function removeRequest(requestorID) {
-                console.log("let's remove this request now");
-                $("#"+requestorID+"_row").remove();
-              }
-              
-              // https://docs.djangoproject.com/en/1.10/ref/csrf/#ajax
-              function getCookie(name) {
-                  var cookieValue = null;
-                  if (document.cookie && document.cookie !== '') {
-                      var cookies = document.cookie.split(';');
-                      for (var i = 0; i < cookies.length; i++) {
-                          var cookie = jQuery.trim(cookies[i]);
-                          // Does this cookie string begin with the name we want?
-                          if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                              break;
-                          }
-                      }
-                  }
-                  return cookieValue;
-              }
-            </script>
           </div>    
         {% endfor %}
+      </div>
     </div>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        // const Url = "http://connectifyapp.herokuapp.com/friendrequest/processRequest";
+        const Url = "http://127.0.0.1:8000/friendrequest/processRequest";
+        var authorID = "{{request.user.id}}";
+        var requestorID;
+        var csrftoken = getCookie('csrftoken');
+        $(".addfriend").click(function() {
+          requestorID = this.id;
+          var data = {
+            "action": "ACCEPT",
+            "IdOfLoggedInUser": authorID,
+            "IdOfFriendToAddOrDeny": requestorID,
+          };
+          var jsonData = JSON.stringify(data);
+          $.ajax({
+            url: Url,
+            type: "POST",
+            data: jsonData,
+            // dataType: "jsonp",
+            contentType: "application/json",
+            success: function(result){
+              console.log("success");
+              removeRequest(requestorID);
+            },
+            beforeSend: function(xhr) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+              console.log(errorThrown);
+            }
+          })
+        })
+        $(".ignorefriend").click(function() {
+          console.log("remove this friend");
+          var data = {
+            "action": "DENY",
+            "IdOfLoggedInUser": authorID,
+            "IdOfFriendToAddOrDeny": requestorID,
+          };
+          
+          var jsonData = JSON.stringify(data);
+          $.ajax({
+            url: Url,
+            type: "POST",
+            data: jsonData,
+            // dataType: "jsonp",
+            contentType: "application/json",
+            success: function(result){
+              console.log("success");
+              removeRequest(requestorID);
+            },
+            beforeSend: function(xhr) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+              console.log(errorThrown);
+            }
+          })
+          // this should call removeRequest after as well
+          removeRequest(requestorID);
+        });
+      });
+  
+      // called on accept or ignore request to delete the row 
+      function removeRequest(requestorID) {
+        console.log("let's remove this request now");
+        $("#"+requestorID+"_row").remove();
+      }
+      
+      // https://docs.djangoproject.com/en/1.10/ref/csrf/#ajax
+      function getCookie(name) {
+          var cookieValue = null;
+          if (document.cookie && document.cookie !== '') {
+              var cookies = document.cookie.split(';');
+              for (var i = 0; i < cookies.length; i++) {
+                  var cookie = jQuery.trim(cookies[i]);
+                  // Does this cookie string begin with the name we want?
+                  if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                      cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                      break;
+                  }
+              }
+          }
+          return cookieValue;
+      }
+    </script>
   {% endif %}
 {% endblock %}
