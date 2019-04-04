@@ -22,6 +22,8 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from users.models import CustomUser
+from django.db.models import Q
+
 
 from .forms import EditProfileForm, commentForm, friendRequestForm, uploadForm
 from .models import (Comment, Follow, Friendship, Post, PostAuthorizedAuthor,
@@ -86,7 +88,7 @@ def getAuthorData(request, extra=False, pk=None, githubRequired=False):
             friend_object = get_object_or_404(queryset, pk=friend.friend_b.id)
 
             friend_entry["id"] = url
-            # todo: look up the user, find what host they belong to, and return that value
+            # TODO: look up the user, find what host they belong to, and return that value
             # instead of using request.get_host() here
             friend_entry["host"] = "https://" + request.get_host()
             friend_entry["displayName"] =  friend_object.displayname
@@ -154,7 +156,7 @@ def getPostData(request, pk=None):
     # origin
     # just the path of the post
     if Services.isNotBlank(post["original_host"]):
-        origin = str(post["original_host"]) + "/posts/" + str(post["id"])
+        origin = str(post["original_host"]) #+ "/posts/" + str(post["id"])
     else:
         queryset = Server.objects.filter(username=constants.LOCAL_USERNAME)
         server = ServerSerializer(queryset, many=True).data[0]
@@ -336,6 +338,7 @@ class PostsViewSet(viewsets.ModelViewSet):
         for post in serialized_posts.data:
             # Get single post information
             postId = str(post["id"])            
+            # print(postId)
             posts.append(getPostData(request, pk=postId))
 
         # response.update({"posts":serialized_posts.data})
@@ -523,31 +526,38 @@ class AuthorViewSet(viewsets.ModelViewSet):
             raise ParseError("No correct X-User header or authentication were provided.")
         uid = str(uid).replace('-','')
         
-        # todo: properly escape this using https://docs.djangoproject.com/en/1.9/topics/db/sql/#passing-parameters-into-raw
-        # allowed_posts = Post.objects.raw(' \
-        # WITH posts AS (SELECT id FROM API_post WHERE author_id in  \
-        # (SELECT f2.friend_a_id AS fofid \
-        #     FROM API_friendship f \
-        #     JOIN API_friendship f2 ON f.friend_a_id = f2.friend_b_id \
-        #     WHERE fofid NOT IN (SELECT friend_a_ID FROM API_friendship  \
-        #     WHERE friend_b_id = %s) AND f.friend_b_id = %s AND fofid != %s) AND privacy_setting = 4 \
-        # UNION \
-        #     SELECT id FROM API_post WHERE (author_id in  \
-        #     (WITH friends(fid) AS (SELECT friend_b_id FROM API_friendship WHERE friend_a_id=%s) \
-        #     SELECT * FROM friends WHERE fid != %s GROUP BY fid)  \
-        #     AND (privacy_setting = 3 OR privacy_setting = 4)) OR author_id = %s OR  privacy_setting = 6) \
-        #     SELECT * FROM API_post WHERE id in posts \
-        #     ORDER BY published DESC' , [str(uid)]*6)
-        allowed_posts = []
-        allPosts = Post.objects.filter().order_by('-published') # I think this returns them all
+        viewable_posts = []
+
+        try:
+            uname = request.user
+            uid = uname.id
+
+            # ------------- set queries by Tolu ----------------------
+            userUser = CustomUser.objects.filter(pk=uid)[0].id
+            hostHost = CustomUser.objects.filter(pk=uid)[0].host
+            option1 = Post.objects.filter(author=userUser)
+            friendZone = Friendship.objects.filter(friend_a=userUser).values_list('friend_b', flat=True)
+            fofriendZone = Friendship.objects.filter(friend_a__in=friendZone).values_list('friend_b', flat=True)
+            option3 = Post.objects.filter(Q(author__in=friendZone) & Q(privacy_setting=3) | Q(author__in=friendZone) & Q(privacy_setting=4))
+            option4 = Post.objects.filter(Q(author__in=fofriendZone) & Q(privacy_setting=4))
+            option5 = Post.objects.filter(Q(author__in=friendZone) & Q(privacy_setting=5) &Q(original_host=hostHost))
+            option6 = Post.objects.filter(Q(privacy_setting=6))
+            unlistedPosts = Post.objects.filter(Q(is_unlisted=True) & ~Q(author=userUser))
+            allPosts = option1.union(option3,option4,option5,option6)
+            if unlistedPosts.exists():
+                viewable_posts = allPosts.difference(unlistedPosts).order_by('-published')
+            else:
+                viewable_posts = allPosts.order_by('-published')
+        except:
+            pass
+
+        allowed_posts = viewable_posts
 
         request_user_id = getAuthorIdForApiRequest(request)
         if request_user_id == None:
             raise ParseError("No correct X-User header or authentication were provided.")
 
-        for post in allPosts:
-            if Services.has_permission_to_see_post(request_user_id, post):
-                allowed_posts.append(post)
+        
 
         paginator = PostsPagination()
         paginated_posts = paginator.paginate_queryset(allowed_posts, request)
