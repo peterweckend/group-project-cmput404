@@ -18,7 +18,7 @@
             <div class="row">
               <div>
                 <div class="col s8">
-                  <p class="" style="font-size: 20px"> <a class="friendsp" href="{% url 'profile' username=friend.friend_b %}">{{friend.friend_b.displayname}}</a></p>
+                  <p class="" style="font-size: 20px;"> <a class="friendsp" href="{% url 'profile' username=friend.friend_b %}">{{friend.friend_b.displayname}}</a></p>
                 </div>
                 <div class="col s4">
                   <div class="center">
@@ -36,12 +36,12 @@
       
       <div class="col s12">
         <hr>
-        <h1 style="font-size: 45px; margin-bottom:15px;">Requests</h1>
+        <h1 style="font-size: 45px; margin-top: 15px; margin-bottom:15px;">Requests</h1>
         {% for r in requests %}
           <div class="row" style="margin-bottom:0px" id="{{r.id}}_row">
             <p class="friends">
               <div class="col s8">
-                <a class="friendsp" style="font-size: 20px" href="{% url 'profile' username=r.username %}">{{ r.displayname }}</a>
+                <a class="friendsp" style="font-size: 20px;" href="{% url 'profile' username=r.username %}">{{ r.displayname }}</a>
               </div>
               <div class="col s2">
                 <div class="right">
@@ -103,8 +103,6 @@
         })
         $(".ignorefriend").click(function() {
           requestorID = this.id;
-          console.log(requestorID);
-
           // delete request
           var data = {
             "action": "DENY",

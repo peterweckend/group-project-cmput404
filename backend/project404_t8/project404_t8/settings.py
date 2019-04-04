@@ -139,7 +139,7 @@ USE_TZ = True
 # STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn")
 STATIC_URL = '/static/'
 LOGIN_REDIRECT_URL = 'home'
-LOGOUT_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'login'
 
 if '/app' in os.environ['HOME']:
     django_heroku.settings(locals())
