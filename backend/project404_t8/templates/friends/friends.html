@@ -26,7 +26,7 @@
       <hr class="separator">
       <script type="text/javascript">
         $(document).ready(function() {
-          console.log("does this work?");
+          // const Url = "http://connectifyapp.herokuapp.com/friendrequest/processRequest";
           const Url = "http://127.0.0.1:8000/friendrequest/processRequest";
           var authorID = "{{request.user.id}}";
           var requestorID = "{{r.id}}";
@@ -43,10 +43,10 @@
               url: Url,
               type: "POST",
               data: jsonData,
+              // dataType: "jsonp",
               contentType: "application/json",
               success: function(result){
-                console.log(result)
-                console.log("time to remove this row");
+                console.log("success");
                 removeRequest(requestorID);
               },
               beforeSend: function(xhr) {
@@ -59,6 +59,7 @@
           })
           $(".ignorefriend").click(function() {
             console.log("remove this friend");
+            // delete request
             // this should call removeRequest after as well
           });
         });
