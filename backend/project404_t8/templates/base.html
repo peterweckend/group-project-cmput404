@@ -93,17 +93,11 @@
 <body>
   {% if user.is_authenticated %}
     <div class="row">
-      <!-- -------------------- LEFT COLUMN -------------------- -->
-      <div class="leftcolumn">
+      <!-- -------------------- MAIN COLUMN -------------------- -->
+      <div class="one-main-column">
+        <div class="col s12 m8 offset-m2 l6 offset-l3"
         {% block content %}
         {% endblock %}
-      </div>
-
-      <!-- -------------------- RIGHT COLUMN -------------------- -->
-      <div class="rightcolumn">
-        {% if user.is_authenticated %}
-          right column
-        {% endif %}
       </div>
     </div>
   {% else %}
