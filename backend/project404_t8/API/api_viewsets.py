@@ -22,7 +22,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from users.models import CustomUser
-
+import API.serverMethods as ServerMethods
 from .forms import EditProfileForm, commentForm, friendRequestForm, uploadForm
 from .models import (Comment, Follow, Friendship, Post, PostAuthorizedAuthor,
                      PostCategory, Server)
@@ -495,20 +495,30 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
     # http://service/friendrequest/processRequest
     @action(methods=['post'], detail=False)
     def processRequest(self, request, pk=None):
-        print("you called the endpoint!")
-        body = json.loads(request.body.decode('utf-8'))
+        body = request.data
         idOfFriendToAddOrDeny = body["IdOfFriendToAddOrDeny"]
         idOfLoggedInUser = body["IdOfLoggedInUser"]
+        action = body["action"]
         
-        if body["action"] == "ACCEPT":
-            print("you chose to accept the request")
-        elif body["action"] == "DENY":
-            print("you chose to deny the request")
-        else:
-            print("ERROR: incorrect action specified")
-            return Response(status=500)
+        friendToAddOrDeny = CustomUser.objects.get(pk=idOfFriendToAddOrDeny)
+        loggedInUser = CustomUser.objects.get(pk=idOfLoggedInUser)
 
-        print("Body:", body)
+        if action == "ACCEPT":
+            requesterIsRemote = False
+            if Services.isNotBlank(friendToAddOrDeny.host):
+                requesterIsRemote = True
+
+            if requesterIsRemote:
+                result = ServerMethods.befriend_remote_author_by_id(idOfFriendToAddOrDeny, idOfLoggedInUser)
+            else:
+                Services.handle_friend_request(idOfFriendToAddOrDeny, idOfLoggedInUser)
+
+        else:
+            follow = Follow.objects.get(follower=idOfFriendToAddOrDeny, receiver=idOfLoggedInUser)
+            follow.delete()
+            Services.updateNotificationsById(idOfFriendToAddOrDeny.id)
+            Services.updateNotificationsById(idOfLoggedInUser.id)
+            
         return Response(status=200)
     
 
