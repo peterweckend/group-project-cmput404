@@ -28,7 +28,12 @@
             <div class="col s12 m4 l4"><b>Email: </b><br> {{ author.email }} </div>
             <div class="col s12" style="margin:10px;"><hr></div>
             <div class="col s12 m4 l4"><b>GitHub Username: </b><br> {{ author.github_id }}</div>
-            <div class="col s12 m8 l8"><b>GitHub URL: </b><br> {{ author.github_url }}</div>
+            <div class="col s12 m4 l4"><b>GitHub URL: </b><br> {{ author.github_url }}</div>
+            {% if author.host != "" %}
+              <div class="col s12 m4 l4"><b>Host: </b><br> {{ author.host }}</div>
+            {% else %}
+            <div class="col s12 m4 l4"><b>Host: </b><br>Connectify</div>
+            {% endif %}
           </div>
         </div>
       </li>
