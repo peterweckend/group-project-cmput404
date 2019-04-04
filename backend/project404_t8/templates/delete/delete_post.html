@@ -1,23 +1,31 @@
 {% extends '../base.html' %}
 {% block content %}
-{% load static %}
-<link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
 {% if user.is_authenticated %}
+<div class="one-main-column">
+  <div class="col s12">
+    <div class="" style="margin-top:50px"></div>
+    {{friend}}
     {% if user.id == object.author_id %}
-        <p class="confirmation">Are you sure you want to delete '{{object.title}}'?</p>
-
+      <div class="center">
+        <p style="font-size: 25px;">
+          Are you sure you want to delete <br>'{{object.title}}'?
+        </p>
         <form method ="POST">
             {% csrf_token %}
-            <button type="submit" class="btn btn-danger delete-button"> Yes, I'm sure.</button>
+            <button class="btn waves-effect waves-light friendsbutton" type="submit" name="action" style="background-color: #34495e; margin-top: 20px;" onMouseOver="this.style.color='#f4f7f7'" onMouseOut="this.style.color='#f4f7f7'">Yes, I'm sure.
+              </button>
         </form>
+      </div>
     {% else %}
-        <p>You do not have access to this page.</p>
-    {% endif %}
+      <p>You do not have access to this page.</p>
+  </div>
+</div>
+{% endif %}
 {% else %}
   {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
     <p>You are not logged in</p>
     <p><a href="{% url 'signup' %}">Sign Up</a></p>
     <p><a href="{% url 'login' %}">Log In </a></p>
-  {% endif %}
+{% endif %}
 {% endblock %}

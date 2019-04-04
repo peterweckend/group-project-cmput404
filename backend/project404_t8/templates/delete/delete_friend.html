@@ -1,18 +1,25 @@
 {% extends '../base.html' %}
 {% block content %}
 {% if user.is_authenticated %}
- 
-  {{friend}}
-  {% if user.id == object.friend_a_id %}
-  <br>
-  <p> Are you sure you want to remove '{{object.friend_b}}' as a friend?</p>
-
-  <form method ="POST">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-danger"> Yes, I'm sure.</button>
-  </form>
-  {% else %}
+<div class="one-main-column">
+  <div class="col s12">
+    <div class="" style="margin-top:50px"></div>
+    {{friend}}
+    {% if user.id == object.friend_a_id %}
+      <div class="center">
+        <p style="font-size: 25px;">
+          Are you sure you want to remove '{{object.friend_b}}' as a friend?
+        </p>
+        <form method ="POST">
+            {% csrf_token %}
+            <button class="btn waves-effect waves-light friendsbutton" type="submit" name="action" style="background-color: #34495e; margin-top: 20px;" onMouseOver="this.style.color='#f4f7f7'" onMouseOut="this.style.color='#f4f7f7'">Yes, I'm sure.
+              </button>
+        </form>
+      </div>
+    {% else %}
       <p>You do not have access to this page.</p>
+  </div>
+</div>
 {% endif %}
 {% else %}
   {% load static %}
@@ -20,5 +27,5 @@
     <p>You are not logged in</p>
     <p><a href="{% url 'signup' %}">Sign Up</a></p>
     <p><a href="{% url 'login' %}">Log In </a></p>
-  {% endif %}
+{% endif %}
 {% endblock %}
