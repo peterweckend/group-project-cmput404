@@ -69,8 +69,8 @@
                 <!--Display some extra stuff regarding friends if the user has unignored friend requests
                     Would this just be an if/else??? -->
                 {% if user.friend_requests > '0' %}
-                  <li><a href="/friends/">My Friends <span class="new badge red">{{user.friend_requests}}</span></a></li>
-                  <!-- <span class="new badge red" data-badge-caption="custom caption"></span> -->
+                  <li><a href="/friends/">My Friends <span class="new badge" style="background-color: #da6342">{{user.friend_requests}}</span></a></li>
+                  <!-- <span class="new badge" style="background-color: #da6342" data-badge-caption="custom caption"></span> -->
                 {% else %}
                   <li><a href="/friends/">My Friends</a></li>
                 {% endif %}
@@ -91,7 +91,7 @@
           <li><a href="{% url 'editprofile' pk=user.pk %}"><i class="material-icons">edit</i>Edit Profile</a></li>
           <!-- <li><div class="divider"></div></li> -->
           {% if user.friend_requests > '0' %}
-            <li><a href="/friends/"><i class="material-icons">people</i>My Friends <span class="new badge red">{{user.friend_requests}}</span></a></li>
+            <li><a href="/friends/"><i class="material-icons">people</i>Friends <span class="new badge" style="background-color: #da6342">{{user.friend_requests}}</span></a></li>
             {% else %}
             <li><a href="/friends/"><i class="material-icons">people</i>My Friends</a></li>
           {% endif %}

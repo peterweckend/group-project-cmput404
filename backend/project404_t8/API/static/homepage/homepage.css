@@ -6,6 +6,7 @@
   --dark-secondary: #5da0a2;
   --light-secondary: #aacfd0;
   --orange-color: #da6342;
+  --orange-color2: #b8654e;
   --beige-color: #e9dcd3;
   --letter-grey: #afaeae;
   --links-color: #3e81c4;
@@ -74,12 +75,14 @@ nav a {
   text-decoration: none;
   text-transform: uppercase;
 }
-nav a:active, a:visited, a:focus {
-  color: var(--orange-color) !important;
+nav a:active, nav a:visited, nav a:focus {
+  color: var(--light-main) !important;
   text-decoration: none;
 }
-nav a:hover {
-  color: var(--orange-color);
+nav #nav-mobile a:hover {
+  color: var(--light-main) !important;
+  background-color: var(--orange-color2) !important;
+  text-decoration: none;
 }
 nav a::before {
   content: '';
@@ -103,7 +106,8 @@ nav a::before {
   text-transform: uppercase;
 }
 .dropdown-content a:hover {
-  background-color: var(--orange-color) !important;
+  color: var(--light-main) !important;
+  background-color: var(--orange-color2) !important;
 }
 .dropdown-content i.material-icons {
   color: var(--light-main) !important;
@@ -119,7 +123,7 @@ nav a::before {
   text-transform: uppercase;
 }
 .sidenav a:hover {
-  background-color: var(--orange-color) !important;
+  background-color: var(--orange-color2) !important;
 }
 .sidenav i.material-icons {
   color: var(--light-main) !important;
@@ -149,6 +153,7 @@ nav a::before {
   padding-left: 5%;
   padding-right: 5%;
   min-height: 83vh;
+  background-color: var(--light-main) !important;
 }
 /* Clear floats after the columns */
 .row:after {
@@ -344,21 +349,15 @@ ul.dropdown-content.select-dropdown li span {
 }
 /* --------- for friend page------------ */
 .friendshref {
-  padding-left: 2%;
+  padding-left: 0;
 }
 .friends {
   font-size: 2em;
-  padding-left: 3%;
+  padding-left: 0;
 }
 .friendsp {
   size: 1em;
 }
 .friendsbutton {
   font-size: 10px;
-}
-
-.friendtitle {
-  padding-left: 3%;
-  font-size: 35px;
-  text-decoration: underline;
 }
