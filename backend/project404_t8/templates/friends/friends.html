@@ -102,13 +102,16 @@
           })
         })
         $(".ignorefriend").click(function() {
-          console.log("remove this friend");
+          requestorID = this.id;
+          console.log(requestorID);
+
+          // delete request
           var data = {
             "action": "DENY",
             "IdOfLoggedInUser": authorID,
             "IdOfFriendToAddOrDeny": requestorID,
           };
-          
+
           var jsonData = JSON.stringify(data);
           $.ajax({
             url: Url,
