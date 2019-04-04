@@ -4,156 +4,127 @@
 {% block title %}Send friend request{% endblock %}
 
 {% block content %}
-{% if user.is_authenticated %}
-  {% load static %}
-  <link rel="stylesheet" type="text/css" href="{% static 'upload/upload.css' %}">
-  <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
-  <meta charset="utf-8">
-  <!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
-  <!--This is the friends page
-      In the future this will probably be on the users profile page
-      But again, this is like the first iteration of the thingy, proof of concept
-      The accept and ignore buttons should use AJAX to send/ignore the request
-      Then refresh the dom/friend list
-      -->
-  <h1 class="section-header friendtitle">Friend Requests</h1>
-  {% for r in requests %}
-    <div id="{{r.id}}_row">
-      <p class="friends"><a class="friendsp" href="{% url 'profile' username=r.username %}">{{ r.displayname }}</a>
-      <button type="button" class="addfriend btn btn-secondary">Accept</button>
-      <button type="button" class="ignorefriend btn btn-danger">Ignore</button>
-      </p>
-      <hr class="separator">
-      <script type="text/javascript">
-        $(document).ready(function() {
-          // const Url = "http://connectifyapp.herokuapp.com/friendrequest/processRequest";
-          const Url = "http://127.0.0.1:8000/friendrequest/processRequest";
-          var authorID = "{{request.user.id}}";
-          var requestorID = "{{r.id}}";
-          var csrftoken = getCookie('csrftoken');
-          $(".addfriend").click(function() {
-            console.log("add this friend");
-            var data = {
-              "action": "ACCEPT",
-              "IdOfLoggedInUser": authorID,
-              "IdOfFriendToAddOrDeny": requestorID,
-            };
-            var jsonData = JSON.stringify(data);
-            $.ajax({
-              url: Url,
-              type: "POST",
-              data: jsonData,
-              // dataType: "jsonp",
-              contentType: "application/json",
-              success: function(result){
-                console.log("success");
-                removeRequest(requestorID);
-              },
-              beforeSend: function(xhr) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-              },
-              error: function(XMLHttpRequest, textStatus, errorThrown) {
-                console.log(errorThrown);
-              }
-            })
-          })
-          $(".ignorefriend").click(function() {
-            console.log("remove this friend");
-            // delete request
-            // this should call removeRequest after as well
-          });
-        });
-
-        // called on accept or ignore request to delete the row 
-        function removeRequest(requestorID) {
-          console.log("let's remove this request now");
-          $("#"+requestorID+"_row").remove();
-        }
-        
-        // https://docs.djangoproject.com/en/1.10/ref/csrf/#ajax
-        function getCookie(name) {
-            var cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                var cookies = document.cookie.split(';');
-                for (var i = 0; i < cookies.length; i++) {
-                    var cookie = jQuery.trim(cookies[i]);
-                    // Does this cookie string begin with the name we want?
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-      </script>
-    </div>    
-  {% endfor %}
-  
-  </br>
-  <h1 class="section-header friendtitle">Friends</h1>
-  {% for friend in friendsObj %}
-    <!-- this should be a hyperlink to their profile -->
-    {% if user.id == friend.friend_a_id %}
-
-              
-    <div>
-        <p class="friends"> <a class="friendsp" href="{% url 'profile' username=friend.friend_b %}">{{friend.friend_b.displayname}}</a>
-          <a class=friendshref href ="{% url 'delete_friend' pk=friend.pk %}"> 
-              <button type="button" class="btn btn-danger btn-xs friendsbutton">Remove</button>
-          </a>
-        </p>
-     
-<!--   <div class="one-main-column">
-    <div class="col s12">
-      <h1 style="font-size: 45px; margin-bottom:15px;">Friends</h1>
-      {% for friend in friendsObj %}
-      <div class="row"> -->
-        <!-- this should be a hyperlink to their profile -->
-<!--         {% if user.id == friend.friend_a_id %}   
-          <div>
-            <div class="col s7">
-              <p class="" style="font-size: 25px"> <a class="friendsp" href="{% url 'profile' username=friend.friend_b %}">{{friend.friend_b.displayname}}</a></p>
-            </div>
-            <div class="col s5">
-              <div class="right">
-                <a class=friendshref href ="{% url 'delete_friend' pk=friend.pk %}">
-                    <button class="btn waves-effect waves-light friendsbutton" type="submit" name="action" style="background-color: #34495e;" onMouseOver="this.style.color='#f4f7f7'" onMouseOut="this.style.color='#f4f7f7'">Remove
-                      </button>
-                </a>
+  {% if user.is_authenticated %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'upload/upload.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
+    <meta charset="utf-8">
+    
+    <div class="one-main-column">
+      <div class="col s12">
+        <h1 style="font-size: 45px; margin-bottom:15px;">Friends</h1>
+        {% for friend in friendsObj %}
+          {% if user.id == friend.friend_a_id %}   
+            <div class="row">
+              <div>
+                <div class="col s8">
+                  <p class="" style="font-size: 20px"> <a class="friendsp" href="{% url 'profile' username=friend.friend_b %}">{{friend.friend_b.displayname}}</a></p>
+                </div>
+                <div class="col s4">
+                  <div class="center">
+                    <a class=friendshref href ="{% url 'delete_friend' pk=friend.pk %}">
+                        <button class="btn waves-effect waves-light friendsbutton" type="submit" name="action" style="background-color: #34495e; margin-left: 20px;" onMouseOver="this.style.color='#f4f7f7'" onMouseOut="this.style.color='#f4f7f7'">Remove
+                        </button>
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        {% endif %}
+          {% endif %}
+        {% endfor %}
       </div>
-      {% endfor %}
-    </div>
-    <div class="col s12">
-      <hr>
-      <h1 style="font-size: 45px; margin-bottom:15px;">Requests</h1>
-      {% for r in requests %}
-        <div class="row">
-          <div class="col s7">
-              <p style="font-size: 25px">{{ r }}</p>
-          </div>
-          <div class="col s5">
-            <div class="right">
-              <a class="btn-floating btn-small waves-effect waves-light" style="background-color: rgb(57, 190, 57);">
-              <i class="material-icons">check</i></a>
-              <a class="btn-floating btn-small waves-effect waves-light" style="background-color: rgb(235, 45, 45)">
-              <i class="material-icons">clear</i></a>
-            </div>
-          </div>
-        </div>
-      {% endfor %} -->
-    </div>
-    
-  </div>
-{% else %}
-  {% load static %}
-  <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
-  <p>You are not logged in</p>
-  <a href="{% url 'login' %}">login</a>
-{% endif %}
-{% endblock %}
+      
+      <div class="col s12">
+        <hr>
+        <h1 style="font-size: 45px; margin-bottom:15px;">Requests</h1>
+        {% for r in requests %}
+          <div class="row" style="margin-bottom:0px" id="{{r.id}}_row">
+            <p class="friends">
+              <div class="col s8">
+                <a class="friendsp" style="font-size: 20px" href="{% url 'profile' username=r.username %}">{{ r.displayname }}</a>
+              </div>
+              <div class="col s2">
+                <div class="right">
+                  <div class="row" style="display: inline-block">
+                    <a class="addfriend btn-floating btn-small waves-effect waves-light" style="background-color: rgb(57, 190, 57);">
+                    <i class="material-icons">check</i></a>
+                  </div>
+                </div>
+              </div>
+              <div class="col s2">
+                <div class="center">
+                  <div class="row" style="display: inline-block">
+                      <a class="ignorefriend btn-floating btn-small waves-effect waves-light" style="background-color: rgb(235, 45, 45)">
+                      <i class="material-icons">clear</i></a>
+                  </div>
+                </div>
+              </div>
+            </p>
+            <script type="text/javascript">
+              $(document).ready(function() {
+                // const Url = "http://connectifyapp.herokuapp.com/friendrequest/processRequest";
+                const Url = "http://127.0.0.1:8000/friendrequest/processRequest";
+                var authorID = "{{request.user.id}}";
+                var requestorID = "{{r.id}}";
+                var csrftoken = getCookie('csrftoken');
+                $(".addfriend").click(function() {
+                  console.log("add this friend");
+                  var data = {
+                    "action": "ACCEPT",
+                    "IdOfLoggedInUser": authorID,
+                    "IdOfFriendToAddOrDeny": requestorID,
+                  };
+                  var jsonData = JSON.stringify(data);
+                  $.ajax({
+                    url: Url,
+                    type: "POST",
+                    data: jsonData,
+                    // dataType: "jsonp",
+                    contentType: "application/json",
+                    success: function(result){
+                      console.log("success");
+                      removeRequest(requestorID);
+                    },
+                    beforeSend: function(xhr) {
+                      xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                      console.log(errorThrown);
+                    }
+                  })
+                })
+                $(".ignorefriend").click(function() {
+                  console.log("remove this friend");
+                  // delete request
+                  // this should call removeRequest after as well
+                });
+              });
 
+              // called on accept or ignore request to delete the row 
+              function removeRequest(requestorID) {
+                console.log("let's remove this request now");
+                $("#"+requestorID+"_row").remove();
+              }
+              
+              // https://docs.djangoproject.com/en/1.10/ref/csrf/#ajax
+              function getCookie(name) {
+                  var cookieValue = null;
+                  if (document.cookie && document.cookie !== '') {
+                      var cookies = document.cookie.split(';');
+                      for (var i = 0; i < cookies.length; i++) {
+                          var cookie = jQuery.trim(cookies[i]);
+                          // Does this cookie string begin with the name we want?
+                          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                              break;
+                          }
+                      }
+                  }
+                  return cookieValue;
+              }
+            </script>
+          </div>    
+        {% endfor %}
+    </div>
+  {% endif %}
+{% endblock %}
