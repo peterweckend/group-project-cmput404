@@ -242,15 +242,51 @@ def addPost(postJSON):
         if post["contentType"] not in ["text/plain", "text/markdown"]:
             post["content"] = "THIS SHOULD BE AN IMAGE SOMEHOW"        
 
+        # Change me
+        # Read the sent visibility and save it as such
+        # Convert text to number string
+        privacy = post["visibility"]
+        # visibility = ["PRIVATE", "FRIENDS", "FOAF", "SERVERONLY", "PUBLIC"]
+        if privacy == "PRIVATE":
+            privacy = '1'
+        if privacy == "FRIENDS":
+            privacy = '3'
+        if privacy == "FOAF":
+            privacy = '4'
+        if privacy == "SERVERONLY":
+            privacy = '5'
+        if privacy == "PUBLIC":
+            privacy = '6'
+
+
         post_object = Post(
             id = post["id"],
             author = post_author, 
             title = post["title"], 
             description = post["description"], 
             body = post["content"], 
-            privacy_setting = '6', # Hardcoded for now lel, not looking good
+            privacy_setting = privacy, 
             published = post["published"], 
             original_host = post["origin"]
         )
         post_object.save()
         return post
+
+def addComment(commentJSON, post_id):
+
+    try:
+        comment_object = Comment.objects.get(pk=commentJSON["comment"]["id"])
+        return False
+    except:
+        author = commentJSON["comment"]["author"]
+        commentID = commentJSON["comment"]["id"]
+        comment = commentJSON["comment"]["comment"]
+        postTime = commentJSON["comment"]["published"]
+        post = Post.objects.get(pk=post_id)
+
+        author = addAuthor(author)
+
+        newComment = Comment(id=commentID, author=author, post=post, datetime=postTime, body=comment)
+        newComment.save()
+
+        return True

@@ -353,10 +353,17 @@ class PostsViewSet(viewsets.ModelViewSet):
         queryset = Post.objects.filter(pk=pk)
         # serializer_class = PostSerializer(queryset, many=True)
         post = getPostData(request, pk=pk)
+        requested_post = Post.objects.get(pk=pk)
         response = OrderedDict()
         response.update({"query":"getPost"})
         response.update({"posts":post})
-        
+
+        request_user_id = getAuthorIdForApiRequest(request)
+        if request_user_id == None:
+            raise ParseError("No correct X-User header or authentication were provided.")
+
+        if not Services.has_permission_to_see_post(request_user_id, requested_post):
+            return Response("403", status=403)
 
         # return Response(serializer_class.data)
         return Response(response)
@@ -388,38 +395,22 @@ class PostsViewSet(viewsets.ModelViewSet):
 
             if Services.has_permission_to_see_post(request_user_id, requested_post): 
                 body = json.loads(request.body.decode('utf-8'))
-                author = body["comment"]["author"]
-                commentID = body["comment"]["id"]
-                comment = body["comment"]["comment"]
-                postTime = body["comment"]["published"]
-                post = Post.objects.get(pk=post_id)
 
-                # swapped to UUID so this shouldn't be an issue 
-                # if Comment.objects.get(pk=commentID):
-                #     response = {
-                #     'query': 'addComment',
-                #         'success':False,
-                #         'message':"Comment not allowed"
-                #     }
-                #     return Response(response, status=403)
+                if Services.addComment(body, post_id):
 
-                Services.addAuthor(author)
-
-                newComment = Comment(id=commentID, author=author, post=post, datetime=postTime, body=comment)
-                newComment.save()
-                response = {
-                    'query': 'addComment',
-                        'success':True,
-                        'message':"Comment Added"
-                }
-                return Response(response, status=200)
-            else:
-                response = {
-                    'query': 'addComment',
-                        'success':False,
-                        'message':"Comment not allowed"
-                }
-                return Response(response, status=403)
+                    response = {
+                        'query': 'addComment',
+                            'success':True,
+                            'message':"Comment Added"
+                    }
+                    return Response(response, status=200)
+                else:
+                    response = {
+                        'query': 'addComment',
+                            'success':False,
+                            'message':"Comment not allowed"
+                    }
+                    return Response(response, status=403)
 
         elif request.method == "GET": # this handles "GET" methods
             # check that we're allowed to see the post - for now just check if the posts are public
@@ -536,6 +527,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
             userUser = CustomUser.objects.filter(pk=uid)[0].id
             hostHost = CustomUser.objects.filter(pk=uid)[0].host
             option1 = Post.objects.filter(author=userUser)
+            option2 = Post.objects.filter(shared_author=userUser)
             friendZone = Friendship.objects.filter(friend_a=userUser).values_list('friend_b', flat=True)
             fofriendZone = Friendship.objects.filter(friend_a__in=friendZone).values_list('friend_b', flat=True)
             option3 = Post.objects.filter(Q(author__in=friendZone) & Q(privacy_setting=3) | Q(author__in=friendZone) & Q(privacy_setting=4))
@@ -543,7 +535,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
             option5 = Post.objects.filter(Q(author__in=friendZone) & Q(privacy_setting=5) &Q(original_host=hostHost))
             option6 = Post.objects.filter(Q(privacy_setting=6))
             unlistedPosts = Post.objects.filter(Q(is_unlisted=True) & ~Q(author=userUser))
-            allPosts = option1.union(option3,option4,option5,option6)
+            allPosts = option1.union(option2,option3,option4,option5,option6)
             if unlistedPosts.exists():
                 viewable_posts = allPosts.difference(unlistedPosts).order_by('-published')
             else:
