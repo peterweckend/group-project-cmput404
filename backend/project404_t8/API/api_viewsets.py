@@ -504,7 +504,7 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
             if requesterIsRemote:
                 result = ServerMethods.befriend_remote_author_by_id(idOfFriendToAddOrDeny, idOfLoggedInUser)
             else:
-                Services.handle_friend_request(idOfFriendToAddOrDeny, idOfLoggedInUser)
+                Services.handle_friend_request(friendToAddOrDeny, loggedInUser)
 
         else:
             follow = Follow.objects.get(follower=idOfFriendToAddOrDeny, receiver=idOfLoggedInUser)
