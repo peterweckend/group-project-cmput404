@@ -75,7 +75,7 @@ nav a {
   text-transform: uppercase;
 }
 nav a:active, a:visited, a:focus {
-  color: var(--light-main) !important;
+  color: var(--orange-color) !important;
   text-decoration: none;
 }
 nav a:hover {
