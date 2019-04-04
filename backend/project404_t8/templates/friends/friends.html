@@ -17,21 +17,23 @@
   <h1 class="section-header">Friend Requests</h1>
   {% for r in requests %}
     <div>
-      {{ r }} 
+      {{ r.username }} 
       <button type="button" class="addfriend btn btn-secondary">Accept</button>
       <button type="button" class="removefriend btn btn-danger">Ignore</button>
       <hr class="separator">
       <script type="text/javascript">
         $(document).ready(function() {
           console.log("does this work?");
-          const Url = "http://127.0.0.1:8000/friendrequest";
-          var author = "{{request.user}}";
-          var requestor = "{{r}}";
+          const Url = "http://127.0.0.1:8000/friendrequest/processRequest";
+          var authorID = "{{request.user.id}}";
+          var requestorID = "{{r.id}}";
+          var csrftoken = getCookie('csrftoken');
           $(".addfriend").click(function() {
             console.log("add this friend");
             var data = {
-              "author": author,
-              "friend": requestor,
+              "action": "ACCEPT",
+              "IdOfLoggedInUser": authorID,
+              "IdOfFriendToAddOrDeny": requestorID,
             };
             var jsonData = JSON.stringify(data);
             $.ajax({
@@ -41,6 +43,13 @@
               contentType: "application/json",
               success: function(result){
                 console.log("time to remove this row");
+                removeRequest(requestorID);
+              },
+              beforeSend: function(xhr) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+              },
+              error: function(XMLHttpRequest, textStatus, errorThrown) {
+                console.log(errorThrown);
               }
             })
           })
@@ -48,6 +57,28 @@
             console.log("remove this friend");
           });
         });
+
+        function removeRequest(friend) {
+          console.log("let's remove this request now");
+          $("addfriend"+friend+"_box").remove();
+        }
+        
+        // https://docs.djangoproject.com/en/1.10/ref/csrf/#ajax
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
       </script>
     </div>    
   {% endfor %}

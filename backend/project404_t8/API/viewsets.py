@@ -396,7 +396,7 @@ def friendsView(request):
     # We can do this by querying for each username based on the id
     requests2 = []
     for r in requests: 
-        requests2.append(CustomUser.objects.get(id=r.follower_id).username)
+        requests2.append(CustomUser.objects.get(id=r.follower_id))
     requests = requests2
 
     # Get the users friends
