@@ -396,7 +396,7 @@ def friendsView(request):
     # We can do this by querying for each username based on the id
     requests2 = []
     for r in requests: 
-        requests2.append(CustomUser.objects.get(id=r.follower_id).username)
+        requests2.append(CustomUser.objects.get(id=r.follower_id).displayname)
     requests = requests2
 
     # Get the users friends
@@ -413,12 +413,16 @@ def friendsView(request):
     friends = list(friends)
     friends.sort()
 
+    friends_obj = Friendship.objects.all()
+
     # Make sure None isn't being passed to the template at all
     pageVariables = {}
     if friends != {}:
         pageVariables["friends"] = friends
     if requests != []:
         pageVariables["requests"] = requests
+    if friends_obj != {}:
+        pageVariables["friendsObj"] = friends_obj
     
 
     return render(request, 'friends/friends.html', pageVariables)
