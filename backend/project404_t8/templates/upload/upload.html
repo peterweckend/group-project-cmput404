@@ -16,7 +16,7 @@
     <div class="row">
         <div class="col s8 offset-s2">
           <h1 class="title">Create A Post</h1>
-          <form method="post" action=".">
+          <form method="post" action="." enctype="multipart/form-data" >
             {% csrf_token %}
             <div class="upload">
               <div class="row">
