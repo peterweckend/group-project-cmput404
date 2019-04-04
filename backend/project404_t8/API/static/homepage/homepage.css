@@ -342,3 +342,15 @@ ul.dropdown-content.select-dropdown {
 ul.dropdown-content.select-dropdown li span {
   color: var(--light-main) !important;
 }
+
+.addfriend{
+  margin-left: 1%;
+}
+
+.removefriend{
+  margin-left: 1%;
+}
+
+.separator{
+  
+}

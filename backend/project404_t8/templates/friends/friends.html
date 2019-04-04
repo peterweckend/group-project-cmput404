@@ -6,7 +6,7 @@
 {% block content %}
 {% if user.is_authenticated %}
   {% load static %}
-  <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'upload/upload.css' %}">
 
   <!--This is the friends page
       In the future this will probably be on the users profile page
@@ -18,10 +18,39 @@
   {% for r in requests %}
     <div>
       {{ r }} 
-      <input type="submit" value="Accept"> 
-      <input type="submit" value="Ignore">
+      <button type="button" class="addfriend btn btn-secondary">Accept</button>
+      <button type="button" class="removefriend btn btn-danger">Ignore</button>
+      <hr class="separator">
+      <script type="text/javascript">
+        $(document).ready(function() {
+          console.log("does this work?");
+          const Url = "http://127.0.0.1:8000/friendrequest";
+          var author = "{{request.user}}";
+          var requestor = "{{r}}";
+          $(".addfriend").click(function() {
+            console.log("add this friend");
+            var data = {
+              "author": author,
+              "friend": requestor,
+            };
+            var jsonData = JSON.stringify(data);
+            $.ajax({
+              url: Url,
+              type: "POST",
+              data: jsonData,
+              success: function(result){
+                console.log("time to remove this row");
+              }
+            })
+          })
+          $(".removefriend").click(function() {
+            console.log("remove this friend");
+          });
+        });
+      </script>
     </div>    
   {% endfor %}
+  
   </br>
   <h1 class="section-header">Friends</h1>
   {% for friend in friends %}
@@ -38,3 +67,4 @@
   <a href="{% url 'login' %}">login</a>
 {% endif %}
 {% endblock %}
+
