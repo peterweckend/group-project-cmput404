@@ -8,13 +8,74 @@
 {% block content %}
   <div class="container">
       <div class="row">
-        <div class="col s8 offset-s2">
+        <div class="col s10 offset-s1 m10 offset-m1 l8 offset-l2">
           <h2 class="center">Sign up</h2>
           <form method="post">
             {% csrf_token %}
-            <!-- <table > -->
-              {{ form.as_p }}
-            <!-- </table> -->
+            <div class="row">
+              <div class="col s12 m6 l6">
+                {{ form.username.label_tag }}
+                <div class:"" style="font-weight: bolder; display: inline-block; color:#da6342">*</div>
+                {{ form.username.errors }}
+                {{ form.username }}
+              </div>
+              <div class="col s12 m6 l6">
+                {{ form.displayname.label_tag }}
+                <div class:"" style="font-weight: bolder; display: inline-block; color:#da6342">*</div>
+                {{ form.displayname.errors }}
+                {{ form.displayname }}
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12 m6 l6">
+                {{ form.first_name.label_tag }}
+                <div class:"" style="font-weight: bolder; display: inline-block; color:#da6342">*</div>
+                {{ form.first_name.errors }}
+                {{ form.first_name }}
+              </div>
+              <div class="col s12 m6 l6">
+                {{ form.last_name.label_tag }}
+                <div class:"" style="font-weight: bolder; display: inline-block; color:#da6342">*</div>
+                {{ form.last_name.errors }}
+                {{ form.last_name }}
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12 m6 l6">
+                {{ form.github_username.label_tag }}
+                {{ form.github_username.errors }}
+                {{ form.github_username }}
+              </div>
+              <div class="col s12 m6 l6">
+                {{ form.email.label_tag }}
+                {{ form.email.errors }}
+                {{ form.email }}
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12">
+                {{ form.github_url.label_tag }}
+                {{ form.github_url.errors }}
+                {{ form.github_url }}
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s12 m6 l6">
+                {{ form.password1.label_tag }}
+                <div class:"" style="font-weight: bolder; display: inline-block; color:#da6342">*</div>
+                {{ form.password1.errors }}
+                {{ form.password1 }}
+              </div>
+              <div class="col s12 m6 l6">
+                {{ form.password2.label_tag }}
+                <div class:"" style="font-weight: bolder; display: inline-block; color:#da6342">*</div>
+                {{ form.password2.errors }}
+                {{ form.password2 }}
+              </div>
+            </div>
+            <!-- {{ form.as_p }} -->
+            <!-- {% for field in form.visible_fields %} -->
+            <!-- {% endfor %} -->
             <div class="center">
               <button class="btn waves-effect waves-light" type="submit" name="action" style="background-color: #34495e; margin-top:25px;" onMouseOver="this.style.color='#f09177'" onMouseOut="this.style.color='#f4f7f7'">Sign up
               </button>

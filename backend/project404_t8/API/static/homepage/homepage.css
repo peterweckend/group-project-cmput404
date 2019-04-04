@@ -33,7 +33,7 @@ header {
   z-index: 10;
 }
 .mainlogo {
-  margin-left: 2.5%;
+  margin-left: 2.5% !important;
   /* width: 11%; */
   height: 50%;
 }
@@ -237,7 +237,7 @@ nav a::before {
   position: relative;
   object-fit: contain;
   top: 0;
-  left: 0;
+  /* left: 0; */
 }
 #post-image {
   max-width:100%;

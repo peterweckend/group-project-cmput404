@@ -123,8 +123,8 @@ def befriend_remote_author_by_id(remote_author_id, local_author_id):
     data["author"] = author
     data["friend"] = friend
 
-    request_url = remote_author.host + "/friendrequest"
-    remote_server = get_server_info(str(remote_author.id).split('/author/')[0])
+    request_url = str(remote_author.url).split('/author/')[0] + "/friendrequest"
+    remote_server = get_server_info(str(remote_author.url).split('/author/')[0])
     r = requests.post(request_url, auth=(remote_server.username, remote_server.password), data = json.dumps(data))
     response = r.text
 

@@ -25,32 +25,38 @@
             <div class="row">
               <!-- <div class="card" style="min-height: 100px; padding: 20px;"> -->
               <div class="col s12">
-                <p class="post-body">{{ post.body|safe }}</p>
+                <p class="post-body">{{ post.body|safe|linebreaks }}</p>
               </div>
             </div>
 
 
             <ul class="collapsible">
+              {% if imageExists %}
                 <li class="active">
                   <div class="collapsible-header"><i class="material-icons">attach_file</i>Attachments</div>
                   <div class="collapsible-body">
-                    {% if imageExists %}
-                      {% load static %}
-                      <div class="row">
-                        <!-- <div class="col s12"> -->
-                          <img id="post-image" class="materialboxed z-depth-5" src="{% get_media_prefix %}{{ post.image_link }}">
-                        <!-- </div> -->
-                      </div>
-                      {% else %}
-                        <p>None</p>
-                    {% endif %}
+                    {% load static %}
+                    <div class="row">
+                      <img id="post-image" class="materialboxed z-depth-5" src="{% get_media_prefix %}{{ post.image_link }}">
+                    </div>
                   </div>
                 </li>
+              {% else %}
+                <li>
+                  <div class="collapsible-header"><i class="material-icons">attach_file</i>Attachments</div>
+                  <div class="collapsible-body">
+                    {% load static %}
+                    <div class="row">
+                      <p>None</p>
+                    </div>
+                  </div>
+                </li>
+              {% endif %}
               <li>
                 <div class="collapsible-header"><i class="material-icons">more_vert</i>Details</div>
                 <div class="collapsible-body">
                   <div class="row" style="font-size: 15px; line-height: 25px;">
-                    <div class="col s12 m4 l4"><b>Unlisted Status: </b><br> {{ post.is_unlisted }} </div>
+                    <div class="col s12 m4 l4"><b>Unlisted Status:</b><br> {{ post.is_unlisted }} </div>
                     <div class="col s12 m4 l4"><b>Markdown Format:</b><br> {{ post.is_markdown }} </div>
                     <div class="col s12 m4 l4"><b>Privacy Setting:</b><br> {{ post.privacy_setting }} </div>
                     <!-- for string version of privacy, try using "function privacyStrFunc(privacy)"" in API/templates/base_pages.html -->
@@ -71,7 +77,7 @@
                 {% for comment in post.comments.all %}
                   <div class=row style="margin: 0 !important">
                     <div class="col s12">
-                      <p class="commentBody">{{comment.body}} </p>
+                      <p class="commentBody">{{comment.body|safe|linebreaks}} </p>
                       <div class="col s12">
                         <p class="commentUser">
                           <a href="{% url 'profile' username=comment.author %}"> {{comment.author.displayname}}</a>
