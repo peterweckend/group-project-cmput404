@@ -7,9 +7,32 @@
   {% load static %}
 
     <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
-    <div class="displayname" style="margin-top: 30px;">{{author.displayname}}</div>
-    <div class="username">(@{{author.username}})</div>
-    <div class="bio">{{author.bio}}</div>
+    <div class="center">
+      <div class="displayname" style="margin-top: 30px;">{{author.displayname}}</div>
+      <div class="username">(@{{author.username}})</div>
+      {% if author.bio != "" and author.bio != NONE %}
+        <div class="bio" style="color: #5e5c5c; margin-top: 5px; margin-bottom: 30px; font-size: 17px; font-style: italic">
+            {{author.bio}}
+          <i class="material-icons tiny">chat</i> 
+        </div>
+      {% endif %}
+    </div>
+    <ul class="collapsible">
+      <li>
+        <div class="collapsible-header" style="font-size: 17px;"><i class="material-icons">portrait</i>More about {{author.displayname}}</div>
+        <div class="collapsible-body">
+          {% load static %}
+          <div class="row" style="font-size: 15px; line-height: 25px;">
+            <div class="col s12 m4 l4"><b>First Name: </b><br> {{ author.first_name }} </div>
+            <div class="col s12 m4 l4"><b>Last Name: </b><br> {{ author.last_name }} </div>
+            <div class="col s12 m4 l4"><b>Email: </b><br> {{ author.email }} </div>
+            <div class="col s12" style="margin:10px;"><hr></div>
+            <div class="col s12 m4 l4"><b>GitHub Username: </b><br> {{ author.github_id }}</div>
+            <div class="col s12 m8 l8"><b>GitHub URL: </b><br> {{ author.github_url }}</div>
+          </div>
+        </div>
+      </li>
+    </ul>
     <hr>
     {% for p in posts reversed %}
     <div class="">
@@ -33,8 +56,8 @@
                 <div class="col s1">
                   {% if user.id == p.author_id %}
                     <p class="delete_post">
-                      <a href="{% url 'delete_post' pk=p.pk  %}"><span class="glyphicon glyphicon-trash"> </a>
                       <a href="{% url 'update_post' pk=p.pk  %}"><span class="glyphicon glyphicon-pencil"> </a>
+                        <a href="{% url 'delete_post' pk=p.pk  %}"><span class="glyphicon glyphicon-trash"> </a>
                     </p>
                   {% endif %}
                 </div>
@@ -95,7 +118,7 @@
         </div>
         <br>
       </div>
-      {% endfor %}
-      <div class="page-bottom"></div>
+    {% endfor %}
+    <div class="page-bottom"></div>
 {% endif %}
 {% endblock %}
