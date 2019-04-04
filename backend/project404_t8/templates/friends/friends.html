@@ -70,8 +70,8 @@
     </div>
     <script type="text/javascript">
       $(document).ready(function() {
-        // const Url = "http://connectifyapp.herokuapp.com/friendrequest/processRequest";
-        const Url = "http://127.0.0.1:8000/friendrequest/processRequest";
+        const Url = "http://connectifyapp.herokuapp.com/friendrequest/processRequest";
+        // const Url = "http://127.0.0.1:8000/friendrequest/processRequest";
         var authorID = "{{request.user.id}}";
         var requestorID;
         var csrftoken = getCookie('csrftoken');
@@ -135,7 +135,6 @@
   
       // called on accept or ignore request to delete the row 
       function removeRequest(requestorID) {
-        console.log("let's remove this request now");
         $("#"+requestorID+"_row").remove();
       }
       
