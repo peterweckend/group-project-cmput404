@@ -491,6 +491,25 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
             Services.handle_friend_request(friend, author)
         # handleFriendRequest
         return Response(status=200)
+
+    # http://service/friendrequest/processRequest
+    @action(methods=['post'], detail=False)
+    def processRequest(self, request, pk=None):
+        print("you called the endpoint!")
+        body = json.loads(request.body.decode('utf-8'))
+        idOfFriendToAddOrDeny = body["IdOfFriendToAddOrDeny"]
+        idOfLoggedInUser = body["IdOfLoggedInUser"]
+        
+        if body["action"] == "ACCEPT":
+            print("you chose to accept the request")
+        elif body["action"] == "DENY":
+            print("you chose to deny the request")
+        else:
+            print("ERROR: incorrect action specified")
+            return Response(status=500)
+
+        print("Body:", body)
+        return Response(status=200)
     
 
 class AuthorViewSet(viewsets.ModelViewSet):
