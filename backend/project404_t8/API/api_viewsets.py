@@ -395,38 +395,22 @@ class PostsViewSet(viewsets.ModelViewSet):
 
             if Services.has_permission_to_see_post(request_user_id, requested_post): 
                 body = json.loads(request.body.decode('utf-8'))
-                author = body["comment"]["author"]
-                commentID = body["comment"]["id"]
-                comment = body["comment"]["comment"]
-                postTime = body["comment"]["published"]
-                post = Post.objects.get(pk=post_id)
 
-                # swapped to UUID so this shouldn't be an issue 
-                # if Comment.objects.get(pk=commentID):
-                #     response = {
-                #     'query': 'addComment',
-                #         'success':False,
-                #         'message':"Comment not allowed"
-                #     }
-                #     return Response(response, status=403)
+                if Services.addComment(body, post_id):
 
-                Services.addAuthor(author)
-
-                newComment = Comment(id=commentID, author=author, post=post, datetime=postTime, body=comment)
-                newComment.save()
-                response = {
-                    'query': 'addComment',
-                        'success':True,
-                        'message':"Comment Added"
-                }
-                return Response(response, status=200)
-            else:
-                response = {
-                    'query': 'addComment',
-                        'success':False,
-                        'message':"Comment not allowed"
-                }
-                return Response(response, status=403)
+                    response = {
+                        'query': 'addComment',
+                            'success':True,
+                            'message':"Comment Added"
+                    }
+                    return Response(response, status=200)
+                else:
+                    response = {
+                        'query': 'addComment',
+                            'success':False,
+                            'message':"Comment not allowed"
+                    }
+                    return Response(response, status=403)
 
         elif request.method == "GET": # this handles "GET" methods
             # check that we're allowed to see the post - for now just check if the posts are public
