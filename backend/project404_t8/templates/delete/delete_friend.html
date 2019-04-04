@@ -4,7 +4,8 @@
  
   {{friend}}
   {% if user.id == object.friend_a_id %}
-  Are you sure you want to remove '{{object.friend_b}}' as a friend?
+  <br>
+  <p> Are you sure you want to remove '{{object.friend_b}}' as a friend?</p>
 
   <form method ="POST">
       {% csrf_token %}
