@@ -13,28 +13,27 @@
           <form method="post">
             {% csrf_token %}
             {% for field in form %}
-              {% if form.github_url.label_tag == field.label_tag %}
-                <div class="fieldWrapper col s12">
-              {% elif form.bio.label_tag == field.label_tag %}
-                <div class="fieldWrapper col s12">
-              {% else %}
-                <div class="fieldWrapper col s12 m6 l6">
+              {% if form.bio.label_tag != field.label_tag %}
+                {% if form.github_url.label_tag == field.label_tag %}
+                  <div class="fieldWrapper col s12">
+                {% else %}
+                  <div class="fieldWrapper col s12 m6 l6">
+                {% endif %}
+                  {{ field.errors }}
+                  {% if form.displayname.label_tag == field.label_tag %}
+                    Display name
+                  {% else %}  
+                    {{ field.label }}
+                  {% endif %}  
+                  {% if field.field.required %}
+                    <div class:"" style="font-weight: bolder; display: inline-block; color:#da6342">*</div>
+                  {% endif %}
+                  {{ field }}
+                  {% if field.help_text %}
+                    <p class="help">{{ field.help_text|safe }}</p>
+                  {% endif %}
+                </div>
               {% endif %}
-                  
-                {{ field.errors }}
-                {% if form.displayname.label_tag == field.label_tag %}
-                  Display name
-                {% else %}  
-                  {{ field.label }}
-                {% endif %}  
-                {% if field.field.required %}
-                  <div class:"" style="font-weight: bolder; display: inline-block; color:#da6342">*</div>
-                {% endif %}
-                {{ field }}
-                {% if field.help_text %}
-                  <p class="help">{{ field.help_text|safe }}</p>
-                {% endif %}
-              </div>
             {% endfor %}
             <div class="center">
               <button class="btn waves-effect waves-light" type="submit" name="action" style="background-color: #34495e; margin-top:25px;" onMouseOver="this.style.color='#f09177'" onMouseOut="this.style.color='#f4f7f7'">Sign up
