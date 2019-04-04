@@ -125,7 +125,16 @@ class EditProfileForm(forms.ModelForm):
             'class': 'form-control',
             'placeholder': 'Enter a Last Name...'
         }))
-
+    bio = forms.CharField(label='Bio', required=False, widget=forms.TextInput(
+        attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter a bio...'
+        }))
+    email = forms.CharField(label='New Email', required=False, widget=forms.EmailInput(
+        attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter email...'
+        }))
     github_id = forms.CharField(label='Github Username', max_length=24, required=False, widget=forms.TextInput(
         attrs={
             'class': 'form-control',
@@ -138,7 +147,7 @@ class EditProfileForm(forms.ModelForm):
         }))
     class Meta:
         model = CustomUser
-        fields = ['displayname', 'first_name', 'last_name', 'github_id','github_url']
+        fields = ['displayname', 'first_name', 'last_name', 'bio', 'email', 'github_id','github_url']
         
     def save(self, user=None):
         user_profile = super(EditProfileForm, self).save(commit=False)

@@ -10,7 +10,7 @@ class CustomUserCreationForm(UserCreationForm):
 
     class Meta(UserCreationForm):
         model = CustomUser
-        fields = ('username', 'displayname', 'first_name', 'last_name', 'email', 'github_url', 'github_username', 'password1', 'password2')
+        fields = ('username', 'displayname', 'first_name', 'last_name', 'bio', 'email', 'github_url', 'github_username', 'password1', 'password2')
         labels = {
             'displayname': 'Display name',
             'github_url': 'Github URL',

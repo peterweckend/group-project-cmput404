@@ -7,8 +7,9 @@
   {% load static %}
 
     <link rel="stylesheet" type="text/css" href="{% static 'homepage/homepage.css' %}">
-    <div class="displayname">{{author.displayname}}</div>
+    <div class="displayname" style="margin-top: 30px;">{{author.displayname}}</div>
     <div class="username">(@{{author.username}})</div>
+    <div class="bio">{{author.bio}}</div>
     <hr>
     {% for p in posts reversed %}
     <div class="">
