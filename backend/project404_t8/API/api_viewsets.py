@@ -509,8 +509,8 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
         else:
             follow = Follow.objects.get(follower=idOfFriendToAddOrDeny, receiver=idOfLoggedInUser)
             follow.delete()
-            Services.updateNotificationsById(idOfFriendToAddOrDeny.id)
-            Services.updateNotificationsById(idOfLoggedInUser.id)
+            Services.updateNotificationsById(friendToAddOrDeny.id)
+            Services.updateNotificationsById(loggedInUser.id)
             
         return Response(status=200)
     
