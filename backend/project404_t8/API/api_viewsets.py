@@ -22,9 +22,8 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from users.models import CustomUser
+import API.serverMethods as ServerMethods
 from django.db.models import Q
-
-
 from .forms import EditProfileForm, commentForm, friendRequestForm, uploadForm
 from .models import (Comment, Follow, Friendship, Post, PostAuthorizedAuthor,
                      PostCategory, Server)
@@ -484,6 +483,35 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
 
             Services.handle_friend_request(friend, author)
 
+        return Response(status=200)
+
+    # http://service/friendrequest/processRequest
+    @action(methods=['post'], detail=False)
+    def processRequest(self, request, pk=None):
+        body = request.data
+        idOfFriendToAddOrDeny = body["IdOfFriendToAddOrDeny"]
+        idOfLoggedInUser = body["IdOfLoggedInUser"]
+        action = body["action"]
+        
+        friendToAddOrDeny = CustomUser.objects.get(pk=idOfFriendToAddOrDeny)
+        loggedInUser = CustomUser.objects.get(pk=idOfLoggedInUser)
+
+        if action == "ACCEPT":
+            requesterIsRemote = False
+            if Services.isNotBlank(friendToAddOrDeny.host):
+                requesterIsRemote = True
+
+            if requesterIsRemote:
+                result = ServerMethods.befriend_remote_author_by_id(idOfFriendToAddOrDeny, idOfLoggedInUser)
+            else:
+                Services.handle_friend_request(friendToAddOrDeny, loggedInUser)
+
+        else:
+            follow = Follow.objects.get(follower=idOfFriendToAddOrDeny, receiver=idOfLoggedInUser)
+            follow.delete()
+            Services.updateNotificationsById(idOfFriendToAddOrDeny.id)
+            Services.updateNotificationsById(idOfLoggedInUser.id)
+            
         return Response(status=200)
     
 

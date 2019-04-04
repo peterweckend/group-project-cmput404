@@ -347,6 +347,19 @@ ul.dropdown-content.select-dropdown {
 ul.dropdown-content.select-dropdown li span {
   color: var(--light-main) !important;
 }
+
+.addfriend{
+  margin-left: 1%;
+}
+
+.ignorefriend{
+  margin-left: 1%;
+}
+
+.separator{
+  
+}
+
 /* --------- for friend page------------ */
 .friendshref {
   padding-left: 0;
@@ -360,4 +373,10 @@ ul.dropdown-content.select-dropdown li span {
 }
 .friendsbutton {
   font-size: 10px;
+}
+
+.friendtitle {
+  /* padding-left: 3%; */
+  font-size: 35px;
+  text-decoration: underline;
 }
