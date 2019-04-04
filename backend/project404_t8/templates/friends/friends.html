@@ -19,9 +19,10 @@
   <h1 class="section-header friendtitle">Friend Requests</h1>
   {% for r in requests %}
     <div>
-      {{ r.displayname }} 
+      <p class="friends"><a class="friendsp" href="{% url 'profile' username=r.username %}">{{ r.displayname }}</a>
       <button type="button" class="addfriend btn btn-secondary">Accept</button>
       <button type="button" class="removefriend btn btn-danger">Ignore</button>
+      </p>
       <hr class="separator">
       <script type="text/javascript">
         $(document).ready(function() {
