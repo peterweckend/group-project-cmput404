@@ -43,6 +43,14 @@ def uploadView(request):
         # Check share author
         if shared_author == "":
             shared_author = None
+        # If a shared author UUID is provided
+        # TRY to save the author object to the post
+        else:
+            try:
+                shared_author = CustomUser.objects.get(pk=str(shared_author))
+            except:
+                # Shared author does not exist
+                shared_author = None
         # Check if there's an image
         if image_link == "": 
             image_link = None
@@ -251,6 +259,7 @@ def homeListView(request):
         userUser = CustomUser.objects.filter(username=uname)[0].id
         hostHost = CustomUser.objects.filter(username=uname)[0].host
         option1 = Post.objects.filter(author=userUser)
+        option2 = Post.objects.filter(shared_author=userUser)
         friendZone = Friendship.objects.filter(friend_a=userUser).values_list('friend_b', flat=True)
         fofriendZone = Friendship.objects.filter(friend_a__in=friendZone).values_list('friend_b', flat=True)
         option3 = Post.objects.filter(Q(author__in=friendZone) & Q(privacy_setting=3) | Q(author__in=friendZone) & Q(privacy_setting=4))
@@ -258,7 +267,7 @@ def homeListView(request):
         option5 = Post.objects.filter(Q(author__in=friendZone) & Q(privacy_setting=5) &Q(original_host=hostHost))
         option6 = Post.objects.filter(Q(privacy_setting=6))
         unlistedPosts = Post.objects.filter(Q(is_unlisted=True) & ~Q(author=userUser))
-        allPosts = option1.union(option3,option4,option5,option6)
+        allPosts = option1.union(option2,option3,option4,option5,option6)
         if unlistedPosts.exists():
             viewable_posts = allPosts.difference(unlistedPosts).order_by('-published')
         else:
