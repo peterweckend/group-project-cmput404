@@ -15,13 +15,14 @@
                     <form method="POST" action="{% url 'update_post' pk=object.pk %}">
                         {% csrf_token %}
                         {{form.as_p}}
-                    </form>
+                    
                     <div class="center" style="margin-bottom:65px;">
                         <br>
                         <button class="save-changes btn waves-effect waves-light" type="submit" name="action" style="background-color: #34495e" onMouseOver="this.style.color='#f09177'" onMouseOut="this.style.color='#f4f7f7'">
                             Save Changes
                         </button>
                     </div>
+                   </form>
                 {% else %}
                     <h2>You do not have permission to access this page.</h2>
                 {% endif %}
