@@ -69,8 +69,8 @@
     </div>
     <script type="text/javascript">
       $(document).ready(function() {
-        // const Url = "http://connectifyapp.herokuapp.com/friendrequest/processRequest";
-        const Url = "http://127.0.0.1:8000/friendrequest/processRequest";
+        const Url = "http://connectifyapp.herokuapp.com/friendrequest/processRequest";
+        // const Url = "http://127.0.0.1:8000/friendrequest/processRequest";
         var authorID = "{{request.user.id}}";
         var requestorID;
         var csrftoken = getCookie('csrftoken');
@@ -87,7 +87,7 @@
             url: Url,
             type: "POST",
             data: jsonData,
-            // dataType: "jsonp",
+            dataType: "jsonp",
             contentType: "application/json",
             success: function(result){
               console.log("added");
@@ -116,7 +116,7 @@
             url: Url,
             type: "POST",
             data: jsonData,
-            // dataType: "jsonp",
+            dataType: "jsonp",
             contentType: "application/json",
             success: function(result){
               console.log("removed");
