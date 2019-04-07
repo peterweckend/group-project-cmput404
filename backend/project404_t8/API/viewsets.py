@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework import generics,status,viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from django.utils.html import strip_tags,escape
 from .models import Post, Comment, Friendship, Follow, Server
 from users.models import CustomUser
 from rest_framework.decorators import api_view, permission_classes
@@ -33,7 +34,7 @@ def uploadView(request):
     if request.method == 'POST':
         author = request.user
         title = request.POST.get('title')
-        body = request.POST.get('body')
+        body = escape(request.POST.get('body'))
         image_link = request.POST.get('imageLink')
         privacy_setting = request.POST.get('privacy')
         shared_author = request.POST.get('sharedAuthor')
