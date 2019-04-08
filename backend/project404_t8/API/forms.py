@@ -106,7 +106,8 @@ class updatePostForm(forms.ModelForm):
             # print("true")
             post_up = post 
         # print(" no true")
-        post_up.body = escape(post_up.body)
+        if "<script>" in post_up.body or "</script>" in post_up.body:
+            post_up.body = escape(post_up.body)  
         post_up.save()
         return post_up
   

@@ -34,7 +34,12 @@ def uploadView(request):
     if request.method == 'POST':
         author = request.user
         title = request.POST.get('title')
-        body = escape(request.POST.get('body'))
+        # Escape if they have script in it
+        # Otherwise don't escape it and let whatever happens happen
+        body = request.POST.get('body')
+        if "<script>" in body or "</script>" in body:
+            body = escape(body)  
+
         image_link = request.POST.get('imageLink')
         privacy_setting = request.POST.get('privacy')
         shared_authors = request.POST.get('sharedAuthor')
