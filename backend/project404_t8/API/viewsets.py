@@ -3,7 +3,7 @@ from rest_framework import generics,status,viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.utils.html import strip_tags,escape
-from .models import Post, Comment, Friendship, Follow, Server
+from .models import Post, Comment, Friendship, Follow, Server, PostAuthorizedAuthor
 from users.models import CustomUser
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -37,21 +37,10 @@ def uploadView(request):
         body = escape(request.POST.get('body'))
         image_link = request.POST.get('imageLink')
         privacy_setting = request.POST.get('privacy')
-        shared_author = request.POST.get('sharedAuthor')
+        shared_authors = request.POST.get('sharedAuthor')
         is_markdown = request.POST.get('markdown')
         is_unlisted = request.POST.get('unlisted')
 
-        # Check share author
-        if shared_author == "":
-            shared_author = None
-        # If a shared author UUID is provided
-        # TRY to save the author object to the post
-        else:
-            try:
-                shared_author = CustomUser.objects.get(pk=str(shared_author))
-            except:
-                # Shared author does not exist
-                shared_author = None
         # Check if there's an image
         if image_link == "": 
             image_link = None
@@ -74,12 +63,36 @@ def uploadView(request):
             body = body,
             image_link = image_link,
             privacy_setting = privacy_setting,
-            shared_author = shared_author,
+            shared_author = None,
             is_markdown = is_markdown,
             is_unlisted = is_unlisted
         )
         newPost.save()
         id = newPost.id
+
+        # Try to add the shared authors
+        # 231312312312, 123123123123,213123123
+        # Example string of UUID's
+        # First split the string on Commas
+        if shared_authors != "" and str(privacy_setting) == '2':
+            shared_authors = shared_authors.replace(" ", "").split(',')
+
+            # Should now have a list of UUID's
+            # For each UUID, try to add them to the table postAuthorizedAuthor
+            for shared_author in shared_authors:
+                # print(shared_author)
+                try:
+                    
+                    author = CustomUser.objects.get(pk=shared_author)
+
+                    new = PostAuthorizedAuthor(
+                        post_id = newPost,
+                        authorized_author = author
+                    )
+                    new.save()
+                except Exception as e:
+                    print(e)
+
 
         # redirect to a new URL:
         return HttpResponseRedirect('/post/%s' %id)
@@ -257,10 +270,11 @@ def homeListView(request):
         foreignPosts = get_remote_posts_for_feed(request.user.id)
 
         # ------------- set queries by Tolu ----------------------
-        userUser = CustomUser.objects.filter(username=uname)[0].id
-        hostHost = CustomUser.objects.filter(username=uname)[0].host
+        userUser = CustomUser.objects.filter(pk=uid)[0].id
+        hostHost = CustomUser.objects.filter(pk=uid)[0].host
         option1 = Post.objects.filter(author=userUser)
-        option2 = Post.objects.filter(shared_author=userUser)
+        authorized_posts = PostAuthorizedAuthor.objects.filter(authorized_author = userUser).values_list('post_id', flat=True)
+        option2 = Post.objects.filter(pk__in=authorized_posts)
         friendZone = Friendship.objects.filter(friend_a=userUser).values_list('friend_b', flat=True)
         fofriendZone = Friendship.objects.filter(friend_a__in=friendZone).values_list('friend_b', flat=True)
         option3 = Post.objects.filter(Q(author__in=friendZone) & Q(privacy_setting=3) | Q(author__in=friendZone) & Q(privacy_setting=4))

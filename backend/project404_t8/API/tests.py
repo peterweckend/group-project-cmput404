@@ -2,7 +2,7 @@ from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from rest_framework.test import APITestCase, APIClient
 from rest_framework.views import status
-from .models import Post, Friendship, Follow, Server
+from .models import Post, Friendship, Follow, Server, PostAuthorizedAuthor
 from .serializers import PostSerializer
 from .viewsets import uploadView, postView
 import users.models as UserModels
@@ -32,6 +32,7 @@ class PrivacyTestCase(TestCase):
         Post.objects.create(id="9c4f71d9-fcc5-48b0-8092-9b775969bc9f", title="this is a post", body="hello", author=self.author, privacy_setting="6")
         Post.objects.create(id="9c4f71d9-fcc5-48b0-8092-9b775969bc9a", title="this is a post", body="hello", author=self.author, privacy_setting="4")
         Post.objects.create(id="9c4f71d9-fcc5-48b0-8092-9b775969bc9b", title="this is a post", body="hello", author=self.author, privacy_setting="7")
+        PostAuthorizedAuthor.objects.create(authorized_author=self.someUser , post_id=Post.objects.get(pk='9c4f71d9-fcc5-48b0-8092-9b775969bc9d'))
 
         # use this to create HTTP Requests
         self.factory = RequestFactory()
