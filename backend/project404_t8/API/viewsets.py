@@ -195,14 +195,14 @@ def profileView(request, username):
     if request.user.username == username:
         profile_posts = Post.objects.filter(author=author.id).order_by('-published')
     else:
-        print("in else")
         profile_posts_all = Post.objects.filter(author=author.id).order_by('-published')
         profile_posts = []
         for post in profile_posts_all:
-            print("in post for loop")
             if Services.has_permission_to_see_post(request.user.id, post):
-                print("has permission")
                 profile_posts.append(post)
+    for p in profile_posts:
+        if p.is_markdown:
+            p.body = markdownify(p.body)
     
     return render(request, 'profile/profile.html', {'author':author, "posts":profile_posts})
 
