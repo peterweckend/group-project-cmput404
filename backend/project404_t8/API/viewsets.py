@@ -129,6 +129,7 @@ def postView(request, id):
     # imageExists is whether or not there is an image to display
     # markDown is whether or not to display the plaintext or markdown contents
     # Has permission determines whether or not to display content to the user
+    post.privacy_setting = Services.get_privacy_string_for_post(post.privacy_setting)
     return render(request, 'post/post.html', {
         "post":post,
         "imageExists":imageExists,
