@@ -87,7 +87,8 @@
             url: Url,
             type: "POST",
             data: jsonData,
-            dataType: "jsonp",
+            // dataType: "jsonp",
+            crossDomain: true,
             contentType: "application/json",
             success: function(result){
               console.log("success");
