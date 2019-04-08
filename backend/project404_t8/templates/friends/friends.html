@@ -11,16 +11,16 @@
     <meta charset="utf-8">
     
     <div class="one-main-column">
-      <div class="col s12">
+      <div class="col s12" id="friendslist">
         <h1 style="font-size: 45px; margin-bottom:15px;">Friends</h1>
         {% for friend in friendsObj %}
           {% if user.id == friend.friend_a_id %}   
             <div class="row">
               <div>
                 <div class="col s8">
-                  <p class="" style="font-size: 20px;"> <a class="friendsp" href="{% url 'profile' username=friend.friend_b %}">{{friend.friend_b.displayname}}</a></p>
+                  <p class="friendrow" style="font-size: 20px;"> <a class="friendsp" href="{% url 'profile' username=friend.friend_b %}">{{friend.friend_b.displayname}}</a></p>
                 </div>
-                <div class="col s4">
+                <div class="col s4" id="submitCol">
                   <div class="center">
                     <a class=friendshref href ="{% url 'delete_friend' pk=friend.pk %}">
                         <button class="btn waves-effect waves-light friendsbutton" type="submit" name="action" style="background-color: #34495e; margin-left: 20px;" onMouseOver="this.style.color='#f4f7f7'" onMouseOut="this.style.color='#f4f7f7'">Remove
@@ -33,7 +33,6 @@
           {% endif %}
         {% endfor %}
       </div>
-      
       <div class="col s12">
         <hr>
         <h1 style="font-size: 45px; margin-top: 15px; margin-bottom:15px;">Requests</h1>
@@ -47,7 +46,7 @@
                 <div class="right">
                   <div class="row" style="display: inline-block">
                     <a class="addfriend btn-floating btn-small waves-effect waves-light" 
-                    id={{r.id}} 
+                    id={{r.id}}
                     style="background-color: rgb(57, 190, 57);">
                     <i class="material-icons">check</i></a>
                   </div>
@@ -57,7 +56,7 @@
                 <div class="center">
                   <div class="row" style="display: inline-block">
                       <a class="ignorefriend btn-floating btn-small waves-effect waves-light" 
-                      id={{r.id}} 
+                      id={{r.id}}
                       style="background-color: rgb(235, 45, 45)">
                       <i class="material-icons">clear</i></a>
                   </div>
@@ -75,6 +74,7 @@
         var authorID = "{{request.user.id}}";
         var requestorID;
         var csrftoken = getCookie('csrftoken');
+
         $(".addfriend").click(function() {
           requestorID = this.id;
           var data = {
@@ -90,8 +90,8 @@
             // dataType: "jsonp",
             contentType: "application/json",
             success: function(result){
-              console.log("success");
-              removeRequest(requestorID);
+              console.log("added");
+              moveRequest(requestorID);
             },
             beforeSend: function(xhr) {
               xhr.setRequestHeader("X-CSRFToken", csrftoken);
@@ -101,6 +101,7 @@
             }
           })
         })
+
         $(".ignorefriend").click(function() {
           requestorID = this.id;
           // delete request
@@ -118,7 +119,7 @@
             // dataType: "jsonp",
             contentType: "application/json",
             success: function(result){
-              console.log("success");
+              console.log("removed");
               removeRequest(requestorID);
             },
             beforeSend: function(xhr) {
@@ -129,15 +130,28 @@
             }
           })
           // this should call removeRequest after as well
-          removeRequest(requestorID);
         });
       });
   
-      // called on accept or ignore request to delete the row 
+      // called on ignore request to delete the entire row 
       function removeRequest(requestorID) {
         $("#"+requestorID+"_row").remove();
       }
-      
+
+      // called on accept request to move the row and delete the buttons
+      function moveRequest(requestorID) {
+        console.log("moving request row")
+
+        if (document.getElementsByName("friendrow").length > 0) {
+          $("#"+requestorID+"_row").appendTo($(".friendrow"));
+        } else {
+          $("#"+requestorID+"_row").appendTo($("#friendslist"));
+        }
+        // delete the add and ignore buttons from the row
+        $("#"+requestorID).remove();
+        $("#"+requestorID).remove();
+      }
+
       // https://docs.djangoproject.com/en/1.10/ref/csrf/#ajax
       function getCookie(name) {
           var cookieValue = null;
