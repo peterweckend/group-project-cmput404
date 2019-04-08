@@ -193,10 +193,10 @@ def profileView(request, username):
     # will probably change the edit profile functionality later, and check if profile author == logged in user here
     # get the profile author
     if request.user.username == username:
-        profile_posts = Post.objects.filter(author=author.id)
+        profile_posts = Post.objects.filter(author=author.id).order_by('-published')
     else:
         print("in else")
-        profile_posts_all = Post.objects.filter(author=author.id)
+        profile_posts_all = Post.objects.filter(author=author.id).order_by('-published')
         profile_posts = []
         for post in profile_posts_all:
             print("in post for loop")
