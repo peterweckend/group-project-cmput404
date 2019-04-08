@@ -1,6 +1,8 @@
 from django import forms
 from users.models import CustomUser
 from .models import Comment,Post
+from django.utils.html import strip_tags,escape
+
 # This must support markdown
 # Maybe have a button that tells the post to display it in markdown
 # When the user selects 2/shared author, another HTML form should become unhidden
@@ -104,6 +106,7 @@ class updatePostForm(forms.ModelForm):
             # print("true")
             post_up = post 
         # print(" no true")
+        post_up.body = escape(post_up.body)
         post_up.save()
         return post_up
   

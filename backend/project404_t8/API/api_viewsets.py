@@ -221,9 +221,10 @@ def getPostData(request, pk=None):
     currentPost.update({"visibility":Services.get_privacy_string_for_post(post["privacy_setting"])})
 
     authorized_authors = []
-    queryset = PostAuthorizedAuthor.objects.filter(post_id=post["id"])
-    for author_post_object in queryset:
-        authorized_authors.append(author_post_object.authorized_author.get_url_to_author())    
+    # TODO do we really need todo this ???
+    # queryset = PostAuthorizedAuthor.objects.filter(post_id=post["id"])
+    # for author_post_object in queryset:
+    #     authorized_authors.append(author_post_object.authorized_author.get_url_to_author())    
     currentPost.update({"visibleTo":authorized_authors})
 
     currentPost.update({"unlisted":post["is_unlisted"]})
@@ -555,7 +556,8 @@ class AuthorViewSet(viewsets.ModelViewSet):
             userUser = CustomUser.objects.filter(pk=uid)[0].id
             hostHost = CustomUser.objects.filter(pk=uid)[0].host
             option1 = Post.objects.filter(author=userUser)
-            option2 = Post.objects.filter(shared_author=userUser)
+            authorized_posts = PostAuthorizedAuthor.objects.filter(authorized_author = userUser).values_list('post_id', flat=True)
+            option2 = Post.objects.filter(pk__in=authorized_posts)
             friendZone = Friendship.objects.filter(friend_a=userUser).values_list('friend_b', flat=True)
             fofriendZone = Friendship.objects.filter(friend_a__in=friendZone).values_list('friend_b', flat=True)
             option3 = Post.objects.filter(Q(author__in=friendZone) & Q(privacy_setting=3) | Q(author__in=friendZone) & Q(privacy_setting=4))

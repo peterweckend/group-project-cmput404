@@ -1,4 +1,4 @@
-from .models import Post, Comment, Friendship, Follow, Server
+from .models import Post, Comment, Friendship, Follow, Server,PostAuthorizedAuthor
 from users.models import CustomUser
 import uuid
 from urllib.parse import urlparse
@@ -28,8 +28,15 @@ def has_permission_to_see_post(requesting_user_id, post):
         hasPermission = True
 
     # ('2', 'another author'),
+    # This must be multiple shared authors
+    # We have a table called postauthorizedAuthor
     if post.privacy_setting == '2':
-        if requesting_user_id == post.author.id or requesting_user_id == post.shared_author.id:
+        authorized = PostAuthorizedAuthor.objects.filter(post_id = post.id)
+        authors = []
+        # For each row in authorized, grab the UUID of the authorized dude
+        for row in authorized:
+            authors.append(row.authorized_author.id)
+        if requesting_user_id in authors:
             hasPermission = True
 
     # ('3', 'my friends'),

@@ -69,9 +69,6 @@
                   </div>
                 </div>
               </li>
-              {% else %}
-                <h1>You do not have permission to view this page</h1>
-              {% endif %}
             </ul>
 
             
@@ -108,6 +105,9 @@
       </div>
       <br>
     </div>
+    {% else %}
+    <h1>You do not have permission to view this page</h1>
+    {% endif %}
 {% else %}
   {% load static %}
   <link rel="stylesheet" type="text/css" href="{% static 'login/login.css' %}">
