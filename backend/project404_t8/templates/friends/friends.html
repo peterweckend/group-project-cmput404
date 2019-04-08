@@ -70,7 +70,7 @@
     </div>
     <script type="text/javascript">
       $(document).ready(function() {
-        const Url = "https://connectifyapp.herokuapp.com/friendrequest/processRequest";
+        const Url = "http://connectifyapp.herokuapp.com/friendrequest/processRequest";
         // const Url = "http://127.0.0.1:8000/friendrequest/processRequest";
         var authorID = "{{request.user.id}}";
         var requestorID;
@@ -88,7 +88,6 @@
             type: "POST",
             data: jsonData,
             // dataType: "jsonp",
-            crossDomain: true,
             contentType: "application/json",
             success: function(result){
               console.log("success");
