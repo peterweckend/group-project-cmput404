@@ -11,7 +11,7 @@
     <meta charset="utf-8">
     
     <div class="one-main-column">
-      <div class="col s12">
+      <div class="col s12" id="friendslist">
         <h1 style="font-size: 45px; margin-bottom:15px;">Friends</h1>
         {% for friend in friendsObj %}
           {% if user.id == friend.friend_a_id %}   
@@ -20,7 +20,7 @@
                 <div class="col s8">
                   <p class="friendrow" style="font-size: 20px;"> <a class="friendsp" href="{% url 'profile' username=friend.friend_b %}">{{friend.friend_b.displayname}}</a></p>
                 </div>
-                <div class="col s4">
+                <div class="col s4" id="submitCol">
                   <div class="center">
                     <a class=friendshref href ="{% url 'delete_friend' pk=friend.pk %}">
                         <button class="btn waves-effect waves-light friendsbutton" type="submit" name="action" style="background-color: #34495e; margin-left: 20px;" onMouseOver="this.style.color='#f4f7f7'" onMouseOut="this.style.color='#f4f7f7'">Remove
@@ -87,7 +87,7 @@
             url: Url,
             type: "POST",
             data: jsonData,
-            dataType: "jsonp",
+            // dataType: "jsonp",
             contentType: "application/json",
             success: function(result){
               console.log("added");
@@ -116,7 +116,7 @@
             url: Url,
             type: "POST",
             data: jsonData,
-            dataType: "jsonp",
+            // dataType: "jsonp",
             contentType: "application/json",
             success: function(result){
               console.log("removed");
@@ -140,12 +140,18 @@
 
       // called on accept request to move the row and delete the buttons
       function moveRequest(requestorID) {
-        $("#"+requestorID+"_row").appendTo($(".friendrow"));
+        console.log("moving request row")
+
+        if (document.getElementsByName("friendrow").length > 0) {
+          $("#"+requestorID+"_row").appendTo($(".friendrow"));
+        } else {
+          $("#"+requestorID+"_row").appendTo($("#friendslist"));
+        }
         // delete the add and ignore buttons from the row
         $("#"+requestorID).remove();
         $("#"+requestorID).remove();
       }
-      
+
       // https://docs.djangoproject.com/en/1.10/ref/csrf/#ajax
       function getCookie(name) {
           var cookieValue = null;
