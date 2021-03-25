@@ -42,7 +42,7 @@ pyflakes==1.6.0
 pylint==1.9.2
 pytz==2018.9
 pyxdg==0.25
-PyYAML==3.12
+PyYAML==5.4
 requests==2.21.0
 roman==2.0.0
 rope==0.10.5
