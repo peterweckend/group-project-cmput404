@@ -3,7 +3,7 @@ astroid==1.6.5
 autopep8==1.4
 backports.functools-lru-cache==1.5
 bcrypt==3.1.4
-certifi==2018.11.29
+certifi==2022.12.7
 chardet==3.0.4
 configparser==3.5.0b2
 cryptography==2.3
